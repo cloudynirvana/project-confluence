@@ -888,6 +888,43 @@ class InterventionMapper:
             peak_window_days=7.0,       # ~1 week peak cytotoxicity
         ))
         
+        # ══════════════════════════════════════════════════════════════
+        # BCL-2 INHIBITOR (Mitochondrial membrane disruptor)
+        # ══════════════════════════════════════════════════════════════
+        
+        # 20. Venetoclax (ABT-199) - BCL-2 inhibitor
+        # BCL-2 maintains mitochondrial membrane integrity in LSCs.
+        # Blockade → cytochrome c release → apoptosis + OXPHOS collapse.
+        # IC50: 20-100 nM in AML (extremely potent).
+        # Geometric role: Collapses OXPHOS-dependent attractor by disrupting
+        # mitochondrial coupling. Especially effective in AML (LSCs),
+        # HCC, and other OXPHOS-reliant cancers.
+        # Ref: DiNardo et al. 2018, Blood; Roberts et al. 2016, NEJM
+        venetoclax_effect = np.zeros((n, n))
+        if n > 9:
+            venetoclax_effect[3, 3] = -0.25   # ATP collapse (OXPHOS dependent)
+            venetoclax_effect[4, 4] = -0.15   # NADH/NAD+ disruption (mito membrane)
+            venetoclax_effect[9, 9] = 0.20    # ROS from mito dysfunction
+            venetoclax_effect[2, 3] = -0.15   # Pyruvate→ATP pathway disrupted
+        interventions.append(TherapeuticIntervention(
+            name="Venetoclax (BCL-2 inhibitor)",
+            mechanism="BCL-2 blockade → mito membrane permeabilization → OXPHOS collapse + apoptosis",
+            target_pathways=[(3, 3), (4, 4), (9, 9), (2, 3)],
+            expected_effect=venetoclax_effect,
+            dosage_range=(100, 400),    # mg/day (FDA-approved dose for AML)
+            evidence_level="Clinical Standard",
+            references=[
+                "DiNardo et al. 2018, Blood (Ven+Aza in AML)",
+                "Roberts et al. 2016, NEJM (CLL registration)",
+                "Lagadinou et al. 2013, Cell Stem Cell (LSC OXPHOS)",
+            ],
+            curvature_multiplier=0.70,  # Strong flattening via OXPHOS collapse
+            category="curvature_reducer",
+            half_life_days=1.0,         # ~26 hours
+            onset_delay_days=0.17,      # ~4 hours absorption
+            peak_window_days=1.0,       # ~24 hours at plateau
+        ))
+        
         return interventions
     
     # ══════════════════════════════════════════════════════════════

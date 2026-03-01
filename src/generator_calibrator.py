@@ -79,50 +79,42 @@ class GeneratorCalibrator:
         self,
         A: np.ndarray,
         x0: Optional[np.ndarray] = None,
-        dt: float = 0.1,
-        max_days: int = 200,
-        convergence_tol: float = 1e-6,
+        **kwargs,
     ) -> np.ndarray:
         """
-        Simulate dx/dt = Ax to find the steady-state profile.
+        Extract the dominant metabolite profile from generator matrix A.
         
-        For a stable linear system, the steady state is x = 0.
-        In practice, we use the trajectory shape (relative metabolite
-        ratios during transient decay) as the "profile" to match.
+        For a stable linear system dx/dt = Ax (all eigenvalues < 0), the
+        dominant eigenvector (least-negative eigenvalue) captures the
+        slowest-decaying mode — i.e., the metabolite ratios that persist
+        longest during decay to zero. This is the biologically meaningful
+        "profile" since it represents the cancer cell's metabolic steady
+        state before therapeutic intervention drives it to collapse.
         
-        Returns: 10-element normalized metabolite profile
+        This is ~100x faster than time-stepping simulation because it's
+        a single eigendecomposition O(n³) instead of O(steps × n²).
+        
+        Returns: 10-element normalized metabolite profile (all positive)
         """
-        n = A.shape[0]
-        if x0 is None:
-            # Start from a biologically plausible initial state
-            x0 = np.ones(n) * 1.0
+        eigenvalues, eigenvectors = np.linalg.eig(A)
         
-        x = x0.copy()
-        steps = int(max_days / dt)
+        # Find the dominant mode: least-negative real eigenvalue
+        real_parts = eigenvalues.real
+        # Only consider stable modes (negative real parts)
+        stable_mask = real_parts < 0
+        if not np.any(stable_mask):
+            # Fallback: use eigenvector with smallest |real part|
+            dom_idx = np.argmin(np.abs(real_parts))
+        else:
+            # Among stable eigenvalues, find the one closest to 0
+            masked_real = np.where(stable_mask, real_parts, -np.inf)
+            dom_idx = np.argmax(masked_real)
         
-        # Track the trajectory for profile extraction
-        trajectory = np.zeros((min(steps, 1000), n))
-        sample_every = max(1, steps // 1000)
+        # Extract dominant eigenvector and take absolute values
+        # (biological concentrations are positive)
+        profile = np.abs(eigenvectors[:, dom_idx].real)
         
-        for i in range(steps):
-            dx = A @ x * dt
-            x = x + dx
-            
-            if i % sample_every == 0:
-                idx = i // sample_every
-                if idx < trajectory.shape[0]:
-                    trajectory[idx] = x.copy()
-            
-            # Check convergence
-            if np.linalg.norm(dx) < convergence_tol:
-                break
-        
-        # Use the mid-transient profile (captures relative metabolite dynamics)
-        # This is more informative than the steady state (which is 0 for stable systems)
-        mid_idx = min(len(trajectory) // 4, trajectory.shape[0] - 1)
-        profile = trajectory[mid_idx]
-        
-        # Normalize to relative abundances
+        # Normalize
         norm = np.linalg.norm(profile)
         if norm > 1e-9:
             profile = profile / norm
