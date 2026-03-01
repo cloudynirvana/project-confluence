@@ -45,7 +45,7 @@ Key limitations I know about:
 - What breaks first when you stress-test the assumptions?
 - Is there any translational path worth exploring, or is this a dead end?
 
-**Repo:** [github.com/your-username/project-confluence](https://github.com/your-username/project-confluence)
+**Repo:** [github.com/cloudynirvana/project-confluence](https://github.com/cloudynirvana/project-confluence)
 
 The repo includes adversarial stress tests that deliberately break the model, a detailed gaps/limitations doc, and contributing guidelines focused on scientific review.
 
@@ -73,6 +73,6 @@ Mathematically interesting results: adaptive (phased) therapy consistently outpe
 
 **Caveat:** Purely computational. No experimental validation. The biology may be wrong in ways I can't see.
 
-Repo: [link] — includes adversarial stress tests and honest limitations doc.
+Repo: [github.com/cloudynirvana/project-confluence](https://github.com/cloudynirvana/project-confluence) — includes adversarial stress tests and honest limitations doc.
 
 Looking for feedback on the mathematical framework, especially from anyone working in stochastic processes or dynamical systems theory.
