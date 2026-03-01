@@ -1,0 +1,944 @@
+{
+  "base_curvature": 0.29999999999999993,
+  "individual_effects": {
+    "Dichloroacetate (DCA)": 0.0,
+    "Metformin": -0.020000000000000073,
+    "2-Deoxyglucose (2-DG)": -0.024999999999999967,
+    "CB-839 (Telaglenastat)": 0.0,
+    "Entropic Heating (Hyperthermia)": 0.09999999999999995,
+    "High-dose Vitamin C": 0.020000000000000018,
+    "Anti-PD-1 (Pembrolizumab)": 0.0,
+    "Anti-CTLA-4 (Ipilimumab)": 0.0,
+    "Olaparib (PARP inhibitor)": 0.004999999999999893,
+    "Ferroptosis Inducer (Erastin/RSL3)": 0.0,
+    "Vorinostat (SAHA, HDACi)": 0.004999999999999893,
+    "Fasting-Mimicking Diet (FMD)": -0.050000000000000044,
+    "Epogen (Epoetin alfa)": -0.5000000000000001,
+    "NAD+ Precursors (NMN/NR)": 0.019999999999999962
+  },
+  "top_synergies": [],
+  "top_antagonisms": [
+    {
+      "drug1": "Dichloroacetate (DCA)",
+      "drug2": "Entropic Heating (Hyperthermia)",
+      "effect_1": 0.0,
+      "effect_2": 0.09999999999999995,
+      "effect_expected": 0.09999999999999995,
+      "effect_combo": 0.04907146264387918,
+      "synergy_index": 0.49071462643879205,
+      "difference": -0.05092853735612077
+    }
+  ],
+  "all_combinations": [
+    {
+      "drug1": "Dichloroacetate (DCA)",
+      "drug2": "Metformin",
+      "effect_1": 0.0,
+      "effect_2": -0.020000000000000073,
+      "effect_expected": -0.020000000000000073,
+      "effect_combo": -0.020000000000000018,
+      "synergy_index": 0.9999999999999972,
+      "difference": 5.551115123125783e-17
+    },
+    {
+      "drug1": "Dichloroacetate (DCA)",
+      "drug2": "2-Deoxyglucose (2-DG)",
+      "effect_1": 0.0,
+      "effect_2": -0.024999999999999967,
+      "effect_expected": -0.024999999999999967,
+      "effect_combo": -0.02499999999999991,
+      "synergy_index": 0.9999999999999978,
+      "difference": 5.551115123125783e-17
+    },
+    {
+      "drug1": "Dichloroacetate (DCA)",
+      "drug2": "CB-839 (Telaglenastat)",
+      "effect_1": 0.0,
+      "effect_2": 0.0,
+      "effect_expected": 0.0,
+      "effect_combo": 0.0,
+      "synergy_index": 0.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Dichloroacetate (DCA)",
+      "drug2": "Entropic Heating (Hyperthermia)",
+      "effect_1": 0.0,
+      "effect_2": 0.09999999999999995,
+      "effect_expected": 0.09999999999999995,
+      "effect_combo": 0.04907146264387918,
+      "synergy_index": 0.49071462643879205,
+      "difference": -0.05092853735612077
+    },
+    {
+      "drug1": "Dichloroacetate (DCA)",
+      "drug2": "High-dose Vitamin C",
+      "effect_1": 0.0,
+      "effect_2": 0.020000000000000018,
+      "effect_expected": 0.020000000000000018,
+      "effect_combo": 0.019999999999999962,
+      "synergy_index": 0.9999999999999972,
+      "difference": -5.551115123125783e-17
+    },
+    {
+      "drug1": "Dichloroacetate (DCA)",
+      "drug2": "Anti-PD-1 (Pembrolizumab)",
+      "effect_1": 0.0,
+      "effect_2": 0.0,
+      "effect_expected": 0.0,
+      "effect_combo": 0.0,
+      "synergy_index": 0.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Dichloroacetate (DCA)",
+      "drug2": "Anti-CTLA-4 (Ipilimumab)",
+      "effect_1": 0.0,
+      "effect_2": 0.0,
+      "effect_expected": 0.0,
+      "effect_combo": 0.0,
+      "synergy_index": 0.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Dichloroacetate (DCA)",
+      "drug2": "Olaparib (PARP inhibitor)",
+      "effect_1": 0.0,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": 0.004999999999999893,
+      "effect_combo": 0.004999999999999838,
+      "synergy_index": 0.9999999999999889,
+      "difference": -5.551115123125783e-17
+    },
+    {
+      "drug1": "Dichloroacetate (DCA)",
+      "drug2": "Ferroptosis Inducer (Erastin/RSL3)",
+      "effect_1": 0.0,
+      "effect_2": 0.0,
+      "effect_expected": 0.0,
+      "effect_combo": -5.551115123125783e-17,
+      "synergy_index": 0.0,
+      "difference": -5.551115123125783e-17
+    },
+    {
+      "drug1": "Dichloroacetate (DCA)",
+      "drug2": "Vorinostat (SAHA, HDACi)",
+      "effect_1": 0.0,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": 0.004999999999999893,
+      "effect_combo": 0.004999999999999893,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Dichloroacetate (DCA)",
+      "drug2": "Fasting-Mimicking Diet (FMD)",
+      "effect_1": 0.0,
+      "effect_2": -0.050000000000000044,
+      "effect_expected": -0.050000000000000044,
+      "effect_combo": -0.050000000000000044,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Dichloroacetate (DCA)",
+      "drug2": "Epogen (Epoetin alfa)",
+      "effect_1": 0.0,
+      "effect_2": -0.5000000000000001,
+      "effect_expected": -0.5000000000000001,
+      "effect_combo": -0.5000000000000001,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Dichloroacetate (DCA)",
+      "drug2": "NAD+ Precursors (NMN/NR)",
+      "effect_1": 0.0,
+      "effect_2": 0.019999999999999962,
+      "effect_expected": 0.019999999999999962,
+      "effect_combo": 0.019999999999999962,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Metformin",
+      "drug2": "2-Deoxyglucose (2-DG)",
+      "effect_1": -0.020000000000000073,
+      "effect_2": -0.024999999999999967,
+      "effect_expected": -0.04500000000000004,
+      "effect_combo": -0.045000000000000095,
+      "synergy_index": 1.0000000000000013,
+      "difference": -5.551115123125783e-17
+    },
+    {
+      "drug1": "Metformin",
+      "drug2": "CB-839 (Telaglenastat)",
+      "effect_1": -0.020000000000000073,
+      "effect_2": 0.0,
+      "effect_expected": -0.020000000000000073,
+      "effect_combo": -0.020000000000000073,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Metformin",
+      "drug2": "Entropic Heating (Hyperthermia)",
+      "effect_1": -0.020000000000000073,
+      "effect_2": 0.09999999999999995,
+      "effect_expected": 0.07999999999999988,
+      "effect_combo": 0.07999999999999996,
+      "synergy_index": 1.000000000000001,
+      "difference": 8.326672684688674e-17
+    },
+    {
+      "drug1": "Metformin",
+      "drug2": "High-dose Vitamin C",
+      "effect_1": -0.020000000000000073,
+      "effect_2": 0.020000000000000018,
+      "effect_expected": -5.551115123125783e-17,
+      "effect_combo": -5.551115123125783e-17,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Metformin",
+      "drug2": "Anti-PD-1 (Pembrolizumab)",
+      "effect_1": -0.020000000000000073,
+      "effect_2": 0.0,
+      "effect_expected": -0.020000000000000073,
+      "effect_combo": -0.020000000000000073,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Metformin",
+      "drug2": "Anti-CTLA-4 (Ipilimumab)",
+      "effect_1": -0.020000000000000073,
+      "effect_2": 0.0,
+      "effect_expected": -0.020000000000000073,
+      "effect_combo": -0.020000000000000073,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Metformin",
+      "drug2": "Olaparib (PARP inhibitor)",
+      "effect_1": -0.020000000000000073,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": -0.01500000000000018,
+      "effect_combo": -0.015000000000000069,
+      "synergy_index": 0.9999999999999926,
+      "difference": 1.1102230246251565e-16
+    },
+    {
+      "drug1": "Metformin",
+      "drug2": "Ferroptosis Inducer (Erastin/RSL3)",
+      "effect_1": -0.020000000000000073,
+      "effect_2": 0.0,
+      "effect_expected": -0.020000000000000073,
+      "effect_combo": -0.022222222222222254,
+      "synergy_index": 1.1111111111111087,
+      "difference": -0.002222222222222181
+    },
+    {
+      "drug1": "Metformin",
+      "drug2": "Vorinostat (SAHA, HDACi)",
+      "effect_1": -0.020000000000000073,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": -0.01500000000000018,
+      "effect_combo": -0.015000000000000069,
+      "synergy_index": 0.9999999999999926,
+      "difference": 1.1102230246251565e-16
+    },
+    {
+      "drug1": "Metformin",
+      "drug2": "Fasting-Mimicking Diet (FMD)",
+      "effect_1": -0.020000000000000073,
+      "effect_2": -0.050000000000000044,
+      "effect_expected": -0.07000000000000012,
+      "effect_combo": -0.07000000000000006,
+      "synergy_index": 0.9999999999999992,
+      "difference": 5.551115123125783e-17
+    },
+    {
+      "drug1": "Metformin",
+      "drug2": "Epogen (Epoetin alfa)",
+      "effect_1": -0.020000000000000073,
+      "effect_2": -0.5000000000000001,
+      "effect_expected": -0.5200000000000002,
+      "effect_combo": -0.5200000000000001,
+      "synergy_index": 0.9999999999999998,
+      "difference": 1.1102230246251565e-16
+    },
+    {
+      "drug1": "Metformin",
+      "drug2": "NAD+ Precursors (NMN/NR)",
+      "effect_1": -0.020000000000000073,
+      "effect_2": 0.019999999999999962,
+      "effect_expected": -1.1102230246251565e-16,
+      "effect_combo": -5.551115123125783e-17,
+      "synergy_index": 0.5,
+      "difference": 5.551115123125783e-17
+    },
+    {
+      "drug1": "2-Deoxyglucose (2-DG)",
+      "drug2": "CB-839 (Telaglenastat)",
+      "effect_1": -0.024999999999999967,
+      "effect_2": 0.0,
+      "effect_expected": -0.024999999999999967,
+      "effect_combo": -0.024999999999999967,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "2-Deoxyglucose (2-DG)",
+      "drug2": "Entropic Heating (Hyperthermia)",
+      "effect_1": -0.024999999999999967,
+      "effect_2": 0.09999999999999995,
+      "effect_expected": 0.07499999999999998,
+      "effect_combo": 0.07499999999999993,
+      "synergy_index": 0.9999999999999992,
+      "difference": -5.551115123125783e-17
+    },
+    {
+      "drug1": "2-Deoxyglucose (2-DG)",
+      "drug2": "High-dose Vitamin C",
+      "effect_1": -0.024999999999999967,
+      "effect_2": 0.020000000000000018,
+      "effect_expected": -0.004999999999999949,
+      "effect_combo": -0.00500000000000006,
+      "synergy_index": 1.0000000000000222,
+      "difference": -1.1102230246251565e-16
+    },
+    {
+      "drug1": "2-Deoxyglucose (2-DG)",
+      "drug2": "Anti-PD-1 (Pembrolizumab)",
+      "effect_1": -0.024999999999999967,
+      "effect_2": 0.0,
+      "effect_expected": -0.024999999999999967,
+      "effect_combo": -0.024999999999999967,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "2-Deoxyglucose (2-DG)",
+      "drug2": "Anti-CTLA-4 (Ipilimumab)",
+      "effect_1": -0.024999999999999967,
+      "effect_2": 0.0,
+      "effect_expected": -0.024999999999999967,
+      "effect_combo": -0.024999999999999967,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "2-Deoxyglucose (2-DG)",
+      "drug2": "Olaparib (PARP inhibitor)",
+      "effect_1": -0.024999999999999967,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": -0.020000000000000073,
+      "effect_combo": -0.020000000000000018,
+      "synergy_index": 0.9999999999999972,
+      "difference": 5.551115123125783e-17
+    },
+    {
+      "drug1": "2-Deoxyglucose (2-DG)",
+      "drug2": "Ferroptosis Inducer (Erastin/RSL3)",
+      "effect_1": -0.024999999999999967,
+      "effect_2": 0.0,
+      "effect_expected": -0.024999999999999967,
+      "effect_combo": -0.02777777777777779,
+      "synergy_index": 1.1111111111111132,
+      "difference": -0.0027777777777778234
+    },
+    {
+      "drug1": "2-Deoxyglucose (2-DG)",
+      "drug2": "Vorinostat (SAHA, HDACi)",
+      "effect_1": -0.024999999999999967,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": -0.020000000000000073,
+      "effect_combo": -0.020000000000000018,
+      "synergy_index": 0.9999999999999972,
+      "difference": 5.551115123125783e-17
+    },
+    {
+      "drug1": "2-Deoxyglucose (2-DG)",
+      "drug2": "Fasting-Mimicking Diet (FMD)",
+      "effect_1": -0.024999999999999967,
+      "effect_2": -0.050000000000000044,
+      "effect_expected": -0.07500000000000001,
+      "effect_combo": -0.07500000000000012,
+      "synergy_index": 1.0000000000000016,
+      "difference": -1.1102230246251565e-16
+    },
+    {
+      "drug1": "2-Deoxyglucose (2-DG)",
+      "drug2": "Epogen (Epoetin alfa)",
+      "effect_1": -0.024999999999999967,
+      "effect_2": -0.5000000000000001,
+      "effect_expected": -0.5250000000000001,
+      "effect_combo": -0.525,
+      "synergy_index": 0.9999999999999998,
+      "difference": 1.1102230246251565e-16
+    },
+    {
+      "drug1": "2-Deoxyglucose (2-DG)",
+      "drug2": "NAD+ Precursors (NMN/NR)",
+      "effect_1": -0.024999999999999967,
+      "effect_2": 0.019999999999999962,
+      "effect_expected": -0.0050000000000000044,
+      "effect_combo": -0.0050000000000001155,
+      "synergy_index": 1.0000000000000222,
+      "difference": -1.1102230246251565e-16
+    },
+    {
+      "drug1": "CB-839 (Telaglenastat)",
+      "drug2": "Entropic Heating (Hyperthermia)",
+      "effect_1": 0.0,
+      "effect_2": 0.09999999999999995,
+      "effect_expected": 0.09999999999999995,
+      "effect_combo": 0.09999999999999995,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "CB-839 (Telaglenastat)",
+      "drug2": "High-dose Vitamin C",
+      "effect_1": 0.0,
+      "effect_2": 0.020000000000000018,
+      "effect_expected": 0.020000000000000018,
+      "effect_combo": 0.020000000000000018,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "CB-839 (Telaglenastat)",
+      "drug2": "Anti-PD-1 (Pembrolizumab)",
+      "effect_1": 0.0,
+      "effect_2": 0.0,
+      "effect_expected": 0.0,
+      "effect_combo": 0.0,
+      "synergy_index": 0.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "CB-839 (Telaglenastat)",
+      "drug2": "Anti-CTLA-4 (Ipilimumab)",
+      "effect_1": 0.0,
+      "effect_2": 0.0,
+      "effect_expected": 0.0,
+      "effect_combo": 0.0,
+      "synergy_index": 0.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "CB-839 (Telaglenastat)",
+      "drug2": "Olaparib (PARP inhibitor)",
+      "effect_1": 0.0,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": 0.004999999999999893,
+      "effect_combo": 0.004999999999999893,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "CB-839 (Telaglenastat)",
+      "drug2": "Ferroptosis Inducer (Erastin/RSL3)",
+      "effect_1": 0.0,
+      "effect_2": 0.0,
+      "effect_expected": 0.0,
+      "effect_combo": 0.0,
+      "synergy_index": 0.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "CB-839 (Telaglenastat)",
+      "drug2": "Vorinostat (SAHA, HDACi)",
+      "effect_1": 0.0,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": 0.004999999999999893,
+      "effect_combo": 0.004999999999999893,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "CB-839 (Telaglenastat)",
+      "drug2": "Fasting-Mimicking Diet (FMD)",
+      "effect_1": 0.0,
+      "effect_2": -0.050000000000000044,
+      "effect_expected": -0.050000000000000044,
+      "effect_combo": -0.050000000000000044,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "CB-839 (Telaglenastat)",
+      "drug2": "Epogen (Epoetin alfa)",
+      "effect_1": 0.0,
+      "effect_2": -0.5000000000000001,
+      "effect_expected": -0.5000000000000001,
+      "effect_combo": -0.5000000000000001,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "CB-839 (Telaglenastat)",
+      "drug2": "NAD+ Precursors (NMN/NR)",
+      "effect_1": 0.0,
+      "effect_2": 0.019999999999999962,
+      "effect_expected": 0.019999999999999962,
+      "effect_combo": 0.019999999999999962,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Entropic Heating (Hyperthermia)",
+      "drug2": "High-dose Vitamin C",
+      "effect_1": 0.09999999999999995,
+      "effect_2": 0.020000000000000018,
+      "effect_expected": 0.11999999999999997,
+      "effect_combo": 0.11999999999999994,
+      "synergy_index": 0.9999999999999998,
+      "difference": -2.7755575615628914e-17
+    },
+    {
+      "drug1": "Entropic Heating (Hyperthermia)",
+      "drug2": "Anti-PD-1 (Pembrolizumab)",
+      "effect_1": 0.09999999999999995,
+      "effect_2": 0.0,
+      "effect_expected": 0.09999999999999995,
+      "effect_combo": 0.09999999999999995,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Entropic Heating (Hyperthermia)",
+      "drug2": "Anti-CTLA-4 (Ipilimumab)",
+      "effect_1": 0.09999999999999995,
+      "effect_2": 0.0,
+      "effect_expected": 0.09999999999999995,
+      "effect_combo": 0.09999999999999995,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Entropic Heating (Hyperthermia)",
+      "drug2": "Olaparib (PARP inhibitor)",
+      "effect_1": 0.09999999999999995,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": 0.10499999999999984,
+      "effect_combo": 0.10499999999999998,
+      "synergy_index": 1.0000000000000013,
+      "difference": 1.3877787807814457e-16
+    },
+    {
+      "drug1": "Entropic Heating (Hyperthermia)",
+      "drug2": "Ferroptosis Inducer (Erastin/RSL3)",
+      "effect_1": 0.09999999999999995,
+      "effect_2": 0.0,
+      "effect_expected": 0.09999999999999995,
+      "effect_combo": 0.06874999999999998,
+      "synergy_index": 0.6875000000000001,
+      "difference": -0.031249999999999972
+    },
+    {
+      "drug1": "Entropic Heating (Hyperthermia)",
+      "drug2": "Vorinostat (SAHA, HDACi)",
+      "effect_1": 0.09999999999999995,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": 0.10499999999999984,
+      "effect_combo": 0.10499999999999995,
+      "synergy_index": 1.000000000000001,
+      "difference": 1.1102230246251565e-16
+    },
+    {
+      "drug1": "Entropic Heating (Hyperthermia)",
+      "drug2": "Fasting-Mimicking Diet (FMD)",
+      "effect_1": 0.09999999999999995,
+      "effect_2": -0.050000000000000044,
+      "effect_expected": 0.049999999999999906,
+      "effect_combo": 0.04999999999999993,
+      "synergy_index": 1.0000000000000007,
+      "difference": 2.7755575615628914e-17
+    },
+    {
+      "drug1": "Entropic Heating (Hyperthermia)",
+      "drug2": "Epogen (Epoetin alfa)",
+      "effect_1": 0.09999999999999995,
+      "effect_2": -0.5000000000000001,
+      "effect_expected": -0.40000000000000013,
+      "effect_combo": -0.3999999999999999,
+      "synergy_index": 0.9999999999999994,
+      "difference": 2.220446049250313e-16
+    },
+    {
+      "drug1": "Entropic Heating (Hyperthermia)",
+      "drug2": "NAD+ Precursors (NMN/NR)",
+      "effect_1": 0.09999999999999995,
+      "effect_2": 0.019999999999999962,
+      "effect_expected": 0.11999999999999991,
+      "effect_combo": 0.09314444953723511,
+      "synergy_index": 0.7762037461436264,
+      "difference": -0.026855550462764805
+    },
+    {
+      "drug1": "High-dose Vitamin C",
+      "drug2": "Anti-PD-1 (Pembrolizumab)",
+      "effect_1": 0.020000000000000018,
+      "effect_2": 0.0,
+      "effect_expected": 0.020000000000000018,
+      "effect_combo": 0.020000000000000018,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "High-dose Vitamin C",
+      "drug2": "Anti-CTLA-4 (Ipilimumab)",
+      "effect_1": 0.020000000000000018,
+      "effect_2": 0.0,
+      "effect_expected": 0.020000000000000018,
+      "effect_combo": 0.020000000000000018,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "High-dose Vitamin C",
+      "drug2": "Olaparib (PARP inhibitor)",
+      "effect_1": 0.020000000000000018,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": 0.02499999999999991,
+      "effect_combo": -0.011111111111111183,
+      "synergy_index": -0.44444444444444886,
+      "difference": -0.036111111111111094
+    },
+    {
+      "drug1": "High-dose Vitamin C",
+      "drug2": "Ferroptosis Inducer (Erastin/RSL3)",
+      "effect_1": 0.020000000000000018,
+      "effect_2": 0.0,
+      "effect_expected": 0.020000000000000018,
+      "effect_combo": -0.011111111111111127,
+      "synergy_index": -0.5555555555555559,
+      "difference": -0.031111111111111145
+    },
+    {
+      "drug1": "High-dose Vitamin C",
+      "drug2": "Vorinostat (SAHA, HDACi)",
+      "effect_1": 0.020000000000000018,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": 0.02499999999999991,
+      "effect_combo": -0.011111111111111183,
+      "synergy_index": -0.44444444444444886,
+      "difference": -0.036111111111111094
+    },
+    {
+      "drug1": "High-dose Vitamin C",
+      "drug2": "Fasting-Mimicking Diet (FMD)",
+      "effect_1": 0.020000000000000018,
+      "effect_2": -0.050000000000000044,
+      "effect_expected": -0.030000000000000027,
+      "effect_combo": -0.07777777777777783,
+      "synergy_index": 2.592592592592592,
+      "difference": -0.04777777777777781
+    },
+    {
+      "drug1": "High-dose Vitamin C",
+      "drug2": "Epogen (Epoetin alfa)",
+      "effect_1": 0.020000000000000018,
+      "effect_2": -0.5000000000000001,
+      "effect_expected": -0.4800000000000001,
+      "effect_combo": -0.4800000000000001,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "High-dose Vitamin C",
+      "drug2": "NAD+ Precursors (NMN/NR)",
+      "effect_1": 0.020000000000000018,
+      "effect_2": 0.019999999999999962,
+      "effect_expected": 0.03999999999999998,
+      "effect_combo": 0.040000000000000036,
+      "synergy_index": 1.0000000000000013,
+      "difference": 5.551115123125783e-17
+    },
+    {
+      "drug1": "Anti-PD-1 (Pembrolizumab)",
+      "drug2": "Anti-CTLA-4 (Ipilimumab)",
+      "effect_1": 0.0,
+      "effect_2": 0.0,
+      "effect_expected": 0.0,
+      "effect_combo": 0.0,
+      "synergy_index": 0.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Anti-PD-1 (Pembrolizumab)",
+      "drug2": "Olaparib (PARP inhibitor)",
+      "effect_1": 0.0,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": 0.004999999999999893,
+      "effect_combo": 0.004999999999999893,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Anti-PD-1 (Pembrolizumab)",
+      "drug2": "Ferroptosis Inducer (Erastin/RSL3)",
+      "effect_1": 0.0,
+      "effect_2": 0.0,
+      "effect_expected": 0.0,
+      "effect_combo": 0.0,
+      "synergy_index": 0.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Anti-PD-1 (Pembrolizumab)",
+      "drug2": "Vorinostat (SAHA, HDACi)",
+      "effect_1": 0.0,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": 0.004999999999999893,
+      "effect_combo": 0.004999999999999893,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Anti-PD-1 (Pembrolizumab)",
+      "drug2": "Fasting-Mimicking Diet (FMD)",
+      "effect_1": 0.0,
+      "effect_2": -0.050000000000000044,
+      "effect_expected": -0.050000000000000044,
+      "effect_combo": -0.050000000000000044,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Anti-PD-1 (Pembrolizumab)",
+      "drug2": "Epogen (Epoetin alfa)",
+      "effect_1": 0.0,
+      "effect_2": -0.5000000000000001,
+      "effect_expected": -0.5000000000000001,
+      "effect_combo": -0.5000000000000001,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Anti-PD-1 (Pembrolizumab)",
+      "drug2": "NAD+ Precursors (NMN/NR)",
+      "effect_1": 0.0,
+      "effect_2": 0.019999999999999962,
+      "effect_expected": 0.019999999999999962,
+      "effect_combo": 0.019999999999999962,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Anti-CTLA-4 (Ipilimumab)",
+      "drug2": "Olaparib (PARP inhibitor)",
+      "effect_1": 0.0,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": 0.004999999999999893,
+      "effect_combo": 0.004999999999999893,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Anti-CTLA-4 (Ipilimumab)",
+      "drug2": "Ferroptosis Inducer (Erastin/RSL3)",
+      "effect_1": 0.0,
+      "effect_2": 0.0,
+      "effect_expected": 0.0,
+      "effect_combo": 0.0,
+      "synergy_index": 0.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Anti-CTLA-4 (Ipilimumab)",
+      "drug2": "Vorinostat (SAHA, HDACi)",
+      "effect_1": 0.0,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": 0.004999999999999893,
+      "effect_combo": 0.004999999999999893,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Anti-CTLA-4 (Ipilimumab)",
+      "drug2": "Fasting-Mimicking Diet (FMD)",
+      "effect_1": 0.0,
+      "effect_2": -0.050000000000000044,
+      "effect_expected": -0.050000000000000044,
+      "effect_combo": -0.050000000000000044,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Anti-CTLA-4 (Ipilimumab)",
+      "drug2": "Epogen (Epoetin alfa)",
+      "effect_1": 0.0,
+      "effect_2": -0.5000000000000001,
+      "effect_expected": -0.5000000000000001,
+      "effect_combo": -0.5000000000000001,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Anti-CTLA-4 (Ipilimumab)",
+      "drug2": "NAD+ Precursors (NMN/NR)",
+      "effect_1": 0.0,
+      "effect_2": 0.019999999999999962,
+      "effect_expected": 0.019999999999999962,
+      "effect_combo": 0.019999999999999962,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Olaparib (PARP inhibitor)",
+      "drug2": "Ferroptosis Inducer (Erastin/RSL3)",
+      "effect_1": 0.004999999999999893,
+      "effect_2": 0.0,
+      "effect_expected": 0.004999999999999893,
+      "effect_combo": -0.011111111111111183,
+      "synergy_index": -2.222222222222284,
+      "difference": -0.016111111111111076
+    },
+    {
+      "drug1": "Olaparib (PARP inhibitor)",
+      "drug2": "Vorinostat (SAHA, HDACi)",
+      "effect_1": 0.004999999999999893,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": 0.009999999999999787,
+      "effect_combo": 0.009999999999999953,
+      "synergy_index": 1.0000000000000167,
+      "difference": 1.6653345369377348e-16
+    },
+    {
+      "drug1": "Olaparib (PARP inhibitor)",
+      "drug2": "Fasting-Mimicking Diet (FMD)",
+      "effect_1": 0.004999999999999893,
+      "effect_2": -0.050000000000000044,
+      "effect_expected": -0.04500000000000015,
+      "effect_combo": -0.04500000000000004,
+      "synergy_index": 0.9999999999999976,
+      "difference": 1.1102230246251565e-16
+    },
+    {
+      "drug1": "Olaparib (PARP inhibitor)",
+      "drug2": "Epogen (Epoetin alfa)",
+      "effect_1": 0.004999999999999893,
+      "effect_2": -0.5000000000000001,
+      "effect_expected": -0.4950000000000002,
+      "effect_combo": -0.4950000000000002,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Olaparib (PARP inhibitor)",
+      "drug2": "NAD+ Precursors (NMN/NR)",
+      "effect_1": 0.004999999999999893,
+      "effect_2": 0.019999999999999962,
+      "effect_expected": 0.024999999999999856,
+      "effect_combo": 0.025000000000000022,
+      "synergy_index": 1.0000000000000067,
+      "difference": 1.6653345369377348e-16
+    },
+    {
+      "drug1": "Ferroptosis Inducer (Erastin/RSL3)",
+      "drug2": "Vorinostat (SAHA, HDACi)",
+      "effect_1": 0.0,
+      "effect_2": 0.004999999999999893,
+      "effect_expected": 0.004999999999999893,
+      "effect_combo": -0.011111111111111183,
+      "synergy_index": -2.222222222222284,
+      "difference": -0.016111111111111076
+    },
+    {
+      "drug1": "Ferroptosis Inducer (Erastin/RSL3)",
+      "drug2": "Fasting-Mimicking Diet (FMD)",
+      "effect_1": 0.0,
+      "effect_2": -0.050000000000000044,
+      "effect_expected": -0.050000000000000044,
+      "effect_combo": -0.07777777777777789,
+      "synergy_index": 1.5555555555555565,
+      "difference": -0.027777777777777846
+    },
+    {
+      "drug1": "Ferroptosis Inducer (Erastin/RSL3)",
+      "drug2": "Epogen (Epoetin alfa)",
+      "effect_1": 0.0,
+      "effect_2": -0.5000000000000001,
+      "effect_expected": -0.5000000000000001,
+      "effect_combo": -0.4600000000000001,
+      "synergy_index": 0.9199999999999999,
+      "difference": 0.040000000000000036
+    },
+    {
+      "drug1": "Ferroptosis Inducer (Erastin/RSL3)",
+      "drug2": "NAD+ Precursors (NMN/NR)",
+      "effect_1": 0.0,
+      "effect_2": 0.019999999999999962,
+      "effect_expected": 0.019999999999999962,
+      "effect_combo": 0.022222222222222143,
+      "synergy_index": 1.1111111111111092,
+      "difference": 0.002222222222222181
+    },
+    {
+      "drug1": "Vorinostat (SAHA, HDACi)",
+      "drug2": "Fasting-Mimicking Diet (FMD)",
+      "effect_1": 0.004999999999999893,
+      "effect_2": -0.050000000000000044,
+      "effect_expected": -0.04500000000000015,
+      "effect_combo": -0.04499999999999993,
+      "synergy_index": 0.9999999999999951,
+      "difference": 2.220446049250313e-16
+    },
+    {
+      "drug1": "Vorinostat (SAHA, HDACi)",
+      "drug2": "Epogen (Epoetin alfa)",
+      "effect_1": 0.004999999999999893,
+      "effect_2": -0.5000000000000001,
+      "effect_expected": -0.4950000000000002,
+      "effect_combo": -0.4950000000000002,
+      "synergy_index": 1.0,
+      "difference": 0.0
+    },
+    {
+      "drug1": "Vorinostat (SAHA, HDACi)",
+      "drug2": "NAD+ Precursors (NMN/NR)",
+      "effect_1": 0.004999999999999893,
+      "effect_2": 0.019999999999999962,
+      "effect_expected": 0.024999999999999856,
+      "effect_combo": 0.02499999999999991,
+      "synergy_index": 1.0000000000000022,
+      "difference": 5.551115123125783e-17
+    },
+    {
+      "drug1": "Fasting-Mimicking Diet (FMD)",
+      "drug2": "Epogen (Epoetin alfa)",
+      "effect_1": -0.050000000000000044,
+      "effect_2": -0.5000000000000001,
+      "effect_expected": -0.5500000000000002,
+      "effect_combo": -0.5500000000000003,
+      "synergy_index": 1.0000000000000002,
+      "difference": -1.1102230246251565e-16
+    },
+    {
+      "drug1": "Fasting-Mimicking Diet (FMD)",
+      "drug2": "NAD+ Precursors (NMN/NR)",
+      "effect_1": -0.050000000000000044,
+      "effect_2": 0.019999999999999962,
+      "effect_expected": -0.030000000000000082,
+      "effect_combo": -0.02999999999999997,
+      "synergy_index": 0.9999999999999963,
+      "difference": 1.1102230246251565e-16
+    },
+    {
+      "drug1": "Epogen (Epoetin alfa)",
+      "drug2": "NAD+ Precursors (NMN/NR)",
+      "effect_1": -0.5000000000000001,
+      "effect_2": 0.019999999999999962,
+      "effect_expected": -0.48000000000000015,
+      "effect_combo": -0.4800000000000001,
+      "synergy_index": 0.9999999999999999,
+      "difference": 5.551115123125783e-17
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "dataset_name": "Simulated_CCLE_TNBC",
+  "n_replicates": 50,
+  "n_timepoints": 20,
+  "noise_std": 0.2,
+  "true_curvature": 0.29999999999999993,
+  "extracted_curvature": 0.26315688240405494,
+  "curvature_error": 0.036843117595944996,
+  "matrix_frobenius_error": 0.16191105409325418,
+  "eigenvalue_mae": 0.04270093097784744,
+  "calibration_status": "SUCCESS"
+}

@@ -1,0 +1,926 @@
+{
+  "framework": "SAEM \u2014 Project Confluence v2.0",
+  "date": "auto-generated",
+  "cancer_types": 10,
+  "drug_library_size": 19,
+  "synergy_pairs": 8,
+  "monte_carlo_trials": 80,
+  "gates": {
+    "cure_threshold": {
+      "pass": true,
+      "score": "8/10"
+    },
+    "adaptive_superiority": {
+      "pass": true,
+      "score": "10/10"
+    },
+    "protocol_diversity": {
+      "pass": true,
+      "score": "6 unique"
+    },
+    "non_uniform_outcomes": {
+      "pass": true,
+      "score": "range=0.213"
+    },
+    "safety_clearance": {
+      "pass": true,
+      "score": "8/10"
+    },
+    "clonal_dynamics": {
+      "pass": true,
+      "score": "10/10"
+    }
+  },
+  "all_gates_pass": true,
+  "results": [
+    {
+      "cancer_type": "TNBC",
+      "seriousness": 0.4055,
+      "drugs": [
+        "CB-839 (Telaglenastat)",
+        "2-Deoxyglucose (2-DG)",
+        "N6F11 (Selective GPX4 degrader)",
+        "Anti-PD-1 (Pembrolizumab)"
+      ],
+      "drug_evidence": [
+        "emerging",
+        "established",
+        "Preclinical",
+        "established"
+      ],
+      "phase_days": {
+        "flatten": 23,
+        "heat": 6,
+        "push": 25
+      },
+      "total_days": 54,
+      "escape_distance": 0.5551,
+      "cure_rate": 0.975,
+      "cure_rate_ci": [
+        0.9375,
+        1.0
+      ],
+      "safety": {
+        "is_safe": false,
+        "safety_score": 0.339,
+        "cumulative_g34_probability": 0.402,
+        "violations": [
+          "TRIPLE organ overlap on liver: N6F11 (Selective GPX4 degrader), CB-839 (Telaglenastat), Anti-PD-1 (Pembrolizumab)"
+        ],
+        "organ_risk": {
+          "gi_tract": 0.15,
+          "liver": 0.45,
+          "cns": 0.15,
+          "nervous_system": 0.15,
+          "immune_system": 0.15
+        },
+        "recommendations": [
+          "\u26a0\ufe0f Moderate G3/4 AE risk: 40% \u2014 close monitoring required"
+        ],
+        "drug_profiles": {
+          "CB-839 (Telaglenastat)": {
+            "therapeutic_index": 4.0,
+            "grade34_prob": 0.08,
+            "dlt_organ": "gi_tract"
+          },
+          "2-Deoxyglucose (2-DG)": {
+            "therapeutic_index": 2.5,
+            "grade34_prob": 0.15,
+            "dlt_organ": "cns"
+          },
+          "N6F11 (Selective GPX4 degrader)": {
+            "therapeutic_index": 4.5,
+            "grade34_prob": 0.1,
+            "dlt_organ": "liver"
+          },
+          "Anti-PD-1 (Pembrolizumab)": {
+            "therapeutic_index": 5.0,
+            "grade34_prob": 0.15,
+            "dlt_organ": "immune_system"
+          }
+        }
+      },
+      "resistance_comparison": {
+        "adaptive_distance": 0.6357,
+        "continuous_distance": 0.675,
+        "adaptive_wins": "True",
+        "advantage": 0.0393
+      },
+      "clonal_dynamics": {
+        "adaptive": {
+          "final_sensitive": 0.281185,
+          "final_resistant": 0.278602,
+          "final_resistant_fraction": 0.4977,
+          "final_burden": 0.559787,
+          "is_cured": false
+        },
+        "continuous": {
+          "final_sensitive": 0.026668,
+          "final_resistant": 0.254924,
+          "final_resistant_fraction": 0.9053,
+          "final_burden": 0.281592,
+          "is_cured": false
+        },
+        "adaptive_wins": true,
+        "resistant_fraction_advantage": 0.4076,
+        "burden_advantage": -0.278195
+      }
+    },
+    {
+      "cancer_type": "PDAC",
+      "seriousness": 0.5559,
+      "drugs": [
+        "Bevacizumab (Anti-VEGF)",
+        "2-Deoxyglucose (2-DG)",
+        "Ferroptosis Inducer (Erastin/RSL3)",
+        "Anti-PD-1 (Pembrolizumab)"
+      ],
+      "drug_evidence": [
+        "Clinical Standard",
+        "established",
+        "emerging",
+        "established"
+      ],
+      "phase_days": {
+        "flatten": 32,
+        "heat": 9,
+        "push": 32
+      },
+      "total_days": 73,
+      "escape_distance": 0.7041,
+      "cure_rate": 0.8,
+      "cure_rate_ci": [
+        0.7125,
+        0.875
+      ],
+      "safety": {
+        "is_safe": false,
+        "safety_score": 0.198,
+        "cumulative_g34_probability": 0.523,
+        "violations": [
+          "Duration-adjusted toxicity risk too high: 85%"
+        ],
+        "organ_risk": {
+          "vascular": 0.15,
+          "heart": 0.15,
+          "cns": 0.15,
+          "nervous_system": 0.15,
+          "liver": 0.3,
+          "kidney": 0.15,
+          "immune_system": 0.15
+        },
+        "recommendations": [
+          "\u26a0\ufe0f Moderate G3/4 AE risk: 52% \u2014 close monitoring required",
+          "\u26a0\ufe0f Dual liver toxicity: Ferroptosis Inducer (Erastin/RSL3), Anti-PD-1 (Pembrolizumab) \u2014 stagger dosing"
+        ],
+        "drug_profiles": {
+          "Bevacizumab (Anti-VEGF)": {
+            "therapeutic_index": 4.0,
+            "grade34_prob": 0.12,
+            "dlt_organ": "vascular"
+          },
+          "2-Deoxyglucose (2-DG)": {
+            "therapeutic_index": 2.5,
+            "grade34_prob": 0.15,
+            "dlt_organ": "cns"
+          },
+          "Ferroptosis Inducer (Erastin/RSL3)": {
+            "therapeutic_index": 2.0,
+            "grade34_prob": 0.25,
+            "dlt_organ": "liver"
+          },
+          "Anti-PD-1 (Pembrolizumab)": {
+            "therapeutic_index": 5.0,
+            "grade34_prob": 0.15,
+            "dlt_organ": "immune_system"
+          }
+        }
+      },
+      "resistance_comparison": {
+        "adaptive_distance": 0.7894,
+        "continuous_distance": 0.942,
+        "adaptive_wins": "True",
+        "advantage": 0.1526
+      },
+      "clonal_dynamics": {
+        "adaptive": {
+          "final_sensitive": 0.306231,
+          "final_resistant": 0.19485,
+          "final_resistant_fraction": 0.3889,
+          "final_burden": 0.501081,
+          "is_cured": false
+        },
+        "continuous": {
+          "final_sensitive": 0.030819,
+          "final_resistant": 0.1616,
+          "final_resistant_fraction": 0.8398,
+          "final_burden": 0.192419,
+          "is_cured": false
+        },
+        "adaptive_wins": true,
+        "resistant_fraction_advantage": 0.4509,
+        "burden_advantage": -0.308662
+      }
+    },
+    {
+      "cancer_type": "NSCLC",
+      "seriousness": 0.328,
+      "drugs": [
+        "Bevacizumab (Anti-VEGF)",
+        "2-Deoxyglucose (2-DG)",
+        "Anti-PD-1 (Pembrolizumab)"
+      ],
+      "drug_evidence": [
+        "Clinical Standard",
+        "established",
+        "established"
+      ],
+      "phase_days": {
+        "flatten": 19,
+        "heat": 5,
+        "push": 21
+      },
+      "total_days": 45,
+      "escape_distance": 0.4934,
+      "cure_rate": 1.0,
+      "cure_rate_ci": [
+        1.0,
+        1.0
+      ],
+      "safety": {
+        "is_safe": "True",
+        "safety_score": 0.627,
+        "cumulative_g34_probability": 0.364,
+        "violations": [],
+        "organ_risk": {
+          "vascular": 0.15,
+          "heart": 0.15,
+          "cns": 0.15,
+          "nervous_system": 0.15,
+          "immune_system": 0.15,
+          "liver": 0.15
+        },
+        "recommendations": [],
+        "drug_profiles": {
+          "Bevacizumab (Anti-VEGF)": {
+            "therapeutic_index": 4.0,
+            "grade34_prob": 0.12,
+            "dlt_organ": "vascular"
+          },
+          "2-Deoxyglucose (2-DG)": {
+            "therapeutic_index": 2.5,
+            "grade34_prob": 0.15,
+            "dlt_organ": "cns"
+          },
+          "Anti-PD-1 (Pembrolizumab)": {
+            "therapeutic_index": 5.0,
+            "grade34_prob": 0.15,
+            "dlt_organ": "immune_system"
+          }
+        }
+      },
+      "resistance_comparison": {
+        "adaptive_distance": 0.4434,
+        "continuous_distance": 0.4731,
+        "adaptive_wins": "True",
+        "advantage": 0.0297
+      },
+      "clonal_dynamics": {
+        "adaptive": {
+          "final_sensitive": 0.154423,
+          "final_resistant": 0.21591,
+          "final_resistant_fraction": 0.583,
+          "final_burden": 0.370333,
+          "is_cured": false
+        },
+        "continuous": {
+          "final_sensitive": 0.011342,
+          "final_resistant": 0.175361,
+          "final_resistant_fraction": 0.9392,
+          "final_burden": 0.186704,
+          "is_cured": false
+        },
+        "adaptive_wins": true,
+        "resistant_fraction_advantage": 0.3562,
+        "burden_advantage": -0.183629
+      }
+    },
+    {
+      "cancer_type": "Melanoma",
+      "seriousness": 0.3027,
+      "drugs": [
+        "Bevacizumab (Anti-VEGF)",
+        "2-Deoxyglucose (2-DG)",
+        "Ferroptosis Inducer (Erastin/RSL3)",
+        "Anti-PD-1 (Pembrolizumab)"
+      ],
+      "drug_evidence": [
+        "Clinical Standard",
+        "established",
+        "emerging",
+        "established"
+      ],
+      "phase_days": {
+        "flatten": 18,
+        "heat": 5,
+        "push": 20
+      },
+      "total_days": 43,
+      "escape_distance": 0.4909,
+      "cure_rate": 1.0,
+      "cure_rate_ci": [
+        1.0,
+        1.0
+      ],
+      "safety": {
+        "is_safe": "True",
+        "safety_score": 0.398,
+        "cumulative_g34_probability": 0.523,
+        "violations": [],
+        "organ_risk": {
+          "vascular": 0.15,
+          "heart": 0.15,
+          "cns": 0.15,
+          "nervous_system": 0.15,
+          "liver": 0.3,
+          "kidney": 0.15,
+          "immune_system": 0.15
+        },
+        "recommendations": [
+          "\u26a0\ufe0f Moderate G3/4 AE risk: 52% \u2014 close monitoring required",
+          "\u26a0\ufe0f Dual liver toxicity: Ferroptosis Inducer (Erastin/RSL3), Anti-PD-1 (Pembrolizumab) \u2014 stagger dosing"
+        ],
+        "drug_profiles": {
+          "Bevacizumab (Anti-VEGF)": {
+            "therapeutic_index": 4.0,
+            "grade34_prob": 0.12,
+            "dlt_organ": "vascular"
+          },
+          "2-Deoxyglucose (2-DG)": {
+            "therapeutic_index": 2.5,
+            "grade34_prob": 0.15,
+            "dlt_organ": "cns"
+          },
+          "Ferroptosis Inducer (Erastin/RSL3)": {
+            "therapeutic_index": 2.0,
+            "grade34_prob": 0.25,
+            "dlt_organ": "liver"
+          },
+          "Anti-PD-1 (Pembrolizumab)": {
+            "therapeutic_index": 5.0,
+            "grade34_prob": 0.15,
+            "dlt_organ": "immune_system"
+          }
+        }
+      },
+      "resistance_comparison": {
+        "adaptive_distance": 0.5449,
+        "continuous_distance": 0.5845,
+        "adaptive_wins": "True",
+        "advantage": 0.0396
+      },
+      "clonal_dynamics": {
+        "adaptive": {
+          "final_sensitive": 0.190146,
+          "final_resistant": 0.171496,
+          "final_resistant_fraction": 0.4742,
+          "final_burden": 0.361642,
+          "is_cured": false
+        },
+        "continuous": {
+          "final_sensitive": 0.011998,
+          "final_resistant": 0.151523,
+          "final_resistant_fraction": 0.9266,
+          "final_burden": 0.163521,
+          "is_cured": false
+        },
+        "adaptive_wins": true,
+        "resistant_fraction_advantage": 0.4524,
+        "burden_advantage": -0.198121
+      }
+    },
+    {
+      "cancer_type": "GBM",
+      "seriousness": 0.4709,
+      "drugs": [
+        "2-Deoxyglucose (2-DG)",
+        "Bevacizumab (Anti-VEGF)",
+        "High-dose Vitamin C",
+        "Anti-PD-1 (Pembrolizumab)"
+      ],
+      "drug_evidence": [
+        "established",
+        "Clinical Standard",
+        "emerging",
+        "established"
+      ],
+      "phase_days": {
+        "flatten": 27,
+        "heat": 7,
+        "push": 28
+      },
+      "total_days": 62,
+      "escape_distance": 0.5861,
+      "cure_rate": 0.9875,
+      "cure_rate_ci": [
+        0.9625,
+        1.0
+      ],
+      "safety": {
+        "is_safe": "True",
+        "safety_score": 0.664,
+        "cumulative_g34_probability": 0.39,
+        "violations": [],
+        "organ_risk": {
+          "cns": 0.15,
+          "nervous_system": 0.15,
+          "vascular": 0.15,
+          "heart": 0.15,
+          "kidney": 0.15,
+          "immune_system": 0.15,
+          "liver": 0.15
+        },
+        "recommendations": [],
+        "drug_profiles": {
+          "2-Deoxyglucose (2-DG)": {
+            "therapeutic_index": 2.5,
+            "grade34_prob": 0.15,
+            "dlt_organ": "cns"
+          },
+          "Bevacizumab (Anti-VEGF)": {
+            "therapeutic_index": 4.0,
+            "grade34_prob": 0.12,
+            "dlt_organ": "vascular"
+          },
+          "High-dose Vitamin C": {
+            "therapeutic_index": 6.0,
+            "grade34_prob": 0.04,
+            "dlt_organ": "kidney"
+          },
+          "Anti-PD-1 (Pembrolizumab)": {
+            "therapeutic_index": 5.0,
+            "grade34_prob": 0.15,
+            "dlt_organ": "immune_system"
+          }
+        }
+      },
+      "resistance_comparison": {
+        "adaptive_distance": 0.8863,
+        "continuous_distance": 0.9499,
+        "adaptive_wins": "True",
+        "advantage": 0.0636
+      },
+      "clonal_dynamics": {
+        "adaptive": {
+          "final_sensitive": 0.336467,
+          "final_resistant": 0.199915,
+          "final_resistant_fraction": 0.3727,
+          "final_burden": 0.536382,
+          "is_cured": false
+        },
+        "continuous": {
+          "final_sensitive": 0.073293,
+          "final_resistant": 0.161174,
+          "final_resistant_fraction": 0.6874,
+          "final_burden": 0.234467,
+          "is_cured": false
+        },
+        "adaptive_wins": true,
+        "resistant_fraction_advantage": 0.3147,
+        "burden_advantage": -0.301915
+      }
+    },
+    {
+      "cancer_type": "CRC",
+      "seriousness": 0.3456,
+      "drugs": [
+        "2-Deoxyglucose (2-DG)",
+        "Bevacizumab (Anti-VEGF)",
+        "Anti-PD-1 (Pembrolizumab)"
+      ],
+      "drug_evidence": [
+        "established",
+        "Clinical Standard",
+        "established"
+      ],
+      "phase_days": {
+        "flatten": 20,
+        "heat": 5,
+        "push": 22
+      },
+      "total_days": 47,
+      "escape_distance": 0.5036,
+      "cure_rate": 0.9875,
+      "cure_rate_ci": [
+        0.95,
+        1.0
+      ],
+      "safety": {
+        "is_safe": "True",
+        "safety_score": 0.627,
+        "cumulative_g34_probability": 0.364,
+        "violations": [],
+        "organ_risk": {
+          "cns": 0.15,
+          "nervous_system": 0.15,
+          "vascular": 0.15,
+          "heart": 0.15,
+          "immune_system": 0.15,
+          "liver": 0.15
+        },
+        "recommendations": [],
+        "drug_profiles": {
+          "2-Deoxyglucose (2-DG)": {
+            "therapeutic_index": 2.5,
+            "grade34_prob": 0.15,
+            "dlt_organ": "cns"
+          },
+          "Bevacizumab (Anti-VEGF)": {
+            "therapeutic_index": 4.0,
+            "grade34_prob": 0.12,
+            "dlt_organ": "vascular"
+          },
+          "Anti-PD-1 (Pembrolizumab)": {
+            "therapeutic_index": 5.0,
+            "grade34_prob": 0.15,
+            "dlt_organ": "immune_system"
+          }
+        }
+      },
+      "resistance_comparison": {
+        "adaptive_distance": 0.6664,
+        "continuous_distance": 0.7163,
+        "adaptive_wins": "True",
+        "advantage": 0.0499
+      },
+      "clonal_dynamics": {
+        "adaptive": {
+          "final_sensitive": 0.205109,
+          "final_resistant": 0.223396,
+          "final_resistant_fraction": 0.5213,
+          "final_burden": 0.428505,
+          "is_cured": false
+        },
+        "continuous": {
+          "final_sensitive": 0.017708,
+          "final_resistant": 0.188082,
+          "final_resistant_fraction": 0.9139,
+          "final_burden": 0.20579,
+          "is_cured": false
+        },
+        "adaptive_wins": true,
+        "resistant_fraction_advantage": 0.3926,
+        "burden_advantage": -0.222715
+      }
+    },
+    {
+      "cancer_type": "HGSOC",
+      "seriousness": 0.4555,
+      "drugs": [
+        "Bevacizumab (Anti-VEGF)",
+        "2-Deoxyglucose (2-DG)",
+        "Anti-PD-1 (Pembrolizumab)"
+      ],
+      "drug_evidence": [
+        "Clinical Standard",
+        "established",
+        "established"
+      ],
+      "phase_days": {
+        "flatten": 26,
+        "heat": 7,
+        "push": 27
+      },
+      "total_days": 60,
+      "escape_distance": 0.5428,
+      "cure_rate": 1.0,
+      "cure_rate_ci": [
+        1.0,
+        1.0
+      ],
+      "safety": {
+        "is_safe": "True",
+        "safety_score": 0.627,
+        "cumulative_g34_probability": 0.364,
+        "violations": [],
+        "organ_risk": {
+          "vascular": 0.15,
+          "heart": 0.15,
+          "cns": 0.15,
+          "nervous_system": 0.15,
+          "immune_system": 0.15,
+          "liver": 0.15
+        },
+        "recommendations": [],
+        "drug_profiles": {
+          "Bevacizumab (Anti-VEGF)": {
+            "therapeutic_index": 4.0,
+            "grade34_prob": 0.12,
+            "dlt_organ": "vascular"
+          },
+          "2-Deoxyglucose (2-DG)": {
+            "therapeutic_index": 2.5,
+            "grade34_prob": 0.15,
+            "dlt_organ": "cns"
+          },
+          "Anti-PD-1 (Pembrolizumab)": {
+            "therapeutic_index": 5.0,
+            "grade34_prob": 0.15,
+            "dlt_organ": "immune_system"
+          }
+        }
+      },
+      "resistance_comparison": {
+        "adaptive_distance": 0.6834,
+        "continuous_distance": 0.7099,
+        "adaptive_wins": "True",
+        "advantage": 0.0265
+      },
+      "clonal_dynamics": {
+        "adaptive": {
+          "final_sensitive": 0.185522,
+          "final_resistant": 0.262536,
+          "final_resistant_fraction": 0.5859,
+          "final_burden": 0.448058,
+          "is_cured": false
+        },
+        "continuous": {
+          "final_sensitive": 0.012076,
+          "final_resistant": 0.215156,
+          "final_resistant_fraction": 0.9469,
+          "final_burden": 0.227233,
+          "is_cured": false
+        },
+        "adaptive_wins": true,
+        "resistant_fraction_advantage": 0.361,
+        "burden_advantage": -0.220825
+      }
+    },
+    {
+      "cancer_type": "AML",
+      "seriousness": 0.3897,
+      "drugs": [
+        "Bevacizumab (Anti-VEGF)",
+        "2-Deoxyglucose (2-DG)",
+        "High-dose Vitamin C",
+        "Anti-PD-1 (Pembrolizumab)"
+      ],
+      "drug_evidence": [
+        "Clinical Standard",
+        "established",
+        "emerging",
+        "established"
+      ],
+      "phase_days": {
+        "flatten": 23,
+        "heat": 6,
+        "push": 24
+      },
+      "total_days": 53,
+      "escape_distance": 0.5475,
+      "cure_rate": 0.975,
+      "cure_rate_ci": [
+        0.9375,
+        1.0
+      ],
+      "safety": {
+        "is_safe": "True",
+        "safety_score": 0.664,
+        "cumulative_g34_probability": 0.39,
+        "violations": [],
+        "organ_risk": {
+          "vascular": 0.15,
+          "heart": 0.15,
+          "cns": 0.15,
+          "nervous_system": 0.15,
+          "kidney": 0.15,
+          "immune_system": 0.15,
+          "liver": 0.15
+        },
+        "recommendations": [],
+        "drug_profiles": {
+          "Bevacizumab (Anti-VEGF)": {
+            "therapeutic_index": 4.0,
+            "grade34_prob": 0.12,
+            "dlt_organ": "vascular"
+          },
+          "2-Deoxyglucose (2-DG)": {
+            "therapeutic_index": 2.5,
+            "grade34_prob": 0.15,
+            "dlt_organ": "cns"
+          },
+          "High-dose Vitamin C": {
+            "therapeutic_index": 6.0,
+            "grade34_prob": 0.04,
+            "dlt_organ": "kidney"
+          },
+          "Anti-PD-1 (Pembrolizumab)": {
+            "therapeutic_index": 5.0,
+            "grade34_prob": 0.15,
+            "dlt_organ": "immune_system"
+          }
+        }
+      },
+      "resistance_comparison": {
+        "adaptive_distance": 0.4581,
+        "continuous_distance": 0.4618,
+        "adaptive_wins": "True",
+        "advantage": 0.0037
+      },
+      "clonal_dynamics": {
+        "adaptive": {
+          "final_sensitive": 0.113313,
+          "final_resistant": 0.429893,
+          "final_resistant_fraction": 0.7914,
+          "final_burden": 0.543206,
+          "is_cured": false
+        },
+        "continuous": {
+          "final_sensitive": 0.002659,
+          "final_resistant": 0.377621,
+          "final_resistant_fraction": 0.993,
+          "final_burden": 0.38028,
+          "is_cured": false
+        },
+        "adaptive_wins": true,
+        "resistant_fraction_advantage": 0.2016,
+        "burden_advantage": -0.162926
+      }
+    },
+    {
+      "cancer_type": "mCRPC",
+      "seriousness": 0.4064,
+      "drugs": [
+        "Bevacizumab (Anti-VEGF)",
+        "Metformin",
+        "Anti-PD-1 (Pembrolizumab)"
+      ],
+      "drug_evidence": [
+        "Clinical Standard",
+        "established",
+        "established"
+      ],
+      "phase_days": {
+        "flatten": 23,
+        "heat": 6,
+        "push": 25
+      },
+      "total_days": 54,
+      "escape_distance": 0.4957,
+      "cure_rate": 0.9875,
+      "cure_rate_ci": [
+        0.95,
+        1.0
+      ],
+      "safety": {
+        "is_safe": "True",
+        "safety_score": 0.805,
+        "cumulative_g34_probability": 0.274,
+        "violations": [],
+        "organ_risk": {
+          "vascular": 0.15,
+          "heart": 0.15,
+          "gi_tract": 0.15,
+          "immune_system": 0.15,
+          "liver": 0.15
+        },
+        "recommendations": [],
+        "drug_profiles": {
+          "Bevacizumab (Anti-VEGF)": {
+            "therapeutic_index": 4.0,
+            "grade34_prob": 0.12,
+            "dlt_organ": "vascular"
+          },
+          "Metformin": {
+            "therapeutic_index": 8.0,
+            "grade34_prob": 0.03,
+            "dlt_organ": "gi_tract"
+          },
+          "Anti-PD-1 (Pembrolizumab)": {
+            "therapeutic_index": 5.0,
+            "grade34_prob": 0.15,
+            "dlt_organ": "immune_system"
+          }
+        }
+      },
+      "resistance_comparison": {
+        "adaptive_distance": 0.4918,
+        "continuous_distance": 0.5274,
+        "adaptive_wins": "True",
+        "advantage": 0.0357
+      },
+      "clonal_dynamics": {
+        "adaptive": {
+          "final_sensitive": 0.195368,
+          "final_resistant": 0.247515,
+          "final_resistant_fraction": 0.5589,
+          "final_burden": 0.442883,
+          "is_cured": false
+        },
+        "continuous": {
+          "final_sensitive": 0.020424,
+          "final_resistant": 0.207433,
+          "final_resistant_fraction": 0.9104,
+          "final_burden": 0.227857,
+          "is_cured": false
+        },
+        "adaptive_wins": true,
+        "resistant_fraction_advantage": 0.3515,
+        "burden_advantage": -0.215026
+      }
+    },
+    {
+      "cancer_type": "HCC",
+      "seriousness": 0.5289,
+      "drugs": [
+        "Bevacizumab (Anti-VEGF)",
+        "2-Deoxyglucose (2-DG)",
+        "N6F11 (Selective GPX4 degrader)",
+        "Anti-PD-1 (Pembrolizumab)"
+      ],
+      "drug_evidence": [
+        "Clinical Standard",
+        "established",
+        "Preclinical",
+        "established"
+      ],
+      "phase_days": {
+        "flatten": 30,
+        "heat": 8,
+        "push": 30
+      },
+      "total_days": 68,
+      "escape_distance": 0.6825,
+      "cure_rate": 0.85,
+      "cure_rate_ci": [
+        0.7747,
+        0.925
+      ],
+      "safety": {
+        "is_safe": "True",
+        "safety_score": 0.529,
+        "cumulative_g34_probability": 0.428,
+        "violations": [],
+        "organ_risk": {
+          "vascular": 0.15,
+          "heart": 0.15,
+          "cns": 0.15,
+          "nervous_system": 0.15,
+          "liver": 0.3,
+          "immune_system": 0.15
+        },
+        "recommendations": [
+          "\u26a0\ufe0f Moderate G3/4 AE risk: 43% \u2014 close monitoring required",
+          "\u26a0\ufe0f Dual liver toxicity: N6F11 (Selective GPX4 degrader), Anti-PD-1 (Pembrolizumab) \u2014 stagger dosing"
+        ],
+        "drug_profiles": {
+          "Bevacizumab (Anti-VEGF)": {
+            "therapeutic_index": 4.0,
+            "grade34_prob": 0.12,
+            "dlt_organ": "vascular"
+          },
+          "2-Deoxyglucose (2-DG)": {
+            "therapeutic_index": 2.5,
+            "grade34_prob": 0.15,
+            "dlt_organ": "cns"
+          },
+          "N6F11 (Selective GPX4 degrader)": {
+            "therapeutic_index": 4.5,
+            "grade34_prob": 0.1,
+            "dlt_organ": "liver"
+          },
+          "Anti-PD-1 (Pembrolizumab)": {
+            "therapeutic_index": 5.0,
+            "grade34_prob": 0.15,
+            "dlt_organ": "immune_system"
+          }
+        }
+      },
+      "resistance_comparison": {
+        "adaptive_distance": 0.8156,
+        "continuous_distance": 0.9711,
+        "adaptive_wins": "True",
+        "advantage": 0.1554
+      },
+      "clonal_dynamics": {
+        "adaptive": {
+          "final_sensitive": 0.226249,
+          "final_resistant": 0.331465,
+          "final_resistant_fraction": 0.5943,
+          "final_burden": 0.557713,
+          "is_cured": false
+        },
+        "continuous": {
+          "final_sensitive": 0.020287,
+          "final_resistant": 0.276802,
+          "final_resistant_fraction": 0.9317,
+          "final_burden": 0.297089,
+          "is_cured": false
+        },
+        "adaptive_wins": true,
+        "resistant_fraction_advantage": 0.3374,
+        "burden_advantage": -0.260624
+      }
+    }
+  ]
+}

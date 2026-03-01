@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAEM Cancer POC — Geometric Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-card: #111827;
+            --bg-card-hover: #1a2332;
+            --border: #1e3a5f;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --glow: 0 0 20px rgba(59, 130, 246, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header .badge {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 2rem;
+            padding: 0.75rem 2rem;
+            background: rgba(17, 24, 39, 0.8);
+            border-bottom: 1px solid var(--border);
+            font-size: 0.8rem;
+            overflow-x: auto;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            padding: 1rem 2rem 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.2s;
+        }
+
+        .card:hover {
+            background: var(--bg-card-hover);
+            box-shadow: var(--glow);
+        }
+
+        .card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-title .icon {
+            font-size: 1rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 320px;
+        }
+
+        .card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Protocol Timeline */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .timeline-phase {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .timeline-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            border-radius: 0 0 8px 8px;
+            opacity: 0.7;
+        }
+
+        .phase-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            min-width: 160px;
+        }
+
+        .phase-drugs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .drug-pill {
+            padding: 0.15rem 0.5rem;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 1px solid;
+        }
+
+        .phase-days {
+            margin-left: auto;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        /* Heatmap Table */
+        .heatmap-container {
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 400px;
+        }
+
+        .heatmap-table {
+            border-collapse: collapse;
+            font-size: 0.7rem;
+            width: 100%;
+        }
+
+        .heatmap-table th {
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            padding: 0.4rem 0.5rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            z-index: 1;
+        }
+
+        .heatmap-table th:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 2;
+        }
+
+        .heatmap-table td {
+            padding: 0.3rem 0.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-weight: 600;
+            min-width: 55px;
+        }
+
+        .heatmap-table td:first-child {
+            text-align: left;
+            position: sticky;
+            left: 0;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-weight: 500;
+            min-width: 70px;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: var(--text-secondary);
+        }
+
+        .error-msg {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>SAEM Geometric Dashboard</h1>
+        <span class="badge">Pan-Cancer Analysis</span>
+    </div>
+
+    <div class="status-bar" id="statusBar">
+        <div class="status-item"><span class="status-dot" style="background: var(--accent-blue);"></span> Loading...</div>
+    </div>
+
+    <div class="grid" id="dashboard">
+        <div class="loading">Loading dashboard data...</div>
+    </div>
+
+    <script>
+    const COLORS = {
+        'TNBC':     { bg: 'rgba(239,68,68,0.6)',   border: '#ef4444' },
+        'PDAC':     { bg: 'rgba(249,115,22,0.6)',   border: '#f97316' },
+        'NSCLC':    { bg: 'rgba(59,130,246,0.6)',   border: '#3b82f6' },
+        'Melanoma': { bg: 'rgba(139,92,246,0.6)',   border: '#8b5cf6' },
+        'GBM':      { bg: 'rgba(6,182,212,0.6)',    border: '#06b6d4' },
+        'CRC':      { bg: 'rgba(16,185,129,0.6)',   border: '#10b981' },
+        'Healthy':  { bg: 'rgba(148,163,184,0.4)',  border: '#94a3b8' },
+    };
+
+    async function loadData() {
+        try {
+            const resp = await fetch('dashboard_data.json');
+            if (!resp.ok) throw new Error('Failed to load dashboard_data.json. Run generate_dashboard_data.py first.');
+            return await resp.json();
+        } catch (e) {
+            document.getElementById('dashboard').innerHTML = `
+                <div class="error-msg full-width">
+                    <strong>Data not found.</strong><br>
+                    Run: <code>python visualization/generate_dashboard_data.py</code> first, then reload.
+                </div>`;
+            throw e;
+        }
+    }
+
+    function updateStatusBar(data) {
+        const types = data.cancer_types.length;
+        const drugs = data.drug_effectiveness.drug_names.length;
+        const bar = document.getElementById('statusBar');
+        bar.innerHTML = `
+            <div class="status-item"><span class="status-dot" style="background: var(--accent-green);"></span> ${types} Cancer Types</div>
+            <div class="status-item"><span class="status-dot" style="background: var(--accent-blue);"></span> ${drugs} Drugs Evaluated</div>
+            <div class="status-item"><span class="status-dot" style="background: var(--accent-amber);"></span> 3-Phase Protocol</div>
+            <div class="status-item"><span class="status-dot" style="background: var(--accent-purple);"></span> 10 Metabolite Axes</div>
+        `;
+    }
+
+    function renderEigenvaluePlot(container, data) {
+        const ctx = container.querySelector('canvas').getContext('2d');
+        const datasets = [];
+
+        data.cancer_types.forEach(ct => {
+            const c = COLORS[ct.name] || COLORS['Healthy'];
+            datasets.push({
+                label: ct.name,
+                data: ct.eigenvalues.real.map((r, i) => ({ x: r, y: ct.eigenvalues.imag[i] })),
+                backgroundColor: c.bg,
+                borderColor: c.border,
+                pointRadius: 6,
+                pointHoverRadius: 9,
+            });
+        });
+
+        // Healthy reference
+        const h = data.cancer_types[0].eigenvalues_healthy;
+        datasets.push({
+            label: 'Healthy',
+            data: h.real.map((r, i) => ({ x: r, y: h.imag[i] })),
+            backgroundColor: COLORS['Healthy'].bg,
+            borderColor: COLORS['Healthy'].border,
+            pointRadius: 5,
+            pointStyle: 'triangle',
+        });
+
+        new Chart(ctx, {
+            type: 'scatter',
+            data: { datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#94a3b8', font: { size: 10 } } },
+                    tooltip: {
+                        callbacks: {
+                            label: (c) => `${c.dataset.label}: Re=${c.parsed.x.toFixed(3)}, Im=${c.parsed.y.toFixed(3)}`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Real Part (λ)', color: '#94a3b8' },
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#64748b' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Imaginary Part (λ)', color: '#94a3b8' },
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#64748b' }
+                    }
+                }
+            }
+        });
+    }
+
+    function renderRadarChart(container, data) {
+        const ctx = container.querySelector('canvas').getContext('2d');
+        const labels = ['Curvature', 'Anisotropy', 'Escape Rate', 'Coherence', 'Stability'];
+        const datasets = [];
+
+        // Normalize values for radar
+        const allCurv = data.cancer_types.map(c => c.geometry.curvature);
+        const maxCurv = Math.max(...allCurv.map(Math.abs)) || 1;
+        const allAniso = data.cancer_types.map(c => c.geometry.anisotropy);
+        const maxAniso = Math.max(...allAniso) || 1;
+        const allEsc = data.cancer_types.map(c => c.escape_rate_baseline);
+        const maxEsc = Math.max(...allEsc) || 1;
+
+        data.cancer_types.forEach(ct => {
+            const c = COLORS[ct.name] || COLORS['Healthy'];
+            datasets.push({
+                label: ct.name,
+                data: [
+                    Math.abs(ct.geometry.curvature) / maxCurv,
+                    ct.geometry.anisotropy / maxAniso,
+                    ct.escape_rate_baseline / maxEsc,
+                    ct.coherence.overall_score,
+                    ct.coherence.stability_score,
+                ],
+                backgroundColor: c.bg.replace('0.6', '0.15'),
+                borderColor: c.border,
+                borderWidth: 2,
+                pointRadius: 3,
+            });
+        });
+
+        new Chart(ctx, {
+            type: 'radar',
+            data: { labels, datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } },
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(255,255,255,0.08)' },
+                        grid: { color: 'rgba(255,255,255,0.08)' },
+                        pointLabels: { color: '#94a3b8', font: { size: 11 } },
+                        ticks: { display: false },
+                        suggestedMin: 0,
+                        suggestedMax: 1,
+                    }
+                }
+            }
+        });
+    }
+
+    function renderProtocolTimeline(container, data) {
+        const timeline = container.querySelector('.timeline');
+        if (!timeline) return;
+        const phases = data.protocol.phases;
+        const totalDays = 60;
+
+        phases.forEach(phase => {
+            const pct = ((phase.end_day - phase.start_day) / totalDays) * 100;
+            const startPct = (phase.start_day / totalDays) * 100;
+
+            const el = document.createElement('div');
+            el.className = 'timeline-phase';
+            el.innerHTML = `
+                <div class="phase-label" style="color: ${phase.color};">${phase.name}</div>
+                <div class="phase-drugs">
+                    ${phase.drugs.map(d => `<span class="drug-pill" style="color: ${phase.color}; border-color: ${phase.color};">${d}</span>`).join('')}
+                </div>
+                <div class="phase-days">Day ${phase.start_day}–${phase.end_day}</div>
+                <div class="timeline-bar" style="background: ${phase.color}; left: ${startPct}%; width: ${pct}%;"></div>
+            `;
+            timeline.appendChild(el);
+        });
+    }
+
+    function renderHeatmap(container, data) {
+        const heatmapDiv = container.querySelector('.heatmap-container');
+        if (!heatmapDiv) return;
+
+        const eff = data.drug_effectiveness;
+        let html = '<table class="heatmap-table"><thead><tr><th>Drug \\ Cancer</th>';
+        eff.cancer_names.forEach(n => { html += `<th>${n}</th>`; });
+        html += '</tr></thead><tbody>';
+
+        eff.drug_names.forEach((drug, di) => {
+            // Shorten drug name
+            const shortName = drug.replace(/\(.*?\)/g, '').trim().substring(0, 18);
+            html += `<tr><td title="${drug}">${shortName}</td>`;
+            eff.cancer_names.forEach((_, ci) => {
+                const val = eff.effectiveness[ci][di];
+                const color = val > 0.1
+                    ? `rgba(16,185,129,${Math.min(val * 2, 0.9)})`
+                    : val < -0.1
+                        ? `rgba(239,68,68,${Math.min(Math.abs(val) * 2, 0.9)})`
+                        : 'rgba(255,255,255,0.03)';
+                html += `<td style="background: ${color};" title="${drug} on ${eff.cancer_names[ci]}: ${(val*100).toFixed(1)}%">${(val*100).toFixed(0)}%</td>`;
+            });
+            html += '</tr>';
+        });
+
+        html += '</tbody></table>';
+        heatmapDiv.innerHTML = html;
+    }
+
+    async function init() {
+        const data = await loadData();
+        updateStatusBar(data);
+
+        const grid = document.getElementById('dashboard');
+        grid.innerHTML = `
+            <div class="card" id="eigenCard">
+                <div class="card-title"><span class="icon">◉</span> Attractor Eigenvalue Spectrum</div>
+                <div class="chart-container"><canvas></canvas></div>
+            </div>
+            <div class="card" id="radarCard">
+                <div class="card-title"><span class="icon">⬡</span> Pan-Cancer Geometry Comparison</div>
+                <div class="chart-container"><canvas></canvas></div>
+            </div>
+            <div class="card" id="protocolCard">
+                <div class="card-title"><span class="icon">▷</span> Geometric Achievement Protocol</div>
+                <div class="timeline"></div>
+            </div>
+            <div class="card" id="heatmapCard">
+                <div class="card-title"><span class="icon">▦</span> Drug × Cancer Effectiveness</div>
+                <div class="heatmap-container"></div>
+            </div>
+        `;
+
+        renderEigenvaluePlot(document.getElementById('eigenCard'), data);
+        renderRadarChart(document.getElementById('radarCard'), data);
+        renderProtocolTimeline(document.getElementById('protocolCard'), data);
+        renderHeatmap(document.getElementById('heatmapCard'), data);
+    }
+
+    init();
+    </script>
+</body>
+</html>

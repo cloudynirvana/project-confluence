@@ -1,0 +1,264 @@
+{
+  "calibrated_params": {
+    "base_force": 0.375,
+    "exhaustion_rate": 0.2,
+    "treg_load": 0.5,
+    "noise_scale": 0.1875,
+    "score": 58.16715409835078
+  },
+  "pan_cancer_corrections": {
+    "TNBC": {
+      "curvature_before": 0.29999999999999993,
+      "curvature_after": 0.42000000000000004,
+      "escape_rate_before": 0.10717963290880692,
+      "escape_rate_after": 0.18753138910251702,
+      "coherence_before": 0.5852694433872455,
+      "coherence_after": 0.6022452251031569,
+      "sparse_targets": [
+        [
+          9,
+          9,
+          -0.5
+        ],
+        [
+          1,
+          1,
+          -0.5
+        ],
+        [
+          2,
+          1,
+          -0.30000000000000004
+        ],
+        [
+          6,
+          7,
+          -0.2
+        ],
+        [
+          5,
+          5,
+          -0.2
+        ]
+      ],
+      "stability_improvement": 0.0,
+      "is_stabilizing": true
+    },
+    "PDAC": {
+      "curvature_before": 0.30499999999999994,
+      "curvature_after": 0.39999999999999997,
+      "escape_rate_before": 0.09343844887133569,
+      "escape_rate_after": 0.1851164223614699,
+      "coherence_before": 0.5623219826433368,
+      "coherence_after": 0.6085895202316698,
+      "sparse_targets": [
+        [
+          1,
+          1,
+          -0.55
+        ],
+        [
+          9,
+          9,
+          -0.4
+        ],
+        [
+          2,
+          1,
+          -0.4
+        ],
+        [
+          5,
+          6,
+          -0.3
+        ],
+        [
+          0,
+          2,
+          -0.29999999999999993
+        ]
+      ],
+      "stability_improvement": 0.014917619288776884,
+      "is_stabilizing": true
+    },
+    "NSCLC": {
+      "curvature_before": 0.33999999999999997,
+      "curvature_after": 0.465,
+      "escape_rate_before": 0.08358007226998784,
+      "escape_rate_after": 0.21255390236706886,
+      "coherence_before": 0.5890994660559807,
+      "coherence_after": 0.6209561259303314,
+      "sparse_targets": [
+        [
+          1,
+          1,
+          -0.45000000000000007
+        ],
+        [
+          9,
+          9,
+          -0.45
+        ],
+        [
+          0,
+          0,
+          -0.2
+        ],
+        [
+          2,
+          1,
+          -0.19999999999999998
+        ],
+        [
+          5,
+          5,
+          -0.15000000000000002
+        ]
+      ],
+      "stability_improvement": 0.08114368799263877,
+      "is_stabilizing": true
+    },
+    "Melanoma": {
+      "curvature_before": 0.35,
+      "curvature_after": 0.4600000000000001,
+      "escape_rate_before": 0.0914727557556937,
+      "escape_rate_after": 0.23040781249068068,
+      "coherence_before": 0.6204983403669191,
+      "coherence_after": 0.641443949913171,
+      "sparse_targets": [
+        [
+          9,
+          9,
+          -0.55
+        ],
+        [
+          1,
+          1,
+          -0.4
+        ],
+        [
+          0,
+          0,
+          -0.15000000000000002
+        ],
+        [
+          9,
+          4,
+          -0.15
+        ],
+        [
+          2,
+          3,
+          -0.10000000000000003
+        ]
+      ],
+      "stability_improvement": 0.04965962895933959,
+      "is_stabilizing": true
+    },
+    "GBM": {
+      "curvature_before": 0.30999999999999994,
+      "curvature_after": 0.44299999999999995,
+      "escape_rate_before": 0.08560151609934129,
+      "escape_rate_after": 0.21132668607044958,
+      "coherence_before": 0.5776519123858326,
+      "coherence_after": 0.6216281842971692,
+      "sparse_targets": [
+        [
+          9,
+          9,
+          -0.48000000000000004
+        ],
+        [
+          1,
+          1,
+          -0.45000000000000007
+        ],
+        [
+          2,
+          1,
+          -0.24999999999999997
+        ],
+        [
+          0,
+          0,
+          -0.2
+        ],
+        [
+          8,
+          8,
+          -0.19999999999999998
+        ]
+      ],
+      "stability_improvement": 0.09418391666517159,
+      "is_stabilizing": true
+    },
+    "CRC": {
+      "curvature_before": 0.323,
+      "curvature_after": 0.43800000000000006,
+      "escape_rate_before": 0.1018214085498235,
+      "escape_rate_after": 0.20576817946533582,
+      "coherence_before": 0.6015924796717412,
+      "coherence_after": 0.6140937022646884,
+      "sparse_targets": [
+        [
+          1,
+          1,
+          -0.5
+        ],
+        [
+          9,
+          9,
+          -0.45
+        ],
+        [
+          2,
+          1,
+          -0.35
+        ],
+        [
+          0,
+          0,
+          -0.2
+        ],
+        [
+          2,
+          3,
+          0.18
+        ]
+      ],
+      "stability_improvement": 0.018327567593592525,
+      "is_stabilizing": true
+    }
+  },
+  "target_outcomes": {
+    "Standard": 5.76,
+    "Iatrogenic": 6.1,
+    "Geometric": 0.14
+  },
+  "stability_targets": {
+    "healthy_lyapunov": -0.2,
+    "tnbc_lyapunov": -0.064,
+    "treated_lyapunov": -0.0829,
+    "coherence_deficit": 0.136,
+    "coupling_disruption": 1.1151
+  },
+  "sparse_correction_reference": {
+    "9,9": -0.5571,
+    "1,1": -0.4893,
+    "2,1": -0.2996,
+    "5,6": -0.2764,
+    "0,0": -0.2285
+  },
+  "metabolite_names": [
+    "Glucose",
+    "Lactate",
+    "Pyruvate",
+    "ATP",
+    "NADH",
+    "Glutamine",
+    "Glutamate",
+    "aKG",
+    "Citrate",
+    "ROS"
+  ]
+}

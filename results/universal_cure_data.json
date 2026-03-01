@@ -1,0 +1,32 @@
+{
+  "calibrated_params": {
+    "base_force": 0.55,
+    "exhaustion_rate": 0.15,
+    "treg_load": 0.5,
+    "noise_scale": 0.15,
+    "resistance_tau_days": 18.0
+  },
+  "gate_outcomes": {
+    "Cure Threshold (\u226590% cure rate per cancer)": {
+      "passed": true,
+      "detail": "10/10 cancers achieve \u226590% cure rate"
+    },
+    "Adaptive Superiority": {
+      "passed": true,
+      "detail": "Adaptive beats continuous in 10/10 cancers"
+    },
+    "Protocol Diversity": {
+      "passed": true,
+      "detail": "5/10 unique drug combinations (min 5 required)"
+    },
+    "Non-Uniform Outcomes": {
+      "passed": true,
+      "detail": "Escape distance range: [0.271, 0.543]"
+    }
+  },
+  "cure_summary": {
+    "total_cures": 10,
+    "adaptive_wins": 10,
+    "unique_protocols": 5
+  }
+}

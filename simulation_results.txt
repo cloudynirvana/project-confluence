@@ -1,0 +1,25 @@
+﻿
+Running Scenario: Standard of Care (Checkpoint Only)
+  Final Distance from Health: 0.096
+  Max Well Depth: 0.296
+  Min Well Depth: 0.296
+  Outcome: CURE
+
+Running Scenario: Iatrogenic Failure (Epogen + Checkpoint)
+  Final Distance from Health: 0.143
+  Max Well Depth: 0.796
+  Min Well Depth: 0.796
+  Outcome: CURE
+
+Running Scenario: Geometric Achievement Protocol
+  Final Distance from Health: 0.247
+  Max Well Depth: 0.316
+  Min Well Depth: 0.241
+  Outcome: CURE
+
+==================================================
+FINAL RESULTS
+==================================================
+1. Standard Care:   SUCCESS (Dist: 0.10)
+2. Epogen Trap:     SUCCESS (Dist: 0.14)
+3. Geometric Cure:  SUCCESS (Dist: 0.25)

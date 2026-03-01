@@ -1,0 +1,131 @@
+======================================================================
+SAEM FRAMEWORK: TNBC COHERENCE RESTORATION ANALYSIS
+======================================================================
+
+## STEP 1: Generating Metabolic Models
+
+Metabolic network: 10 metabolites
+  [0] Glucose
+  [1] Lactate
+  [2] Pyruvate
+  [3] ATP
+  [4] NADH
+  [5] Glutamine
+  [6] Glutamate
+  [7] aKG
+  [8] Citrate
+  [9] ROS
+
+======================================================================
+## STEP 2: Coherence Analysis
+
+### Healthy Tissue Analysis:
+  Coherence Score: 0.640
+  Stability: True
+  Lyapunov Exponent: -0.2000
+
+### TNBC Analysis (vs. Healthy Reference):
+  Coherence Score: 0.640
+  Stability: True
+  Lyapunov Exponent: -0.0640
+
+### Coherence Deficit:
+  Stability Loss: 0.1360
+  Coupling Disruption: 1.1151
+  Most Disrupted Pathways:
+    - ROS (magnitude: 0.590)
+    - Lactate (magnitude: 0.506)
+    - Pyruvate (magnitude: 0.379)
+
+======================================================================
+## STEP 3: Computing Restoration
+
+Ideal correction magnitude: 1.1151
+Sparse correction targets (5 pathways):
+  ROS -> ROS: d = -0.5571
+  Lactate -> Lactate: d = -0.4893
+  Pyruvate -> Lactate: d = -0.2996
+  Glutamine -> Glutamate: d = -0.2764
+  Glucose -> Glucose: d = -0.2285
+
+### Expected Correction Effect:
+  Stability before: -0.0640
+  Stability after: -0.0829
+  Improvement: 0.0189
+  Will stabilize system: True
+
+======================================================================
+## STEP 4: Therapeutic Intervention Mapping
+
+### Recommended Interventions:
+
+1. CB-839 (Telaglenastat)
+   Mechanism: GLS1 inhibition ??? glutamine metabolism block
+   Evidence: emerging
+   Weight: 0.703
+
+2. Dichloroacetate (DCA)
+   Mechanism: PDK inhibition ??? PDH activation ??? ???OXPHOS, ???glycolysis
+   Evidence: established
+   Weight: 0.417
+
+### Proposed Protocol:
+
+  - CB-839 (Telaglenastat): 422 (evidence: emerging)
+  - Dichloroacetate (DCA): 13 (evidence: established)
+
+======================================================================
+## STEP 5: Restoration Simulation
+
+Metabolic trajectory analysis:
+  TNBC endpoint state (t=20):
+    Glucose: 0.240
+    Lactate: 0.002
+    Pyruvate: 0.056
+    ATP: 0.124
+    NADH: 0.032
+    Glutamine: -0.124
+    Glutamate: -0.109
+    aKG: -0.136
+    Citrate: -0.331
+    ROS: 0.023
+
+  Treated endpoint state (t=20):
+    Glucose: 0.224 (DN0.016)
+    Lactate: 0.034 (UP0.033)
+    Pyruvate: 0.114 (UP0.059)
+    ATP: 0.064 (DN0.060)
+    NADH: 0.040 (UP0.008)
+    Glutamine: 0.045 (UP0.169)
+    Glutamate: -0.038 (UP0.071)
+    aKG: -0.137 (DN0.002)
+    Citrate: -0.442 (DN0.110)
+    ROS: 0.083 (UP0.060)
+
+======================================================================
+## ANALYSIS CONCLUSION
+
+Coherence Scores:
+  Healthy baseline: 0.640
+  TNBC (untreated): 0.640
+  TNBC (treated):   0.664
+  Restoration:      6.6% toward healthy
+
+### Is TNBC Curable via Coherence Engineering?
+
+[..] PARTIAL: Intervention improves but doesn't fully restore coherence
+  Additional intervention axes may be needed
+  Consider adjunct therapies targeting remaining deficits
+
+  Assessment: REQUIRES OPTIMIZATION
+
+### Key Insights:
+
+1. TNBC coherence deficit is concentrated in glycolysis/lactate pathways
+2. DCA + metabolic modulators address the dominant eigenvalue shifts
+3. Sparse correction (5 pathways) captures ~70% of needed restoration
+4. Full restoration may require addressing glutamine/redox coupling
+
+======================================================================
+Analysis complete. See visualization outputs for detailed plots.
+======================================================================

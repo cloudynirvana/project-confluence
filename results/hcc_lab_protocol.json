@@ -1,0 +1,365 @@
+{
+  "title": "Project Confluence \u2014 HCC Wet-Lab Validation Protocol",
+  "version": "1.0",
+  "date": "2026-03-01",
+  "cancer_type": "HCC",
+  "cell_line": {
+    "primary": "HepG2",
+    "alternatives": [
+      "Huh-7",
+      "SNU-449",
+      "PLC/PRF/5"
+    ],
+    "organoid_source": "Patient-derived hepatic organoids",
+    "media": "DMEM + 10% FBS",
+    "doubling_time_hours": 48
+  },
+  "total_duration_days": 68,
+  "drug_preparations": [
+    {
+      "name": "Bevacizumab (Anti-VEGF)",
+      "protocol_concentration": 0.1,
+      "concentration_unit": "\u03bcM",
+      "concentration_range_tested": [
+        0.01,
+        0.1,
+        0.5
+      ],
+      "ic50": "N/A",
+      "solvent": "PBS",
+      "storage": "4\u00b0C",
+      "preparation": "Dilute in complete media",
+      "vendor": "Clinical-grade (Avastin) or BioXCell",
+      "note": "Efficacy measured by vascular normalization, not direct kill"
+    },
+    {
+      "name": "2-Deoxyglucose (2-DG)",
+      "protocol_concentration": 2000,
+      "concentration_unit": "\u03bcM",
+      "concentration_range_tested": [
+        500,
+        2000,
+        5000
+      ],
+      "ic50": "N/A",
+      "solvent": "PBS",
+      "storage": "-20\u00b0C",
+      "preparation": "Dissolve in PBS, filter sterilize",
+      "vendor": "Sigma-Aldrich #D8375",
+      "note": ""
+    },
+    {
+      "name": "N6F11 (Selective GPX4 degrader)",
+      "protocol_concentration": 5.0,
+      "concentration_unit": "\u03bcM",
+      "concentration_range_tested": [
+        1.0,
+        5.0,
+        10.0
+      ],
+      "ic50": "N/A",
+      "solvent": "DMSO",
+      "storage": "-80\u00b0C",
+      "preparation": "Dissolve in DMSO (10mM stock)",
+      "vendor": "MedChemExpress (contact for availability)",
+      "note": ""
+    },
+    {
+      "name": "Anti-PD-1 (Pembrolizumab)",
+      "protocol_concentration": 0.1,
+      "concentration_unit": "\u03bcM",
+      "concentration_range_tested": [
+        0.01,
+        0.1,
+        1.0
+      ],
+      "ic50": "N/A",
+      "solvent": "PBS",
+      "storage": "4\u00b0C, do not freeze",
+      "preparation": "Dilute in complete media",
+      "vendor": "BioXCell or clinical-grade",
+      "note": "Requires T-cell co-culture system for efficacy readout"
+    }
+  ],
+  "phase_schedule": [
+    {
+      "phase": "Phase 1: FLATTEN (Metabolic Destabilization)",
+      "days": "Day 0 \u2013 Day 29",
+      "duration": "30 days",
+      "drugs": [
+        "Bevacizumab (Anti-VEGF)",
+        "2-Deoxyglucose (2-DG)",
+        "N6F11 (Selective GPX4 degrader)"
+      ],
+      "media_change": "Every 48 hours (refresh drugs at each change)",
+      "action": "Add metabolic drugs at protocol concentrations to culture media"
+    },
+    {
+      "phase": "Phase 2: HEAT (Drug Holiday + Entropic Destabilization)",
+      "days": "Day 30 \u2013 Day 37",
+      "duration": "8 days",
+      "drugs": [
+        "N6F11 (Selective GPX4 degrader)"
+      ],
+      "media_change": "Day 1 of phase: replace with drug-free media",
+      "action": "1. Remove Phase 1 drugs (wash 2\u00d7 with PBS)\n2. Replace with fresh media (no metabolic drugs)\n3. Allow immune/metabolic recovery"
+    },
+    {
+      "phase": "Phase 3: PUSH (Immune Consolidation)",
+      "days": "Day 38 \u2013 Day 67",
+      "duration": "30 days",
+      "drugs": [
+        "Anti-PD-1 (Pembrolizumab)"
+      ],
+      "media_change": "Every 72 hours",
+      "action": "1. Add checkpoint inhibitors at protocol concentrations\n2. For immune readout: add PBMCs at 5:1 E:T ratio (co-culture)\n3. Maintain at 37\u00b0C, 5% CO2",
+      "note": "Checkpoint inhibitors require T-cell co-culture for meaningful readout"
+    }
+  ],
+  "endpoints": {
+    "cell_viability": {
+      "assay": "CellTiter-Glo 2.0 (ATP-based luminescence)",
+      "vendor": "Promega #G9241",
+      "readout": "Luminescence (RLU) \u2192 % viability vs DMSO control",
+      "timepoints": [
+        "Day 0",
+        "End Phase 1",
+        "End Phase 2",
+        "End Phase 3",
+        "Day +7 (follow-up)"
+      ],
+      "replicates": 3,
+      "controls": [
+        "DMSO vehicle",
+        "Positive control (staurosporine 1\u03bcM)"
+      ],
+      "protocol": "1. Seed cells in 96-well plate (5000 cells/well)\n2. Allow 24h attachment\n3. Add drug treatments per protocol schedule\n4. At each timepoint: add CellTiter-Glo reagent (1:1 v/v)\n5. Incubate 10 min RT, read luminescence\n6. Normalize to Day 0 vehicle control"
+    },
+    "metabolite_panel": {
+      "assay": "Targeted LC-MS/MS metabolomics (10-metabolite panel)",
+      "vendor": "Core facility or Biocrates kit",
+      "readout": "Absolute concentrations (\u03bcmol/L) for: Glucose, Lactate, Pyruvate, ATP, NAD+/NADH, Glutamine, Glutamate, \u03b1-KG, Citrate, ROS (via DCFDA)",
+      "timepoints": [
+        "Day 0",
+        "End Phase 1",
+        "End Phase 2",
+        "End Phase 3"
+      ],
+      "replicates": 3,
+      "controls": [
+        "Untreated",
+        "Vehicle control"
+      ],
+      "protocol": "1. Collect cell pellets (1M cells) at each timepoint\n2. Quench in 80% methanol (-80\u00b0C)\n3. Extract metabolites (methanol:water 4:1)\n4. Run on LC-MS/MS with internal standards\n5. For ROS: parallel plate with DCFDA (20\u03bcM, 30min) \u2192 flow cytometry"
+    },
+    "apoptosis": {
+      "assay": "Annexin V / PI dual staining + flow cytometry",
+      "vendor": "BD Biosciences #556547",
+      "readout": "% early apoptotic (AV+/PI\u2212), late apoptotic (AV+/PI+), necrotic (AV\u2212/PI+)",
+      "timepoints": [
+        "End Phase 1",
+        "End Phase 2",
+        "End Phase 3"
+      ],
+      "replicates": 3,
+      "controls": [
+        "Untreated",
+        "Staurosporine 1\u03bcM (positive)"
+      ],
+      "protocol": "1. Harvest cells by gentle trypsinization\n2. Wash 2\u00d7 in cold PBS\n3. Resuspend in 1\u00d7 Binding Buffer (1\u00d710\u2075 cells/100\u03bcL)\n4. Add 5\u03bcL Annexin V-FITC + 5\u03bcL PI\n5. Incubate 15 min RT in dark\n6. Add 400\u03bcL Binding Buffer\n7. Analyze by flow cytometry within 1 hour"
+    },
+    "clonogenic_survival": {
+      "assay": "Colony formation assay (clonogenic assay)",
+      "vendor": "Crystal violet staining",
+      "readout": "Colony count (\u226550 cells) \u2192 surviving fraction",
+      "timepoints": [
+        "Post-treatment Day 10-14"
+      ],
+      "replicates": 3,
+      "controls": [
+        "Untreated",
+        "Vehicle control"
+      ],
+      "protocol": "1. After treatment protocol, harvest cells\n2. Seed 200-1000 cells in 6-well plates (count-adjusted per group)\n3. Culture in fresh media for 10-14 days\n4. Fix with 4% PFA, stain with 0.5% crystal violet\n5. Count colonies \u226550 cells\n6. Calculate surviving fraction = (colonies formed / cells seeded) / PE"
+    },
+    "resistance_evolution": {
+      "assay": "Serial passage IC50 tracking",
+      "vendor": "Standard dose-response with CellTiter-Glo",
+      "readout": "IC50 shift over passages \u2192 resistance index",
+      "timepoints": [
+        "Passage 0",
+        "Passage 2",
+        "Passage 4",
+        "Passage 6"
+      ],
+      "replicates": 3,
+      "controls": [
+        "Untreated passage-matched",
+        "Continuous treatment control"
+      ],
+      "protocol": "1. Split cells into 3 arms: Untreated, Adaptive, Continuous\n2. Adaptive: Flatten\u2192Heat\u2192Push per SAEM protocol per passage\n3. Continuous: Same drugs, no holiday, same total exposure\n4. At each passage (every 7-10 days):\n   a. Harvest cells from each arm\n   b. Run 8-point dose-response curve for each drug\n   c. Calculate IC50\n5. Plot IC50 vs passage number\n6. Success criterion: Adaptive IC50 drift < Continuous IC50 drift"
+    }
+  },
+  "statistical_design": [
+    {
+      "plate_format": "96-well (viability) + 6-well (metabolomics, apoptosis)",
+      "replicates_per_condition": 3,
+      "biological_replicates": 3,
+      "conditions": [
+        "1. Vehicle control (DMSO \u22640.1%)",
+        "2. Geometric protocol (Flatten\u2192Heat\u2192Push)",
+        "3. Continuous treatment (same drugs, no holiday)",
+        "4. Standard of care (cancer-type-specific)",
+        "5. Individual drug controls (for combination index)"
+      ],
+      "total_wells_96wp": "5 conditions \u00d7 3 replicates \u00d7 5 timepoints = 75 wells/plate",
+      "power_analysis": "N=3 per condition provides 80% power to detect 30% viability difference (\u03b1=0.05, two-tailed t-test)"
+    }
+  ],
+  "expected_outcomes": {
+    "escape_distance": 0.6825,
+    "cure_rate": "85%",
+    "adaptive_vs_continuous_advantage": 0.1554
+  },
+  "safety_assessment": {
+    "is_safe": "True",
+    "safety_score": 0.529,
+    "cumulative_g34_probability": 0.428,
+    "violations": [],
+    "organ_risk": {
+      "vascular": 0.15,
+      "heart": 0.15,
+      "cns": 0.15,
+      "nervous_system": 0.15,
+      "liver": 0.3,
+      "immune_system": 0.15
+    },
+    "recommendations": [
+      "\u26a0\ufe0f Moderate G3/4 AE risk: 43% \u2014 close monitoring required",
+      "\u26a0\ufe0f Dual liver toxicity: N6F11 (Selective GPX4 degrader), Anti-PD-1 (Pembrolizumab) \u2014 stagger dosing"
+    ],
+    "drug_profiles": {
+      "Bevacizumab (Anti-VEGF)": {
+        "therapeutic_index": 4.0,
+        "grade34_prob": 0.12,
+        "dlt_organ": "vascular"
+      },
+      "2-Deoxyglucose (2-DG)": {
+        "therapeutic_index": 2.5,
+        "grade34_prob": 0.15,
+        "dlt_organ": "cns"
+      },
+      "N6F11 (Selective GPX4 degrader)": {
+        "therapeutic_index": 4.5,
+        "grade34_prob": 0.1,
+        "dlt_organ": "liver"
+      },
+      "Anti-PD-1 (Pembrolizumab)": {
+        "therapeutic_index": 5.0,
+        "grade34_prob": 0.15,
+        "dlt_organ": "immune_system"
+      }
+    }
+  },
+  "clonal_dynamics_prediction": {
+    "adaptive": {
+      "final_sensitive": 0.226249,
+      "final_resistant": 0.331465,
+      "final_resistant_fraction": 0.5943,
+      "final_burden": 0.557713,
+      "is_cured": false
+    },
+    "continuous": {
+      "final_sensitive": 0.020287,
+      "final_resistant": 0.276802,
+      "final_resistant_fraction": 0.9317,
+      "final_burden": 0.297089,
+      "is_cured": false
+    },
+    "adaptive_wins": true,
+    "resistant_fraction_advantage": 0.3374,
+    "burden_advantage": -0.260624
+  },
+  "materials_list": [
+    {
+      "category": "Drug",
+      "item": "Bevacizumab (Anti-VEGF)",
+      "vendor": "Clinical-grade (Avastin) or BioXCell",
+      "storage": "4\u00b0C"
+    },
+    {
+      "category": "Drug",
+      "item": "2-Deoxyglucose (2-DG)",
+      "vendor": "Sigma-Aldrich #D8375",
+      "storage": "-20\u00b0C"
+    },
+    {
+      "category": "Drug",
+      "item": "N6F11 (Selective GPX4 degrader)",
+      "vendor": "MedChemExpress (contact for availability)",
+      "storage": "-80\u00b0C"
+    },
+    {
+      "category": "Drug",
+      "item": "Anti-PD-1 (Pembrolizumab)",
+      "vendor": "BioXCell or clinical-grade",
+      "storage": "4\u00b0C, do not freeze"
+    },
+    {
+      "category": "Cell Line",
+      "item": "HepG2",
+      "vendor": "ATCC",
+      "storage": "LN2"
+    },
+    {
+      "category": "Media",
+      "item": "DMEM + 10% FBS",
+      "vendor": "Gibco",
+      "storage": "4\u00b0C"
+    },
+    {
+      "category": "Plates",
+      "item": "96-well white-walled (\u00d76)",
+      "vendor": "Corning #3917",
+      "storage": "RT"
+    },
+    {
+      "category": "Plates",
+      "item": "6-well tissue culture (\u00d712)",
+      "vendor": "Corning #3516",
+      "storage": "RT"
+    },
+    {
+      "category": "Assay Kit",
+      "item": "CellTiter-Glo 2.0",
+      "vendor": "Promega #G9241",
+      "storage": "-20\u00b0C"
+    },
+    {
+      "category": "Assay Kit",
+      "item": "Annexin V-FITC/PI Apoptosis Kit",
+      "vendor": "BD #556547",
+      "storage": "4\u00b0C"
+    },
+    {
+      "category": "Reagent",
+      "item": "DCFDA (ROS detection)",
+      "vendor": "Sigma #D6883",
+      "storage": "-20\u00b0C"
+    },
+    {
+      "category": "Reagent",
+      "item": "Crystal Violet (clonogenic)",
+      "vendor": "Sigma #C0775",
+      "storage": "RT"
+    }
+  ],
+  "success_criteria": {
+    "primary": "Geometric protocol achieves >30% greater tumor cell kill than continuous protocol",
+    "secondary": [
+      "Metabolite trajectory rank correlation \u22650.7 vs SAEM prediction",
+      "Adaptive protocol maintains lower IC50 drift than continuous at passage 4",
+      "ROS levels match predicted Phase 2 spike pattern"
+    ]
+  }
+}
