@@ -41,27 +41,40 @@ Before diving into the code or results, understand what this project is and isn'
 ## Architecture
 
 ```
-src/
-├── tnbc_ode.py               # 10-metabolite ODE systems (10 cancer types + healthy)
-├── geometric_optimization.py  # Basin curvature, Kramers escape rate, optimizer
-├── intervention.py            # 19-drug library with PK engine and synergy matrix
-├── immune_dynamics.py         # Multi-compartment immune force field
-├── coherence.py               # Spectral coherence analysis
-├── clonal_dynamics.py         # Lotka-Volterra 2-clone competition model
-├── toxicity_constraints.py    # Clinical safety constraints (MTD, organ overlap)
-├── protocol_translator.py     # Simulation → wet-lab protocol conversion
-├── resistance_model.py        # Multi-mechanism resistance tracking
-├── spatial_dynamics.py        # 3-compartment tumor model (core/rim/stroma)
-├── calibration.py             # Parameter calibration engine
-└── restoration.py             # Generator correction computation
+src/                            # Core computational engine (12 modules)
+├── tnbc_ode.py                 # 10-metabolite ODE systems (10 cancer types + healthy)
+├── geometric_optimization.py   # Basin curvature, Kramers escape rate, optimizer
+├── intervention.py             # 19-drug library with PK engine and synergy matrix
+├── immune_dynamics.py          # Multi-compartment immune force field
+├── coherence.py                # Spectral coherence analysis
+├── clonal_dynamics.py          # Lotka-Volterra 2-clone competition model
+├── toxicity_constraints.py     # Clinical safety constraints (MTD, organ overlap)
+├── protocol_translator.py      # Simulation → wet-lab protocol conversion
+├── resistance_model.py         # Multi-mechanism resistance tracking
+├── spatial_dynamics.py         # 3-compartment tumor model (core/rim/stroma)
+├── calibration.py              # Parameter calibration engine
+└── restoration.py              # Generator correction computation
 
-confluence_runner.py            # Main pipeline: runs all 10 cancers end-to-end
-universal_cure_engine.py        # Enhanced engine with sensitivity analysis
+confluence_runner.py             # Main pipeline: runs all 10 cancers end-to-end
+universal_cure_engine.py         # Enhanced engine with sensitivity analysis
 
-tests/
-├── test_universal_cure.py      # Unit tests (generators, interventions, resistance)
-├── test_adversarial.py         # Adversarial stress tests (break the model)
-└── test_optimization.py        # Protocol optimization tests
+results/                         # Simulation outputs
+├── executive_summary.md         # Start here — one-page overview
+├── confluence_report.md         # Full pan-cancer results
+├── gaps_and_limitations.md      # Honest risk assessment
+├── latiff.md                    # Mathematical formalism (LATIFF)
+├── protocols/                   # Per-cancer lab-ready protocols (10 × md + json)
+└── data/                        # Raw JSON simulation data
+
+tests/                           # Test suites
+├── test_universal_cure.py       # Unit tests (generators, interventions, resistance)
+├── test_adversarial.py          # Adversarial stress tests (break the model)
+└── test_optimization.py         # Protocol optimization tests
+
+examples/                        # Runnable demos
+tools/                           # Development utilities (calibration, sweeps)
+visualization/                   # Interactive dashboard
+docs/                            # Community posting drafts
 ```
 
 ## Quick Start
