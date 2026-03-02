@@ -52,10 +52,33 @@ P(escape) ∝ exp(-μ(A) / (σ² + F))
 
 **Drug library**: Metformin, GLP-1 RA (semaglutide), SGLT2i (empagliflozin), insulin, lifestyle intervention, bariatric surgery, tirzepatide — each with literature-grounded δA corrections and mortality data (UKPDS, EMPA-REG, SUSTAIN-6).
 
+### 🫀 Cardiovascular — 6 Stages, 8 Drugs ✅
+
+| Stage | Generator | Key Feature |
+|-------|-----------|-------------|
+| Healthy | `healthy_generator()` | Balanced lipids, intact endothelium |
+| Dyslipidemia | `dyslipidemia_generator()` | LDL↑, HDL↓ — shallow, reversible |
+| Atherosclerosis | `atherosclerosis_generator()` | Inflammatory plaque remodeling |
+| ACS | `acs_generator()` | Plaque rupture + thrombosis — acute deep |
+| Heart Failure | `heart_failure_generator()` | Neurohormonal spiral — deepest CVD basin |
+| Hypertension | `hypertension_generator()` | RAAS overactivation + vascular remodeling |
+
+**Drug library**: High-intensity statin, ACE inhibitor (ramipril), DAPT (aspirin + ticagrelor), ARNI (sacubitril/valsartan), SGLT2i (dapagliflozin), beta-blocker (carvedilol), PCSK9i (evolocumab), lifestyle — referenced to PARADIGM-HF, DAPA-HF, FOURIER, PROVE-IT, HOPE.
+
+### 🧠 Neurodegeneration — 5 Stages, 6 Drugs ✅
+
+| Stage | Generator | Key Feature |
+|-------|-----------|-------------|
+| Healthy Aging | `healthy_aging_generator()` | Intact clearance + synapses |
+| MCI (Amyloid+) | `mci_amyloid_generator()` | Prodromal AD — modifiable |
+| Alzheimer's | `alzheimers_generator()` | Aβ + tau + synaptic devastation |
+| Parkinson's | `parkinsons_generator()` | α-synuclein + dopaminergic collapse |
+| ALS | `als_generator()` | Excitotoxicity — fastest progression |
+
+**Drug library**: Lecanemab (anti-Aβ, CLARITY AD), levodopa/carbidopa, riluzole, memantine, tofersen (anti-SOD1 ASO), exercise + cognitive training — referenced to CLARITY AD, VALOR, FINGER trial.
+
 ### 🔜 Coming Soon
 
-- **Cardiovascular Disease** — Atherosclerosis, heart failure, arrhythmia
-- **Neurodegeneration** — Alzheimer's, Parkinson's, ALS
 - **Autoimmune** — Lupus, rheumatoid arthritis, multiple sclerosis
 
 ## The Three-Phase Protocol
