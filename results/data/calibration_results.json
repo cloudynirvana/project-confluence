@@ -1,0 +1,102 @@
+{
+  "TNBC": {
+    "n_samples": 3,
+    "rmse_before": 0.3979676422740146,
+    "rmse_after": 0.3838478832342911,
+    "r_squared_before": -3.738645219304483,
+    "r_squared_after": -3.40835915800674,
+    "entries_changed": 11,
+    "frobenius_distance": 0.08479317440862728,
+    "stable_after": true
+  },
+  "PDAC": {
+    "n_samples": 3,
+    "rmse_before": 0.4186489452396971,
+    "rmse_after": 0.38413693428794565,
+    "r_squared_before": -2.9123162582745206,
+    "r_squared_after": -2.293867186276425,
+    "entries_changed": 11,
+    "frobenius_distance": 0.2832026672089433,
+    "stable_after": true
+  },
+  "NSCLC": {
+    "n_samples": 3,
+    "rmse_before": 0.3543803931250534,
+    "rmse_after": 0.24880449402309845,
+    "r_squared_before": -7.342341692486315,
+    "r_squared_after": -3.112113032831946,
+    "entries_changed": 14,
+    "frobenius_distance": 0.3061840566699976,
+    "stable_after": true
+  },
+  "Melanoma": {
+    "n_samples": 3,
+    "rmse_before": 0.3075153037367129,
+    "rmse_after": 0.26307849956579543,
+    "r_squared_before": -9.540556862594856,
+    "r_squared_after": -6.714375965121978,
+    "entries_changed": 11,
+    "frobenius_distance": 0.16037462192648683,
+    "stable_after": true
+  },
+  "GBM": {
+    "n_samples": 3,
+    "rmse_before": 0.3504185434293395,
+    "rmse_after": 0.3161154537697812,
+    "r_squared_before": -3.0055407129085445,
+    "r_squared_after": -2.2597060996642484,
+    "entries_changed": 7,
+    "frobenius_distance": 0.2038765733129472,
+    "stable_after": true
+  },
+  "CRC": {
+    "n_samples": 3,
+    "rmse_before": 0.38043181185383906,
+    "rmse_after": 0.31593627249252204,
+    "r_squared_before": -4.147916249176966,
+    "r_squared_after": -2.5503960467498703,
+    "entries_changed": 7,
+    "frobenius_distance": 0.22242300967780612,
+    "stable_after": true
+  },
+  "HGSOC": {
+    "n_samples": 3,
+    "rmse_before": 0.3439714242508987,
+    "rmse_after": 0.30659461150658934,
+    "r_squared_before": -4.568026019103814,
+    "r_squared_after": -3.423698933064572,
+    "entries_changed": 7,
+    "frobenius_distance": 0.21546423864267616,
+    "stable_after": true
+  },
+  "mCRPC": {
+    "n_samples": 3,
+    "rmse_before": 0.3065979022741281,
+    "rmse_after": 0.28293867910563764,
+    "r_squared_before": -11.540944279141993,
+    "r_squared_after": -9.680129616358004,
+    "entries_changed": 7,
+    "frobenius_distance": 0.22660468404521808,
+    "stable_after": true
+  },
+  "AML": {
+    "n_samples": 3,
+    "rmse_before": 0.3590669149301479,
+    "rmse_after": 0.30345403581438635,
+    "r_squared_before": -4.41081105074367,
+    "r_squared_after": -2.864536587604896,
+    "entries_changed": 11,
+    "frobenius_distance": 0.20642161974286138,
+    "stable_after": true
+  },
+  "HCC": {
+    "n_samples": 3,
+    "rmse_before": 0.3638585782546362,
+    "rmse_after": 0.33194622010861313,
+    "r_squared_before": -2.562524030229002,
+    "r_squared_after": -1.9650226914155389,
+    "entries_changed": 7,
+    "frobenius_distance": 0.22872169203803663,
+    "stable_after": true
+  }
+}

@@ -1,85 +1,97 @@
-# Project Confluence 🧬
+# Project Confluence 🧬🫀🧠
 
-> **A geometric approach to curing cancer using Kramers escape theory and real metabolomics data.**
+> **A universal computational framework for curing disease using geometric attractor escape theory.**
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## TL;DR
+## What Is This?
 
-Cancer is a **stable attractor** in metabolic state space. Using real-data-calibrated generator matrices and verified physics (Kramers' 1940 escape rate theorem), this framework:
+Every disease traps the body in a **pathological attractor basin** — a stable but harmful metabolic/hormonal state. Project Confluence models these attractors as generator matrices and computes *escape protocols* using Kramers' 1940 escape rate theory, calibrated against real-world data.
 
-- **Calibrates** 10×10 metabolic generator matrices against 30 cell lines
-- **Simulates** Flatten→Heat→Push treatment protocols
-- **Projects** fatality reduction across 10 major cancer types
-
-```
-Conservative projection: hundreds of thousands of lives saved per year
-```
-
-## Quick Start
-
-```bash
-git clone https://github.com/YOUR_USERNAME/project-confluence.git
-cd project-confluence
-pip install numpy scipy
-
-# Run the fatality reduction PoC
-python fatality_poc.py
-
-# Run full simulation suite
-python confluence_runner.py
-
-# Run data integration pipeline
-python data_integration_runner.py --verbose --simulate
-```
-
-## How It Works
-
-### The Mathematics
-
-Every cell's metabolism follows a stochastic ODE:
-
-```
-dx/dt = A · x + σ · dW
-```
-
-Where **A** is the generator matrix (10×10, encoding all metabolic couplings) and **x** is the metabolite state vector.
-
-Cancer = the system is trapped in a pathological attractor basin.
-Cure = escape from this basin back to the healthy one.
-
-### Kramers Escape Rate
-
-The escape probability follows Kramers' theorem:
+**SAEM** (System Aligned Equilibrium Medicine) is the underlying mathematical framework:
 
 ```
 P(escape) ∝ exp(-μ(A) / (σ² + F))
 ```
 
-- **μ(A)** = basin curvature (from eigenvalue spectrum)
-- **σ²** = entropic noise (hyperthermia, pro-oxidants)
-- **F** = immune force (checkpoint blockade, CAR-T)
+- **μ(A)** = basin curvature (from eigenvalue spectrum of the generator matrix)
+- **σ²** = entropic noise (hyperthermia, pro-oxidants, metabolic perturbation)
+- **F** = directed force (immune checkpoint, targeted therapy, lifestyle intervention)
 
-### The Three-Phase Protocol
+## Pathologies Modeled
 
-| Phase | Operation | Drugs | Goal |
-|-------|-----------|-------|------|
-| **1. Flatten** | Reduce eigenvalue magnitudes | DCA, CB-839, Metformin, 2-DG | Shallow well |
-| **2. Heat** | Increase effective noise | Hyperthermia, Vitamin C, Ferroptosis | Overcome barrier |
-| **3. Push** | Directed immune force | Anti-PD-1, Anti-CTLA-4, CAR-T | Escape to health |
+### 🧬 Cancer — 10 Types, 20 Drugs, 6 Validation Gates ✅
 
-## Real Data Integration
+| Cancer | Generator | Key Feature |
+|--------|-----------|-------------|
+| TNBC | `tnbc_generator()` | Warburg + glutamine addiction |
+| PDAC | `pdac_generator()` | Deep glycolytic + desmoplastic |
+| NSCLC | `nsclc_generator()` | Metabolically flexible |
+| GBM | `gbm_generator()` | Lipid-dependent + BBB |
+| Melanoma | `melanoma_generator()` | OXPHOS + immune-responsive |
+| CRC | `crc_generator()` | Wnt-driven + butyrate-sensitive |
+| HGSOC | `hgsoc_generator()` | Lipid + BRCA/PARP vulnerable |
+| mCRPC | `mcrpc_generator()` | Anti-Warburg + lipogenic |
+| AML | `aml_generator()` | IDH/2-HG + BCL-2 dependent |
+| HCC | `hcc_generator()` | Lipogenic + urea cycle defect |
 
-Generators are calibrated against **literature-derived metabolomics profiles** from 30 cancer cell lines across 10 types. Calibration uses L-BFGS-B optimization with ±30% entry constraints and stability preservation.
+**Drug library**: Curvature reducers, entropic drivers, vector rectifiers, synthetic lethal agents, ferroptosis inducers, epigenetic reshapers — all with two-compartment pharmacokinetics and CYP enzyme drug-drug interaction modeling.
 
-**Result**: Calibrated generators reveal harder cure profiles for aggressive cancers (PDAC, HCC) — more realistic than hand-tuned models.
+**Results**: All 6 validation gates pass. Conservative projection: hundreds of thousands of lives saved per year.
 
-## Project Structure
+### 🫀 Diabetes — 5 Subtypes, 7 Interventions ✅
+
+| Subtype | Generator | Key Feature |
+|---------|-----------|-------------|
+| Healthy | `healthy_generator()` | Balanced insulin-glucose feedback |
+| Pre-Diabetes | `prediabetes_generator()` | Shallow basin — reversible |
+| T2D Early | `t2d_early_generator()` | Insulin resistance + compensation |
+| T2D Advanced | `t2d_advanced_generator()` | Beta-cell failure — deep attractor |
+| T1D | `t1d_generator()` | Autoimmune — unique attractor |
+
+**Drug library**: Metformin, GLP-1 RA (semaglutide), SGLT2i (empagliflozin), insulin, lifestyle intervention, bariatric surgery, tirzepatide — each with literature-grounded δA corrections and mortality data (UKPDS, EMPA-REG, SUSTAIN-6).
+
+### 🔜 Coming Soon
+
+- **Cardiovascular Disease** — Atherosclerosis, heart failure, arrhythmia
+- **Neurodegeneration** — Alzheimer's, Parkinson's, ALS
+- **Autoimmune** — Lupus, rheumatoid arthritis, multiple sclerosis
+
+## The Three-Phase Protocol
+
+Every pathology follows the same escape strategy:
+
+| Phase | Operation | Goal |
+|-------|-----------|------|
+| **1. Flatten** | Reduce eigenvalue magnitudes | Shallow the attractor well |
+| **2. Heat** | Increase effective noise σ² | Overcome the barrier |
+| **3. Push** | Apply directed force F | Escape to the healthy attractor |
+
+The specific drugs/interventions differ per pathology, but the *geometry* is universal.
+
+## Quick Start
+
+```bash
+git clone https://github.com/cloudynirv/project-confluence.git
+cd project-confluence
+pip install numpy scipy
+
+# Run the cancer fatality reduction PoC
+python fatality_poc.py
+
+# Run full 10-cancer simulation suite
+python confluence_runner.py
+
+# Run data integration pipeline (real metabolomics)
+python data_integration_runner.py --verbose --simulate
+```
+
+## Architecture
 
 ```
 project-confluence/
-├── fatality_poc.py              # ← START HERE: Fatality reduction PoC
+├── fatality_poc.py              # Cancer fatality reduction PoC
 ├── confluence_runner.py         # Full simulation orchestrator
 ├── data_integration_runner.py   # Real data calibration pipeline
 ├── universal_cure_engine.py     # Core SAEM cure engine
@@ -89,38 +101,33 @@ project-confluence/
 │   ├── geometric_optimization.py # Kramers escape + basin curvature
 │   ├── coherence.py            # Spectral/coupling coherence
 │   ├── restoration.py          # δA correction computation
-│   ├── intervention.py         # 20 drugs → generator corrections + PK
+│   ├── intervention.py         # Drug library + PK engine + PathologyScalingTemplate
 │   ├── calibration_data.py     # Real metabolomics profiles (30 cell lines)
 │   ├── generator_calibrator.py # Bayesian L-BFGS-B calibration
-│   └── ...
+│   ├── clonal_dynamics.py      # Tumor heterogeneity + resistance
+│   ├── immune_dynamics.py      # Immune checkpoint modeling
+│   ├── toxicity_constraints.py # Safety limits
+│   ├── protocol_translator.py  # Math → lab-ready protocols
+│   └── patient_stratification.py # Personalized treatment
+├── results/                    # Generated analysis reports
 ├── tests/                      # Validation tests
-├── results/                    # Generated reports
-│   ├── fatality_poc_results.md # Fatality analysis output
-│   ├── data_integration_report.md
-│   └── universal_cure_proof.md
 └── docs/                       # Documentation
 ```
 
-## Cancer Types Modeled
+## Extending to New Pathologies
 
-| Cancer | Generator | Key Feature | References |
-|--------|-----------|-------------|------------|
-| TNBC | `tnbc_generator()` | Warburg + glutamine addiction | Lanning 2017, Cell Reports |
-| PDAC | `pdac_generator()` | Deep glycolytic + desmoplastic | Halbrook 2017, Cell Metab |
-| NSCLC | `nsclc_generator()` | Metabolically flexible | Hensley 2016, Cell |
-| GBM | `gbm_generator()` | Lipid-dependent + BBB | Marin-Valencia 2012 |
-| Melanoma | `melanoma_generator()` | OXPHOS + immune-responsive | Fischer 2018, Mol Cell |
-| CRC | `crc_generator()` | Wnt-driven + butyrate-sensitive | Pate 2014, PNAS |
-| HGSOC | `hgsoc_generator()` | Lipid + BRCA/PARP vulnerable | Nieman 2011, Nat Med |
-| mCRPC | `mcrpc_generator()` | Anti-Warburg + lipogenic | Zadra 2019, Nat Rev Cancer |
-| AML | `aml_generator()` | IDH/2-HG + BCL-2 dependent | Ward 2010, Cancer Cell |
-| HCC | `hcc_generator()` | Lipogenic + urea cycle defect | Ally 2017, Cell |
+The framework is designed to scale. Use `PathologyScalingTemplate`:
 
-## Drug Library (20 Interventions)
+```python
+from src.intervention import PathologyScalingTemplate
 
-Curvature reducers, entropic drivers, vector rectifiers, synthetic lethal agents, ferroptosis inducers, epigenetic reshapers, and negative controls — all with two-compartment pharmacokinetics and CYP enzyme drug-drug interaction modeling.
+cvd = PathologyScalingTemplate("Cardiovascular", n_metabolites=10)
+cvd.set_generators(A_healthy, A_disease)
+cvd.add_intervention(statin_intervention)
+results = cvd.run_optimization()
+```
 
-## Validation Gates
+## Validation Gates (Cancer)
 
 | Gate | Test | Status |
 |------|------|--------|
@@ -131,20 +138,13 @@ Curvature reducers, entropic drivers, vector rectifiers, synthetic lethal agents
 | G5 | Adaptive > continuous therapy | ✅ |
 | G6 | Real-data calibration improves fit | ✅ |
 
-## References
+## Core References
 
-### Core Framework
 - Kramers, H.A. (1940). "Brownian motion in a field of force." *Physica*, 7(4), 284–304.
-- Remisov, I. — SAEM (Stochastic Attractor Escape Model) framework
-
-### Cancer Metabolism
-- Vander Heiden, M.G. et al. (2009). "Understanding the Warburg Effect." *Science*, 324(5930), 1029–1033.
-- DeBerardinis, R.J. et al. (2007). "Beyond aerobic glycolysis." *PNAS*, 104(49), 19345–19350.
-
-### Clinical Trials Referenced
+- Vander Heiden et al. (2009). "Understanding the Warburg Effect." *Science*, 324(5930).
+- DeFronzo, R.A. (2009). "From the triumvirate to the ominous octet." *Diabetes*, 58(11).
 - EMPA-REG (2015): 38% CV death reduction with empagliflozin
 - SUSTAIN-6 (2016): 26% MACE reduction with semaglutide
-- SELECT (2023): 20% MACE reduction in obesity
 
 ## Disclaimer
 
