@@ -1,0 +1,81 @@
+﻿============================================================
+  ML Archetype Classifier ù Smoke Test
+============================================================
+  ML Classifier trained: RF=92.4% (▒1.0%), DT=88.3% (▒1.9%)
+  Classes: ['Healthy Complex', 'Chaotic/Decoupled', 'Rigid/Locked', 'Collapsed/Exhausted', 'Warburg Metabolic', 'Immune Evasion', 'Transitional/Pre-disease', 'Mixed Pathology']
+
+  Training report: {
+  "status": "trained",
+  "n_samples": 2400,
+  "n_classes": 8,
+  "classes": [
+    "Healthy Complex",
+    "Chaotic/Decoupled",
+    "Rigid/Locked",
+    "Collapsed/Exhausted",
+    "Warburg Metabolic",
+    "Immune Evasion",
+    "Transitional/Pre-disease",
+    "Mixed Pathology"
+  ],
+  "cv_accuracy": {
+    "rf_mean": 0.9242,
+    "rf_std": 0.0101,
+    "dt_mean": 0.8829,
+    "dt_std": 0.0189
+  },
+  "n_features": 12
+}
+
+  Test Case        Prediction                Confidence Method            
+python : Traceback 
+(most recent call 
+last):
+At line:1 char:1
++ python models/ml_clas
+sifier.py 2>&1 | 
+Out-File -FilePath 
+C:\Users\Kel ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (Traceback (mo   
+ st recent call las    
+t)::String) [], Re    
+moteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+  File "C:\Users\Kelech
+i\.gemini\antigravity\s
+cratch\project-confluen
+ce\models\ml_classifier
+.py", line 456, in 
+<module>
+    print(f"  
+{'\u2500'*16} 
+{'\u2500'*25} 
+{'\u2500'*10} 
+{'\u2500'*18}")
+    ~~~~~^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^
+  File "C:\Users\Kelech
+i\AppData\Local\Program
+s\Python\Python314\Lib\
+encodings\cp1252.py", 
+line 19, in encode
+    return codecs.charm
+ap_encode(input,self.er
+rors,encoding_table)[0]
+           ~~~~~~~~~~~~
+~~~~~~~~~^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 
+'charmap' codec can't 
+encode characters in 
+position 2-17: 
+character maps to 
+<undefined>

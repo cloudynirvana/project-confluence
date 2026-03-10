@@ -1,0 +1,278 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Project Confluence — Data Submission Template",
+    "description": "Schema for describing datasets submitted for Confluence complexity validation. Submit this JSON alongside your data or as a standalone nomination for public datasets.",
+    "type": "object",
+    "required": [
+        "dataset_metadata",
+        "pathology",
+        "temporal_design",
+        "variables",
+        "intervention"
+    ],
+    "properties": {
+        "dataset_metadata": {
+            "type": "object",
+            "required": [
+                "dataset_name",
+                "principal_investigator",
+                "institution"
+            ],
+            "properties": {
+                "dataset_name": {
+                    "type": "string",
+                    "description": "Human-readable name for the dataset",
+                    "examples": [
+                        "NIDDK-DPP Glucose Variability Substudy",
+                        "TCGA-BRCA Longitudinal ctDNA"
+                    ]
+                },
+                "principal_investigator": {
+                    "type": "string",
+                    "description": "Name of the PI or data steward"
+                },
+                "institution": {
+                    "type": "string",
+                    "description": "Affiliated institution"
+                },
+                "doi_or_accession": {
+                    "type": "string",
+                    "description": "DOI, GEO accession, dbGaP ID, or other persistent identifier (if public)",
+                    "examples": [
+                        "GSE12345",
+                        "phs000123",
+                        "10.1234/zenodo.5678"
+                    ]
+                },
+                "data_sharing_model": {
+                    "type": "string",
+                    "enum": [
+                        "full_sharing",
+                        "federated_only",
+                        "public_nomination"
+                    ],
+                    "description": "full_sharing = you send raw data. federated_only = you run our script locally. public_nomination = you point us to a public dataset."
+                },
+                "ethics_approval": {
+                    "type": "string",
+                    "description": "IRB or ethics committee reference number (if applicable)"
+                }
+            }
+        },
+        "pathology": {
+            "type": "object",
+            "required": [
+                "pathology_class"
+            ],
+            "properties": {
+                "pathology_class": {
+                    "type": "string",
+                    "enum": [
+                        "oncology",
+                        "metabolic",
+                        "comorbidity"
+                    ],
+                    "description": "Primary disease category"
+                },
+                "specific_diagnosis": {
+                    "type": "string",
+                    "description": "Specific disease (e.g., TNBC, Type 2 Diabetes, PDAC + T2D)",
+                    "examples": [
+                        "Triple-Negative Breast Cancer",
+                        "Type 2 Diabetes Mellitus",
+                        "Pancreatic Adenocarcinoma with T2DM"
+                    ]
+                },
+                "staging_or_severity": {
+                    "type": "string",
+                    "description": "TNM stage, HbA1c range, or other severity measure"
+                },
+                "n_patients": {
+                    "type": "integer",
+                    "description": "Number of patients / subjects in the dataset",
+                    "minimum": 1
+                }
+            }
+        },
+        "temporal_design": {
+            "type": "object",
+            "required": [
+                "sampling_frequency",
+                "n_timepoints_median"
+            ],
+            "properties": {
+                "sampling_frequency": {
+                    "type": "string",
+                    "enum": [
+                        "continuous",
+                        "hourly",
+                        "daily",
+                        "weekly",
+                        "biweekly",
+                        "monthly",
+                        "quarterly",
+                        "irregular"
+                    ],
+                    "description": "How often measurements were taken"
+                },
+                "n_timepoints_median": {
+                    "type": "number",
+                    "description": "Median number of timepoints per patient",
+                    "minimum": 2
+                },
+                "total_observation_duration": {
+                    "type": "string",
+                    "description": "Total follow-up period (e.g., '6 months', '2 years')"
+                },
+                "pre_intervention_timepoints": {
+                    "type": "integer",
+                    "description": "Number of timepoints before intervention (0 if none)"
+                },
+                "post_intervention_timepoints": {
+                    "type": "integer",
+                    "description": "Number of timepoints after intervention"
+                }
+            }
+        },
+        "variables": {
+            "type": "array",
+            "description": "List of measured variables in the dataset",
+            "items": {
+                "type": "object",
+                "required": [
+                    "variable_name",
+                    "data_type"
+                ],
+                "properties": {
+                    "variable_name": {
+                        "type": "string",
+                        "description": "Name of the measured variable",
+                        "examples": [
+                            "blood_glucose_mg_dl",
+                            "tumor_volume_mm3",
+                            "cd8_count_cells_ul"
+                        ]
+                    },
+                    "data_type": {
+                        "type": "string",
+                        "enum": [
+                            "continuous",
+                            "ordinal",
+                            "categorical",
+                            "image",
+                            "sequence"
+                        ],
+                        "description": "Type of measurement"
+                    },
+                    "unit": {
+                        "type": "string",
+                        "description": "Unit of measurement",
+                        "examples": [
+                            "mg/dL",
+                            "mm³",
+                            "cells/μL",
+                            "TPM"
+                        ]
+                    },
+                    "variable_variance_available": {
+                        "type": "boolean",
+                        "description": "Is within-patient variance or standard deviation available for this variable?"
+                    },
+                    "loinc_code": {
+                        "type": "string",
+                        "description": "LOINC code if known (optional)"
+                    }
+                }
+            }
+        },
+        "intervention": {
+            "type": "object",
+            "required": [
+                "intervention_present"
+            ],
+            "properties": {
+                "intervention_present": {
+                    "type": "boolean",
+                    "description": "Does the dataset include a therapeutic intervention?"
+                },
+                "intervention_type": {
+                    "type": "string",
+                    "description": "Type of intervention",
+                    "examples": [
+                        "chemotherapy",
+                        "immunotherapy",
+                        "metformin",
+                        "insulin",
+                        "bariatric_surgery",
+                        "lifestyle"
+                    ]
+                },
+                "intervention_timestamp_available": {
+                    "type": "boolean",
+                    "description": "Is the exact start/stop time of intervention recorded?"
+                },
+                "dosing_information_available": {
+                    "type": "boolean",
+                    "description": "Is precise dosing and schedule recorded?"
+                },
+                "outcome_type": {
+                    "type": "string",
+                    "enum": [
+                        "continuous_trajectory",
+                        "binary_response",
+                        "categorical_response",
+                        "survival_time",
+                        "mixed"
+                    ],
+                    "description": "How outcomes are recorded"
+                },
+                "outcome_measure": {
+                    "type": "string",
+                    "description": "Specific outcome metric",
+                    "examples": [
+                        "RECIST_v1.1",
+                        "HbA1c_change",
+                        "overall_survival",
+                        "pathological_complete_response"
+                    ]
+                },
+                "therapeutic_value_found": {
+                    "type": "string",
+                    "enum": [
+                        "yes",
+                        "no",
+                        "partial",
+                        "unknown"
+                    ],
+                    "description": "Did the intervention show therapeutic value? Negative results are welcome."
+                }
+            }
+        },
+        "complexity_readiness": {
+            "type": "object",
+            "description": "Self-assessment of dataset suitability for complexity analysis",
+            "properties": {
+                "time_series_available": {
+                    "type": "boolean",
+                    "description": "Can individual patient trajectories be reconstructed?"
+                },
+                "sufficient_temporal_resolution": {
+                    "type": "boolean",
+                    "description": "≥3 timepoints per patient?"
+                },
+                "raw_measurements_available": {
+                    "type": "boolean",
+                    "description": "Are raw (non-summarized) measurements available?"
+                },
+                "multi_variable": {
+                    "type": "boolean",
+                    "description": "Are ≥3 different variables measured per patient?"
+                },
+                "notes": {
+                    "type": "string",
+                    "description": "Any additional context about data quality, limitations, or special features"
+                }
+            }
+        }
+    }
+}

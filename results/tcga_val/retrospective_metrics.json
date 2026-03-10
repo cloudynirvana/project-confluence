@@ -1,0 +1,92 @@
+[
+  {
+    "patient_id": "TCGA-TNBC-1000",
+    "cancer": "TNBC",
+    "complexity_features": {
+      "structural_total_edges": 0.0,
+      "structural_total_weight": 0.0,
+      "structural_max_weight": 0.0,
+      "structural_edge_density": 0.0,
+      "structural_average_weight": 0.0,
+      "temporal_total_events": 0.0,
+      "temporal_event_frequency": 0.0
+    },
+    "predicted_remission": 0.68,
+    "protocol_escape_distance": 0.9581
+  },
+  {
+    "patient_id": "TCGA-TNBC-1001",
+    "cancer": "TNBC",
+    "complexity_features": {
+      "structural_total_edges": 0.0,
+      "structural_total_weight": 0.0,
+      "structural_max_weight": 0.0,
+      "structural_edge_density": 0.0,
+      "structural_average_weight": 0.0,
+      "temporal_total_events": 0.0,
+      "temporal_event_frequency": 0.0
+    },
+    "predicted_remission": 0.68,
+    "protocol_escape_distance": 0.9581
+  },
+  {
+    "patient_id": "TCGA-TNBC-1002",
+    "cancer": "TNBC",
+    "complexity_features": {
+      "structural_total_edges": 0.0,
+      "structural_total_weight": 0.0,
+      "structural_max_weight": 0.0,
+      "structural_edge_density": 0.0,
+      "structural_average_weight": 0.0,
+      "temporal_total_events": 0.0,
+      "temporal_event_frequency": 0.0
+    },
+    "predicted_remission": 0.68,
+    "protocol_escape_distance": 0.9581
+  },
+  {
+    "patient_id": "TCGA-Melanoma-1000",
+    "cancer": "Melanoma",
+    "complexity_features": {
+      "structural_total_edges": 0.0,
+      "structural_total_weight": 0.0,
+      "structural_max_weight": 0.0,
+      "structural_edge_density": 0.0,
+      "structural_average_weight": 0.0,
+      "temporal_total_events": 0.0,
+      "temporal_event_frequency": 0.0
+    },
+    "predicted_remission": 0.85,
+    "protocol_escape_distance": 0.7127
+  },
+  {
+    "patient_id": "TCGA-Melanoma-1001",
+    "cancer": "Melanoma",
+    "complexity_features": {
+      "structural_total_edges": 0.0,
+      "structural_total_weight": 0.0,
+      "structural_max_weight": 0.0,
+      "structural_edge_density": 0.0,
+      "structural_average_weight": 0.0,
+      "temporal_total_events": 0.0,
+      "temporal_event_frequency": 0.0
+    },
+    "predicted_remission": 0.85,
+    "protocol_escape_distance": 0.7127
+  },
+  {
+    "patient_id": "TCGA-Melanoma-1002",
+    "cancer": "Melanoma",
+    "complexity_features": {
+      "structural_total_edges": 0.0,
+      "structural_total_weight": 0.0,
+      "structural_max_weight": 0.0,
+      "structural_edge_density": 0.0,
+      "structural_average_weight": 0.0,
+      "temporal_total_events": 0.0,
+      "temporal_event_frequency": 0.0
+    },
+    "predicted_remission": 0.85,
+    "protocol_escape_distance": 0.7127
+  }
+]

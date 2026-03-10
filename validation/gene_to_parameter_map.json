@@ -1,0 +1,138 @@
+{
+    "meta": {
+        "version": "1.0",
+        "framework": "Project Confluence",
+        "description": "Maps gene alterations to ODE parameter shifts for digital twin personalization"
+    },
+    "mappings": {
+        "HK2": {
+            "parameter": "glucose_uptake",
+            "mutation_effect": -0.30,
+            "amplification_effect": -0.50,
+            "description": "Hexokinase 2 — rate-limiting glycolysis step",
+            "references": [
+                "Mathupala et al. 2006, Oncogene"
+            ]
+        },
+        "PKM": {
+            "parameter": "glycolysis_flux",
+            "mutation_effect": 0.20,
+            "amplification_effect": 0.40,
+            "description": "Pyruvate kinase M — glycolytic flux regulator",
+            "references": [
+                "Christofk et al. 2008, Nature"
+            ]
+        },
+        "LDHA": {
+            "parameter": "pyruvate_to_lactate",
+            "mutation_effect": 0.10,
+            "amplification_effect": 0.30,
+            "description": "Lactate dehydrogenase A — Warburg effect driver",
+            "references": [
+                "Fantin et al. 2006, Cancer Cell"
+            ]
+        },
+        "PDK1": {
+            "parameter": "pyruvate_to_atp",
+            "mutation_effect": -0.20,
+            "amplification_effect": -0.30,
+            "description": "PDH kinase 1 — blocks OXPHOS entry",
+            "references": [
+                "Kim et al. 2006, Cell Metabolism"
+            ]
+        },
+        "GLS": {
+            "parameter": "glutamine_utilization",
+            "mutation_effect": -0.20,
+            "amplification_effect": -0.40,
+            "description": "Glutaminase — glutamine addiction key enzyme",
+            "references": [
+                "Gross et al. 2014, Mol Cancer Ther"
+            ]
+        },
+        "SLC1A5": {
+            "parameter": "glutaminolysis",
+            "mutation_effect": 0.15,
+            "amplification_effect": 0.30,
+            "description": "ASCT2 glutamine transporter",
+            "references": [
+                "Hassanein et al. 2013, Clin Cancer Res"
+            ]
+        },
+        "SOD2": {
+            "parameter": "ros_clearance",
+            "mutation_effect": 0.30,
+            "deletion_effect": 0.50,
+            "description": "Superoxide dismutase 2 — mitochondrial ROS defense",
+            "references": [
+                "Oberley & Buettner 1979, Cancer Research"
+            ]
+        },
+        "GPX4": {
+            "parameter": "ros_clearance",
+            "mutation_effect": 0.40,
+            "deletion_effect": 0.60,
+            "description": "Glutathione peroxidase 4 — ferroptosis regulator",
+            "references": [
+                "Yang et al. 2014, Cell"
+            ]
+        },
+        "BRCA1": {
+            "parameter": "ros_atp_damage",
+            "mutation_effect": -0.15,
+            "description": "BRCA1 — homologous recombination repair, metabolic stress sensitivity",
+            "references": [
+                "Lord & Ashworth 2017, Science"
+            ]
+        },
+        "TP53": {
+            "parameter": "atp_turnover",
+            "mutation_effect": -0.10,
+            "description": "p53 — metabolic reprogramming via TIGAR, SCO2",
+            "references": [
+                "Vousden & Ryan 2009, Nat Rev Cancer"
+            ]
+        },
+        "KRAS": {
+            "parameter": "glucose_uptake",
+            "mutation_effect": -0.35,
+            "description": "KRAS — drives glycolysis and glutamine dependency",
+            "references": [
+                "Son et al. 2013, Nature"
+            ]
+        },
+        "MYC": {
+            "parameter": "glutamine_utilization",
+            "mutation_effect": -0.25,
+            "amplification_effect": -0.45,
+            "description": "MYC — drives glutaminolysis transcription program",
+            "references": [
+                "Wise et al. 2008, PNAS"
+            ]
+        },
+        "VHL": {
+            "parameter": "glycolysis_flux",
+            "mutation_effect": 0.25,
+            "description": "VHL loss → HIF1α stabilization → Warburg effect",
+            "references": [
+                "Maxwell et al. 1999, Nature"
+            ]
+        },
+        "IDH1": {
+            "parameter": "akg_to_citrate",
+            "mutation_effect": -0.20,
+            "description": "IDH1 neomorphic mutation → 2-HG production",
+            "references": [
+                "Dang et al. 2009, Nature"
+            ]
+        },
+        "PTEN": {
+            "parameter": "glucose_uptake",
+            "mutation_effect": -0.20,
+            "description": "PTEN loss → PI3K/AKT activation → glucose uptake",
+            "references": [
+                "Stambolic et al. 1998, Cell"
+            ]
+        }
+    }
+}

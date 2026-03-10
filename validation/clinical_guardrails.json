@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "version": "1.0",
+    "framework": "Project Confluence",
+    "standard": "CTCAE v5.0",
+    "description": "Clinical guardrails for the RADO optimization engine"
+  },
+  "toxicity_limits": {
+    "max_grade": 2,
+    "description": "Maximum allowable CTCAE toxicity grade across all organs"
+  },
+  "metabolic_bounds": {
+    "ROS_max_fold_increase": {
+      "value": 5.0,
+      "unit": "fold over healthy baseline",
+      "rationale": "Beyond 5x, oxidative stress causes irreversible tissue damage"
+    },
+    "ATP_min_fraction": {
+      "value": 0.3,
+      "unit": "fraction of healthy baseline",
+      "rationale": "Below 30%, cellular energy crisis → organ failure risk"
+    },
+    "Lactate_max_fold": {
+      "value": 4.0,
+      "unit": "fold over healthy baseline",
+      "rationale": "Lactic acidosis threshold (pH < 7.35)"
+    },
+    "Glucose_min": {
+      "value": 0.5,
+      "unit": "normalized",
+      "rationale": "Hypoglycemia threshold"
+    }
+  },
+  "immune_bounds": {
+    "min_effector_activity": {
+      "value": 0.1,
+      "rationale": "Complete immune ablation is unacceptable"
+    },
+    "max_cytokine_storm_index": {
+      "value": 0.8,
+      "rationale": "IL-6 proxy — cytokine release syndrome prevention"
+    }
+  },
+  "pharmacokinetic_limits": {
+    "max_concurrent_cyp3a4_drugs": {
+      "value": 2,
+      "rationale": "CYP3A4 competition beyond 2 drugs → unpredictable PK"
+    },
+    "min_washout_days": {
+      "value": 1.0,
+      "rationale": "Minimum washout between drug switches"
+    },
+    "max_daily_drug_changes": {
+      "value": 3,
+      "rationale": "Protocol complexity limit for clinical feasibility"
+    }
+  },
+  "organ_specific_limits": {
+    "hepatic": {
+      "ALT_max_fold": 3.0,
+      "bilirubin_max_fold": 2.0
+    },
+    "renal": {
+      "creatinine_max_fold": 1.5,
+      "eGFR_min": 30
+    },
+    "cardiac": {
+      "QTc_max_ms": 500,
+      "LVEF_min_pct": 40
+    },
+    "hematologic": {
+      "ANC_min_cells_per_uL": 1000,
+      "platelets_min_per_uL": 50000
+    }
+  }
+}
