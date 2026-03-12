@@ -1,0 +1,43 @@
+{
+  "pipeline": "TCGA Track B Ingestion (Longitudinal Cohort)",
+  "cohort_id": "TCGA-TNBC-TRACKB-MOCK",
+  "disease": "TNBC",
+  "n_patients": 2,
+  "time_unit": "days",
+  "use_neural_ode": true,
+  "spearman_rho": 1.0,
+  "patients": [
+    {
+      "patient_id": "TNBC-MOCK-001",
+      "phi_vector": [
+        0.0,
+        0.0,
+        0.3987,
+        0.1266,
+        0.4493
+      ],
+      "phi_magnitude": 0.613889029059813,
+      "phi_distance": 0.8408671833292105,
+      "coherence": 0.0664,
+      "archetype": "Collapsed/Exhausted",
+      "archetype_confidence": 0.705,
+      "survival_days": 320
+    },
+    {
+      "patient_id": "TNBC-MOCK-002",
+      "phi_vector": [
+        0.0,
+        0.0,
+        0.3355,
+        0.1266,
+        0.4651
+      ],
+      "phi_magnitude": 0.5872868294113193,
+      "phi_distance": 0.8824440265535259,
+      "coherence": 0.0664,
+      "archetype": "Collapsed/Exhausted",
+      "archetype_confidence": 0.775,
+      "survival_days": 410
+    }
+  ]
+}

@@ -32,11 +32,13 @@ from models.ode_system import ComplexAttractorODE, ExtendedParams
 
 def _spearman_rank_correlation(x, y):
     n = len(x)
-    if n < 3:
+    if n < 2:
         return 0.0
     rank_x = np.argsort(np.argsort(x)).astype(float)
     rank_y = np.argsort(np.argsort(y)).astype(float)
     d = rank_x - rank_y
+    if n == 2:
+        return float(1.0 if d[0] == 0 else -1.0)
     rho = 1 - 6 * np.sum(d**2) / (n * (n**2 - 1))
     return float(rho)
 
@@ -79,7 +81,7 @@ def run_track_b(input_path: str, output_path: str, use_neural: bool, resample_dt
 
     survival = [r["survival_days"] for r in results if r["survival_days"] is not None]
     distances = [r["phi_distance"] for r in results if r["survival_days"] is not None]
-    rho = _spearman_rank_correlation(distances, survival) if len(survival) >= 3 else None
+    rho = _spearman_rank_correlation(distances, survival) if len(survival) >= 2 else None
 
     output = {
         "pipeline": "TCGA Track B Ingestion (Longitudinal Cohort)",

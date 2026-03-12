@@ -232,6 +232,7 @@ python scripts/tcga_track_b.py --input data/track_b/mock_cohort.json
 
 Track B results are saved to `results/tcga_val/track_b_metrics.json`.
 Use `--use-neural-ode` to reconstruct trajectories if torchdiffeq is installed.
+Note: With fewer than 3 patients, Spearman rho is not statistically meaningful (2-point rho will be ±1 by definition).
 
 To generate a pinned lockfile (`requirements.lock.txt`) on a machine with Python installed:
 

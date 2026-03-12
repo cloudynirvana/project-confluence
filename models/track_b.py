@@ -121,24 +121,71 @@ def build_trajectory(patient: TrackBPatient,
 
 
 def infer_neural_ode(trajectory: np.ndarray,
-                     timepoints: np.ndarray) -> Optional[np.ndarray]:
+                     timepoints: np.ndarray,
+                     epochs: int = 50,
+                     learning_rate: float = 0.01,
+                     seed: int = 42) -> Optional[np.ndarray]:
+    """
+    Train the ComplexityNeuralODE to fit the input trajectory and return the
+    reconstructed dense trajectory.
+    """
     if not TORCHDIFFEQ_AVAILABLE:
         return None
 
     try:
         import torch
-        from .neural_ode import ComplexityNeuralODE
+        import torch.optim as optim
+        from .neural_ode import ComplexityNeuralODE, compute_complexity_loss
     except Exception:
         return None
 
-    # Expect full 15D observations
-    obs = torch.tensor(trajectory.T, dtype=torch.float32).unsqueeze(0)
+    torch.manual_seed(seed)
+
+    # trajectory shape: [15, num_timepoints]
+    obs_dim = trajectory.shape[0]
+    
+    # The Neural ODE expects:
+    # series_data (history): [batch, seq_len, obs_dim]
+    history_tensor = torch.tensor(trajectory.T, dtype=torch.float32).unsqueeze(0)
     t_span = torch.tensor(timepoints, dtype=torch.float32)
-    model = ComplexityNeuralODE(obs_dim=trajectory.shape[0], state_dim=trajectory.shape[0])
+
+    # Initialize model
+    model = ComplexityNeuralODE(obs_dim=obs_dim, state_dim=obs_dim, hidden_dim=64)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+    # Simple training loop
+    model.train()
+    for epoch in range(epochs):
+        optimizer.zero_grad()
+        
+        # Forward pass returning [batch, seq_len, state_dim]
+        try:
+            predicted_traj = model(history_tensor, t_span)
+            loss = compute_complexity_loss(predicted_traj, history_tensor, l2_weight=1.0, reg_weight=0.01)
+            
+            # Ensure loss is valid
+            if torch.isnan(loss) or torch.isinf(loss):
+                break
+                
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            optimizer.step()
+        except Exception:
+            # If ODE solver fails during training (e.g., stiff gradients), break early
+            break
+
+    # Evaluation pass
     model.eval()
     with torch.no_grad():
-        pred = model(obs, t_span)  # [batch, time, state_dim]
-    return pred.squeeze(0).numpy().T
+        try:
+            pred = model(history_tensor, t_span)  # [batch, time, state_dim]
+            result = pred.squeeze(0).numpy().T     # [state_dim, time]
+            # Ensure it's valid, otherwise return baseline interpolation
+            if np.any(np.isnan(result)) or np.any(np.isinf(result)):
+                return None
+            return result
+        except Exception:
+            return None
 
 
 def compute_phi_for_patient(trajectory: np.ndarray, dt: float) -> Dict:
@@ -156,7 +203,7 @@ def compute_phi_for_patient(trajectory: np.ndarray, dt: float) -> Dict:
         emb_dim_lyap=max_lyap,
     )
     return {
-        "phi_vector": phi.phi_vector,
+        "phi_vector": [float(v) for v in phi.phi_vector],
         "phi_magnitude": float(phi.phi_magnitude),
         "coherence": float(phi.coherence_C),
         "archetype": phi.archetype,
