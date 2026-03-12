@@ -146,6 +146,140 @@ class ExtendedParams(ODEParams):
 
 
 @dataclass
+class TNBCParams(ExtendedParams):
+    """TNBC-specific parameter overrides."""
+    glucose_uptake: float = -1.25
+    glycolysis_flux: float = 0.90
+    K_glucose: float = 1.5
+    glutamine_utilization: float = -0.90
+    sigma_healthy: float = 0.80
+    nu_healthy: float = 0.20
+    I_exhaust_healthy: float = 0.65
+    immune_metabolic_coupling: float = 1.5
+
+
+@dataclass
+class AlzheimersParams(ExtendedParams):
+    """Alzheimer's Disease specific parameter overrides."""
+    glucose_uptake: float = -0.10
+    K_glucose: float = 5.0
+    glutamate_to_akg: float = 0.10
+    ros_clearance: float = -0.40
+    ros_atp_damage: float = -0.35
+    sigma_healthy: float = 0.60
+    I_exhaust_healthy: float = 0.40
+    nu_healthy: float = 0.30
+
+
+@dataclass
+class ParkinsonsParams(ExtendedParams):
+    """Parkinson's Disease specific parameter overrides."""
+    nadh_ros_leak: float = 0.60
+    ros_clearance: float = -0.20
+    ros_atp_damage: float = -0.50
+    citrate_turnover: float = -0.10
+    sigma_healthy: float = 0.40
+    immune_metabolic_coupling: float = 1.8
+
+
+@dataclass
+class DiabetesParams(ExtendedParams):
+    """Type 2 Diabetes specific parameter overrides."""
+    K_glucose: float = 8.0
+    glucose_uptake: float = -0.15
+    ros_clearance: float = -0.45
+    I_reg_healthy: float = 0.05
+    immune_metabolic_coupling: float = 1.6
+    nu_healthy: float = 0.40
+
+
+@dataclass
+class NephroblastomaParams(ExtendedParams):
+    """Nephroblastoma (Wilms' Tumor) specific parameter overrides."""
+    glucose_uptake: float = -0.85
+    glycolysis_flux: float = 0.65
+    K_glucose: float = 2.2
+    glutamine_utilization: float = -0.30  # Note: mapping 'glutamine_uptake' to 'glutamine_utilization'
+    IGF2_signaling: float = 0.75          # New Parameter
+    WT1_activity: float = 0.20            # New Parameter
+    beta_catenin_act: float = 0.60        # New Parameter
+    sigma_healthy: float = 0.50
+    nu_healthy: float = 0.45
+    I_exhaust_healthy: float = 0.30
+    immune_metabolic_coupling: float = 1.3
+    ros_clearance: float = -0.65
+    renin_activity: float = 0.40          # New Parameter
+
+
+@dataclass
+class ALSParams(ExtendedParams):
+    """ALS (Amyotrophic Lateral Sclerosis) specific parameter overrides.
+    
+    Key drivers: TDP-43/SOD1 proteinopathy, glutamate excitotoxicity,
+    mitochondrial dysfunction in motor neurons, neuroinflammation.
+    Distinct from PD: affects upper+lower motor neurons, TDP-43 vs alpha-synuclein,
+    faster progression, stronger glutamate excitotoxicity axis.
+    """
+    glucose_uptake: float = -0.25         # Moderate hypometabolism (less severe than AD)
+    glutamate_to_akg: float = 0.05        # Severe glutamate excitotoxicity (accumulates)
+    glutamine_utilization: float = -0.60   # Increased glutamine demand for astrocyte buffering
+    ros_clearance: float = -0.25          # SOD1 dysfunction -> catastrophic ROS clearance failure
+    ros_atp_damage: float = -0.45         # Severe mitochondrial ROS -> ATP crisis in motor neurons
+    nadh_ros_leak: float = 0.45           # Mitochondrial complex dysfunction (less than PD)
+    citrate_turnover: float = -0.15       # TCA cycle impairment
+    sigma_healthy: float = 0.35           # Moderate gliosis (reactive astrocytes)
+    nu_healthy: float = 0.50              # Blood-spinal cord barrier breakdown
+    I_exhaust_healthy: float = 0.35       # Microglia-mediated neuroinflammation
+    immune_metabolic_coupling: float = 1.5 # Astrocyte-microglia-neuron metabolic axis
+
+
+@dataclass
+class LupusParams(ExtendedParams):
+    """Systemic Lupus Erythematosus (SLE) specific parameter overrides.
+    
+    Key drivers: Autoimmune hyperactivation (INVERTED immune axis),
+    type I interferon signature, immune complex deposition,
+    metabolic reprogramming of immune cells.
+    Unique: I_eff is TOO HIGH (not exhausted), Tregs are depleted,
+    creating the opposite immune phenotype from cancer.
+    """
+    glucose_uptake: float = -0.70         # Moderate increase (immune cell hypermetabolism)
+    glycolysis_flux: float = 0.55         # Activated T-cells shift to aerobic glycolysis
+    ros_clearance: float = -0.55          # Moderate oxidative stress from immune activation
+    K_glucose: float = 2.5               # Increased glucose affinity (activated immune cells)
+    I_eff_healthy: float = 0.85           # HYPERACTIVE effectors (autoimmune drive)
+    I_reg_healthy: float = 0.08           # Treg DEPLETION (loss of self-tolerance)
+    I_exhaust_healthy: float = 0.10       # LOW exhaustion (unlike cancer, immune stays active)
+    sigma_healthy: float = 0.25           # Mild fibrosis (organ damage from immune complexes)
+    nu_healthy: float = 0.50              # Vasculitis (immune complex vessel damage)
+    immune_metabolic_coupling: float = 2.0 # Extreme immune-metabolic coupling (IFN signature)
+    metabolic_immune_coupling: float = 1.5 # Metabolic signals amplify autoimmune loop
+
+
+@dataclass
+class GlioblastomaParams(ExtendedParams):
+    """Glioblastoma Multiforme (GBM) specific parameter overrides.
+    
+    Key drivers: Extreme Warburg effect, IDH-wildtype metabolic reprogramming,
+    glutamine-driven anaplerosis, dense immunosuppressive stroma (blood-brain barrier),
+    MGMT methylation affecting therapy response.
+    Most aggressive adult brain cancer with median survival ~15 months.
+    """
+    glucose_uptake: float = -1.40         # Extreme Warburg (among highest FDG-PET SUVmax)
+    glycolysis_flux: float = 0.95         # Near-complete glycolytic shift
+    K_glucose: float = 1.2               # Very high glucose affinity (GLUT1/3 overexpression)
+    glutamine_utilization: float = -0.85   # Heavy glutamine dependence (anaplerosis)
+    lactate_clearance: float = -0.30      # Lactate export drives immunosuppression
+    ros_clearance: float = -0.50          # Moderate ROS (contributes to genomic instability)
+    citrate_turnover: float = -0.20       # TCA cycle rewiring
+    sigma_healthy: float = 0.85           # Dense stroma + blood-brain barrier = extreme barrier
+    nu_healthy: float = 0.25              # Chaotic, leaky neovasculature
+    I_exhaust_healthy: float = 0.70       # Severe immune exhaustion (BBB + TME)
+    I_reg_healthy: float = 0.45           # High Treg infiltration (immunosuppressive)
+    immune_metabolic_coupling: float = 1.7 # Lactate->TAM polarization + Treg recruitment
+
+
+@dataclass
 class GeneratorMetadata:
     """Metadata for a cancer generator."""
     cancer_type: str
@@ -314,6 +448,32 @@ class ComplexAttractorODE:
         lac_effect = x[1] / (1.0 + x[1] + 1e-10)
         dzdt[0] -= 0.08 * lac_effect * x[0]
 
+        # 5) Disease-specific metabolic modulators (IGF2/WT1/beta-catenin)
+        #    These create the feedback loop between driver parameters and
+        #    core metabolism, enabling therapeutic simulation to shift the
+        #    metabolic attractor. Uses getattr for backward compatibility.
+        igf2 = getattr(p, "IGF2_signaling", 0.10)
+        wt1 = getattr(p, "WT1_activity", 0.80)
+        beta_cat = getattr(p, "beta_catenin_act", 0.15)
+
+        # IGF2 excess drives glucose uptake (GLUT1/3 upregulation)
+        # and glycolytic flux. Effect scales with deviation from healthy baseline.
+        igf2_excess = max(0.0, igf2 - 0.10)  # 0.10 = healthy baseline
+        dzdt[0] -= 0.35 * igf2_excess * x[0]  # glucose consumption
+        dzdt[1] += 0.15 * igf2_excess * x[0]  # lactate production
+        dzdt[2] += 0.10 * igf2_excess * x[0]  # pyruvate flux
+
+        # WT1 loss blocks differentiation -> proliferative metabolism amplified
+        # Lower WT1 = more metabolic drive (healthy WT1 = 0.80)
+        wt1_deficit = max(0.0, 0.80 - wt1)
+        dzdt[0] -= 0.20 * wt1_deficit * x[0]  # glucose demand from proliferation
+        dzdt[3] -= 0.12 * wt1_deficit * x[3]  # ATP consumption from proliferation
+
+        # Beta-catenin (Wnt) activation drives glycolytic gene expression
+        beta_cat_excess = max(0.0, beta_cat - 0.15)  # 0.15 = healthy baseline
+        dzdt[0] -= 0.15 * beta_cat_excess * x[0]  # Wnt->CCND1/MYC->glycolysis
+        dzdt[1] += 0.08 * beta_cat_excess * x[0]  # More lactate from glycolysis
+
         # == IMMUNE DYNAMICS ==
         if self.use_immune:
             coupling_mi = p.metabolic_immune_coupling
@@ -359,10 +519,20 @@ class ComplexAttractorODE:
                 tumor_load = np.linalg.norm(x - x_h) / (np.linalg.norm(x_h) + 1e-10)
                 tumor_load = np.clip(tumor_load, 0, 3.0)
 
-            d_sigma = (p.r_fibrosis * tumor_load * (1.0 - sigma_v)
+            # Nephroblastoma specifics
+            igf2 = getattr(p, "IGF2_signaling", 0.10)
+            wt1 = getattr(p, "WT1_activity", 0.80)
+            beta_cat = getattr(p, "beta_catenin_act", 0.15)
+            renin = getattr(p, "renin_activity", 0.05)
+            
+            # WT1 loss & IGF2 drive stromal proliferation differently than TNBC fibrosis
+            stromal_drive = p.r_fibrosis * tumor_load * (1.0 + igf2 - 0.10) * (2.0 - wt1)
+            d_sigma = (stromal_drive * (1.0 - sigma_v)
                        - p.k_stroma_degrade * sigma_v)
+            
             glyc_proxy = np.clip(x[0] * abs(self._A[0, 0]) / 2.0, 0, 1)
-            vegf = p.vegf_scale * glyc_proxy
+            # Renin heavily drives abnormal vascularization
+            vegf = p.vegf_scale * glyc_proxy * (1.0 + renin)
             d_nu = (p.r_angio * vegf * (1.0 - nu_v)
                     - p.k_vascular_prune * nu_v * I_eff_v
                     + 0.02 * circ)

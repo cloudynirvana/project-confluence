@@ -440,10 +440,15 @@ def coupling_score(trajectory: np.ndarray,
         return 0.5  # Undefined → neutral
 
     correlations = []
+    eps = 1e-12
     for i in group_a:
         for j in group_b:
             if i < n_vars and j < n_vars:
-                c = np.corrcoef(trajectory[i], trajectory[j])[0, 1]
+                a = trajectory[i]
+                b = trajectory[j]
+                if np.std(a) < eps or np.std(b) < eps:
+                    continue
+                c = np.corrcoef(a, b)[0, 1]
                 if np.isfinite(c):
                     correlations.append(abs(c))
 

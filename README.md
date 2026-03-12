@@ -157,6 +157,79 @@ We are seeking **longitudinal pathology and omics datasets** to validate Conflue
 | **Phase 2b** | Cross-disease complexity validation (3-arm protocol) | 📢 Call for Data posted |
 | **Phase 3** | Prospective wet-lab (collaborator-dependent) | ⏳ Planned |
 
+## Validation Walkthrough (Phase 1 Snapshot)
+
+Results below are from `scripts/disease_poc.py` with output captured in `poc_results.txt`.
+
+| Disease | |Phi| | Coherence | Dist. from Healthy |
+|---------|------|-----------|--------------------|
+| Healthy | 1.3199 | 0.2628 | -- |
+| Glioblastoma | 1.5577 | 0.5593 | 0.6732 |
+| TNBC | 1.4490 | 0.5014 | 0.5794 |
+| Alzheimers | 1.3028 | 0.3650 | 0.3792 |
+| Nephroblastoma | 1.3486 | 0.3473 | 0.2932 |
+| Diabetes | 1.3547 | 0.3649 | 0.2404 |
+| Parkinsons | 1.2171 | 0.2355 | 0.2059 |
+| Lupus | 1.2522 | 0.2015 | 0.1574 |
+| ALS | 1.2769 | 0.1982 | 0.1507 |
+
+In this snapshot, Glioblastoma is the furthest from healthy (0.6732), exceeding TNBC.
+Lupus shows the lowest coherence (0.2015), aligned with the autoimmune hyperactivation settings in `LupusParams`.
+ALS and Lupus are closest to healthy (0.1507 and 0.1574), indicating subtle early-stage deviations in this model.
+
+TNBC vs Nephroblastoma distance: 0.3076.
+
+Per-dimension divergence (TNBC vs Nephroblastoma):
+
+| Dimension | Healthy | TNBC | Nephro | D(TNBC-Nephro) |
+|-----------|---------|------|--------|----------------|
+| Phi_temporal | 0.4897 | 0.3901 | 0.3684 | 0.0217 |
+| Phi_spatial | 0.2786 | 0.3224 | 0.3191 | 0.0033 |
+| Phi_functional | 0.9757 | 0.9829 | 0.9871 | 0.0042 |
+| Phi_informational | 0.2882 | 0.8267 | 0.5434 | 0.2833 |
+| Phi_coupling | 0.6242 | 0.4403 | 0.5581 | 0.1178 |
+
+Therapeutic simulation (Nephroblastoma):
+
+| Intervention | Phi-distance (pre) | Phi-distance (post) | Restoration | Notes |
+|--------------|--------------------|---------------------|-------------|-------|
+| IGF2R monotherapy (IGF2_signaling: 0.75 -> 0.30) | 0.2932 | 0.2302 | 21.5% | 3/5 dimensions shift toward healthy |
+| IGF2R + WT1 mRNA (WT1_activity: 0.20 -> 0.55) | 0.2932 | 0.2186 | 25.5% | 4.0% synergy gain vs mono |
+
+TCGA retrospective (Track A, synthetic cohort):
+
+| Disease | Phi-dist | Survival (d) | Spearman rho | HR |
+|---------|----------|--------------|--------------|----|
+| TNBC | 0.4869 | 275 | -0.8220 | 9.83 |
+| Alzheimers | 0.3871 | 1005 | -0.9181 | 1.29 |
+| ALS | 0.1769 | 1078 | -0.8358 | 1.24 |
+| Diabetes | 0.2042 | 1532 | -0.7753 | 1.17 |
+| Parkinsons | 0.1796 | 1486 | -0.7904 | 1.07 |
+| Nephroblastoma | 0.2811 | 1338 | -0.3437 | 1.04 |
+| Lupus | 0.1934 | 1612 | -0.7566 | 1.13 |
+| Glioblastoma | 0.6195 | 387 | -0.8376 | 1.95 |
+
+Overall Spearman rho (240 patients): -0.7937.
+Glioblastoma now shows a strong negative rho after scaling, consistent with its aggressiveness.
+
+Reproduce locally:
+
+```bash
+python scripts/disease_poc.py > poc_results.txt 2>&1
+```
+
+```bash
+python scripts/tcga_retrospective.py > tcga_output.txt 2>&1
+```
+
+TCGA retrospective results are saved to `results/tcga_val/retrospective_metrics.json`.
+
+To generate a pinned lockfile (`requirements.lock.txt`) on a machine with Python installed:
+
+```powershell
+powershell -File scripts/pin_requirements.ps1
+```
+
 ## Safety & Regulatory
 
 - All protocols constrained by `clinical_guardrails.json` (CTCAE v5.0)

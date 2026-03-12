@@ -25,12 +25,21 @@ from models.ode_system import (
     TNBCODESystem,
     ComplexAttractorODE,
     ExtendedParams,
+    TNBCParams,
+    AlzheimersParams,
+    ParkinsonsParams,
+    DiabetesParams,
+    NephroblastomaParams,
+    ALSParams,
+    LupusParams,
+    GlioblastomaParams,
     ODEParams,
     simulate_trajectory,
     METABOLITE_NAMES,
     STATE_NAMES,
     TrajectoryAnalyzer,
 )
+from models.complexity_profiler import ComplexityProfiler
 
 
 class TestMassBalance(unittest.TestCase):
@@ -152,6 +161,45 @@ class TestTrajectoryAnalyzer(unittest.TestCase):
         stats = TrajectoryAnalyzer.summary_stats(result["z"], result["t"])
         for name in STATE_NAMES:
             self.assertIn(name, stats, f"Missing state variable: {name}")
+
+
+class TestDiseaseModels(unittest.TestCase):
+    """Validate disease models solve and yield valid Phi profiles."""
+
+    def test_disease_models_solve_and_profile(self):
+        profiler = ComplexityProfiler()
+        diseases = {
+            "Healthy": ExtendedParams(),
+            "TNBC": TNBCParams(),
+            "Alzheimers": AlzheimersParams(),
+            "Parkinsons": ParkinsonsParams(),
+            "Diabetes": DiabetesParams(),
+            "Nephroblastoma": NephroblastomaParams(),
+            "ALS": ALSParams(),
+            "Lupus": LupusParams(),
+            "Glioblastoma": GlioblastomaParams(),
+        }
+
+        for name, params in diseases.items():
+            ode = ComplexAttractorODE(
+                params=params,
+                use_nonlinear=True,
+                use_immune=True,
+                use_microenv=True,
+            )
+            result = ode.solve(t_span=(0, 60), dt_eval=1.0)
+            self.assertTrue(result["success"],
+                            f"{name}: solver failed: {result['message']}")
+            self.assertTrue(
+                TrajectoryAnalyzer.is_bounded(result["z"], threshold=200),
+                f"{name}: trajectory exploded"
+            )
+            phi = profiler.profile(result["z"], dt=1.0)
+            self.assertEqual(len(phi.phi_vector), 5)
+            self.assertTrue(all(np.isfinite(v) for v in phi.phi_vector),
+                            f"{name}: non-finite Phi values")
+            self.assertTrue(all(0.0 <= v <= 1.0 for v in phi.phi_vector),
+                            f"{name}: Phi out of bounds")
 
 
 if __name__ == '__main__':
