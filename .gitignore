@@ -34,3 +34,7 @@ Thumbs.db
 .env
 *.key
 api_keys.json
+
+# Local validation logs
+poc_output.txt
+tcga_output.txt

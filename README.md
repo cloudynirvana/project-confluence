@@ -224,6 +224,15 @@ python scripts/tcga_retrospective.py > tcga_output.txt 2>&1
 
 TCGA retrospective results are saved to `results/tcga_val/retrospective_metrics.json`.
 
+Track B ingestion (longitudinal cohort):
+
+```bash
+python scripts/tcga_track_b.py --input data/track_b/mock_cohort.json
+```
+
+Track B results are saved to `results/tcga_val/track_b_metrics.json`.
+Use `--use-neural-ode` to reconstruct trajectories if torchdiffeq is installed.
+
 To generate a pinned lockfile (`requirements.lock.txt`) on a machine with Python installed:
 
 ```powershell
