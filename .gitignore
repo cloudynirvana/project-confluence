@@ -38,3 +38,10 @@ api_keys.json
 # Local validation logs
 poc_output.txt
 tcga_output.txt
+test_out.log
+test_output.txt
+pytest_output.txt
+poc_results.txt
+test_af_out.txt
+test_af_output.txt
+.pytest_cache/
