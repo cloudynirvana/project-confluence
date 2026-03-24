@@ -1,14 +1,17 @@
 {
     "meta": {
-        "version": "1.0",
+        "version": "2.0",
         "framework": "Project Confluence",
-        "description": "Maps gene alterations to ODE parameter shifts for digital twin personalization"
+        "description": "Maps gene alterations to ODE parameter shifts for digital twin personalization. v2.0 adds UniProt IDs and key residues for AlphaFold structural integration."
     },
     "mappings": {
         "HK2": {
             "parameter": "glucose_uptake",
             "mutation_effect": -0.30,
             "amplification_effect": -0.50,
+            "uniprot_id": "P52789",
+            "key_residues": [235, 466, 603],
+            "structure_weight": 0.7,
             "description": "Hexokinase 2 — rate-limiting glycolysis step",
             "references": [
                 "Mathupala et al. 2006, Oncogene"
@@ -18,6 +21,9 @@
             "parameter": "glycolysis_flux",
             "mutation_effect": 0.20,
             "amplification_effect": 0.40,
+            "uniprot_id": "P14618",
+            "key_residues": [270, 399, 433],
+            "structure_weight": 0.6,
             "description": "Pyruvate kinase M — glycolytic flux regulator",
             "references": [
                 "Christofk et al. 2008, Nature"
@@ -27,6 +33,9 @@
             "parameter": "pyruvate_to_lactate",
             "mutation_effect": 0.10,
             "amplification_effect": 0.30,
+            "uniprot_id": "P00338",
+            "key_residues": [106, 168, 171],
+            "structure_weight": 0.5,
             "description": "Lactate dehydrogenase A — Warburg effect driver",
             "references": [
                 "Fantin et al. 2006, Cancer Cell"
@@ -36,6 +45,9 @@
             "parameter": "pyruvate_to_atp",
             "mutation_effect": -0.20,
             "amplification_effect": -0.30,
+            "uniprot_id": "Q15118",
+            "key_residues": [244, 307, 352],
+            "structure_weight": 0.7,
             "description": "PDH kinase 1 — blocks OXPHOS entry",
             "references": [
                 "Kim et al. 2006, Cell Metabolism"
@@ -45,6 +57,9 @@
             "parameter": "glutamine_utilization",
             "mutation_effect": -0.20,
             "amplification_effect": -0.40,
+            "uniprot_id": "O94925",
+            "key_residues": [249, 321, 394],
+            "structure_weight": 0.8,
             "description": "Glutaminase — glutamine addiction key enzyme",
             "references": [
                 "Gross et al. 2014, Mol Cancer Ther"
@@ -54,6 +69,9 @@
             "parameter": "glutaminolysis",
             "mutation_effect": 0.15,
             "amplification_effect": 0.30,
+            "uniprot_id": "Q15758",
+            "key_residues": [137, 230, 376],
+            "structure_weight": 0.5,
             "description": "ASCT2 glutamine transporter",
             "references": [
                 "Hassanein et al. 2013, Clin Cancer Res"
@@ -63,6 +81,9 @@
             "parameter": "ros_clearance",
             "mutation_effect": 0.30,
             "deletion_effect": 0.50,
+            "uniprot_id": "P04179",
+            "key_residues": [26, 34, 159, 183],
+            "structure_weight": 0.8,
             "description": "Superoxide dismutase 2 — mitochondrial ROS defense",
             "references": [
                 "Oberley & Buettner 1979, Cancer Research"
@@ -72,6 +93,9 @@
             "parameter": "ros_clearance",
             "mutation_effect": 0.40,
             "deletion_effect": 0.60,
+            "uniprot_id": "P36969",
+            "key_residues": [46, 73, 107],
+            "structure_weight": 0.9,
             "description": "Glutathione peroxidase 4 — ferroptosis regulator",
             "references": [
                 "Yang et al. 2014, Cell"
@@ -80,6 +104,9 @@
         "BRCA1": {
             "parameter": "ros_atp_damage",
             "mutation_effect": -0.15,
+            "uniprot_id": "P38398",
+            "key_residues": [61, 64, 1699, 1775],
+            "structure_weight": 0.8,
             "description": "BRCA1 — homologous recombination repair, metabolic stress sensitivity",
             "references": [
                 "Lord & Ashworth 2017, Science"
@@ -88,6 +115,9 @@
         "TP53": {
             "parameter": "atp_turnover",
             "mutation_effect": -0.10,
+            "uniprot_id": "P04637",
+            "key_residues": [175, 245, 248, 249, 273, 282],
+            "structure_weight": 0.9,
             "description": "p53 — metabolic reprogramming via TIGAR, SCO2",
             "references": [
                 "Vousden & Ryan 2009, Nat Rev Cancer"
@@ -96,6 +126,9 @@
         "KRAS": {
             "parameter": "glucose_uptake",
             "mutation_effect": -0.35,
+            "uniprot_id": "P01116",
+            "key_residues": [12, 13, 61],
+            "structure_weight": 0.9,
             "description": "KRAS — drives glycolysis and glutamine dependency",
             "references": [
                 "Son et al. 2013, Nature"
@@ -105,6 +138,9 @@
             "parameter": "glutamine_utilization",
             "mutation_effect": -0.25,
             "amplification_effect": -0.45,
+            "uniprot_id": "P01106",
+            "key_residues": [58, 62, 357, 439],
+            "structure_weight": 0.6,
             "description": "MYC — drives glutaminolysis transcription program",
             "references": [
                 "Wise et al. 2008, PNAS"
@@ -113,6 +149,9 @@
         "VHL": {
             "parameter": "glycolysis_flux",
             "mutation_effect": 0.25,
+            "uniprot_id": "P40337",
+            "key_residues": [98, 111, 167],
+            "structure_weight": 0.8,
             "description": "VHL loss → HIF1α stabilization → Warburg effect",
             "references": [
                 "Maxwell et al. 1999, Nature"
@@ -121,6 +160,9 @@
         "IDH1": {
             "parameter": "akg_to_citrate",
             "mutation_effect": -0.20,
+            "uniprot_id": "O75874",
+            "key_residues": [100, 132, 170],
+            "structure_weight": 0.9,
             "description": "IDH1 neomorphic mutation → 2-HG production",
             "references": [
                 "Dang et al. 2009, Nature"
@@ -129,6 +171,9 @@
         "PTEN": {
             "parameter": "glucose_uptake",
             "mutation_effect": -0.20,
+            "uniprot_id": "P60484",
+            "key_residues": [124, 130, 173],
+            "structure_weight": 0.8,
             "description": "PTEN loss → PI3K/AKT activation → glucose uptake",
             "references": [
                 "Stambolic et al. 1998, Cell"

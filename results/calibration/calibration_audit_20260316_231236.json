@@ -1,0 +1,321 @@
+{
+  "calibration_summary": {
+    "diseases": [
+      "TNBC",
+      "GBM",
+      "Alzheimers"
+    ],
+    "n_iterations": 0,
+    "optimized_weights": {
+      "sis_weights": [
+        0.25,
+        0.3,
+        0.15,
+        0.2,
+        0.1
+      ],
+      "l1_lambda": 0.1,
+      "gene_scales": {},
+      "objective_weights": {
+        "phi_alignment": 0.35,
+        "cross_panel": 0.2,
+        "drug_response": 0.15,
+        "param_entropy": 0.15,
+        "stability": 0.15
+      }
+    },
+    "audit_grade": "A"
+  },
+  "audit": {
+    "grade": "A",
+    "total_sign_violations": 0,
+    "total_bound_violations": 0,
+    "sign_violations": [],
+    "bound_violations": [],
+    "avg_stability": 0.8782,
+    "avg_cross_panel_coherence": 1.0,
+    "per_disease": {
+      "TNBC": {
+        "calibration_score": 0.0116,
+        "baseline_phi_dist": 0.2097,
+        "calibrated_phi_dist": 0.481,
+        "n_sign_violations": 0,
+        "n_bound_violations": 0,
+        "avg_stability": 0.8885
+      },
+      "GBM": {
+        "calibration_score": 0.2176,
+        "baseline_phi_dist": 0.3239,
+        "calibrated_phi_dist": 0.0975,
+        "n_sign_violations": 0,
+        "n_bound_violations": 0,
+        "avg_stability": 0.8829
+      },
+      "Alzheimers": {
+        "calibration_score": 0.4807,
+        "baseline_phi_dist": 0.383,
+        "calibrated_phi_dist": 0.383,
+        "n_sign_violations": 0,
+        "n_bound_violations": 0,
+        "avg_stability": 0.8712
+      }
+    },
+    "cross_panel_coherence": {
+      "TP53": {
+        "n_diseases": 2,
+        "diseases": [
+          "TNBC",
+          "GBM"
+        ],
+        "sign_consistent": true,
+        "magnitude_cv": 0.0,
+        "coherence_score": 1.0
+      },
+      "PTEN": {
+        "n_diseases": 2,
+        "diseases": [
+          "TNBC",
+          "GBM"
+        ],
+        "sign_consistent": true,
+        "magnitude_cv": 0.0,
+        "coherence_score": 1.0
+      }
+    }
+  },
+  "per_disease_results": {
+    "TNBC": {
+      "disease": "TNBC",
+      "baseline_phi_distance": 0.2097,
+      "calibrated_phi_distance": 0.481,
+      "delta_phi": 0.2713,
+      "n_sign_violations": 0,
+      "sign_violations": [],
+      "n_bound_violations": 0,
+      "bound_violations": [],
+      "calibration_score": 0.0116,
+      "sis_vectors": {
+        "BRCA1": {
+          "gene": "BRCA1",
+          "plddt": 0.412,
+          "stability": 1.0,
+          "pocket": 0.0,
+          "active_site": 1.0,
+          "druggability": 0.939
+        },
+        "TP53": {
+          "gene": "TP53",
+          "plddt": 0.898,
+          "stability": 1.0,
+          "pocket": 0.32,
+          "active_site": 1.0,
+          "druggability": 0.939
+        },
+        "EGFR": {
+          "gene": "EGFR",
+          "plddt": 0.885,
+          "stability": 1.0,
+          "pocket": 0.0,
+          "active_site": 1.0,
+          "druggability": 0.939
+        },
+        "MYC": {
+          "gene": "MYC",
+          "plddt": 0.894,
+          "stability": 0.98,
+          "pocket": 0.0,
+          "active_site": 0.0,
+          "druggability": 0.939
+        },
+        "PTEN": {
+          "gene": "PTEN",
+          "plddt": 0.847,
+          "stability": 1.0,
+          "pocket": 0.0,
+          "active_site": 1.0,
+          "druggability": 0.939
+        },
+        "PIK3CA": {
+          "gene": "PIK3CA",
+          "plddt": 0.894,
+          "stability": 0.98,
+          "pocket": 0.0,
+          "active_site": 0.0,
+          "druggability": 0.939
+        }
+      },
+      "delta_theta": {
+        "BRCA1": {
+          "ros_atp_damage": -0.1045
+        },
+        "TP53": {
+          "atp_turnover": -0.0866
+        },
+        "MYC": {
+          "glutamine_utilization": -0.1529
+        },
+        "PTEN": {
+          "glucose_uptake": -0.1612
+        }
+      },
+      "stability": {
+        "BRCA1": 0.9408,
+        "TP53": 0.8963,
+        "EGFR": 0.8914,
+        "MYC": 0.8538,
+        "PTEN": 0.8948,
+        "PIK3CA": 0.8538
+      }
+    },
+    "GBM": {
+      "disease": "GBM",
+      "baseline_phi_distance": 0.3239,
+      "calibrated_phi_distance": 0.0975,
+      "delta_phi": -0.2265,
+      "n_sign_violations": 0,
+      "sign_violations": [],
+      "n_bound_violations": 0,
+      "bound_violations": [],
+      "calibration_score": 0.2176,
+      "sis_vectors": {
+        "IDH1": {
+          "gene": "IDH1",
+          "plddt": 0.719,
+          "stability": 1.0,
+          "pocket": 0.0,
+          "active_site": 1.0,
+          "druggability": 0.939
+        },
+        "EGFR": {
+          "gene": "EGFR",
+          "plddt": 0.885,
+          "stability": 1.0,
+          "pocket": 0.0,
+          "active_site": 1.0,
+          "druggability": 0.939
+        },
+        "PTEN": {
+          "gene": "PTEN",
+          "plddt": 0.847,
+          "stability": 1.0,
+          "pocket": 0.0,
+          "active_site": 1.0,
+          "druggability": 0.939
+        },
+        "TP53": {
+          "gene": "TP53",
+          "plddt": 0.898,
+          "stability": 1.0,
+          "pocket": 0.32,
+          "active_site": 1.0,
+          "druggability": 0.939
+        },
+        "NF1": {
+          "gene": "NF1",
+          "plddt": 0.894,
+          "stability": 0.98,
+          "pocket": 0.0,
+          "active_site": 0.0,
+          "druggability": 0.939
+        },
+        "PDGFRA": {
+          "gene": "PDGFRA",
+          "plddt": 0.894,
+          "stability": 0.98,
+          "pocket": 0.0,
+          "active_site": 0.0,
+          "druggability": 0.939
+        }
+      },
+      "delta_theta": {
+        "IDH1": {
+          "akg_to_citrate": -0.1547
+        },
+        "PTEN": {
+          "glucose_uptake": -0.1612
+        },
+        "TP53": {
+          "atp_turnover": -0.0866
+        }
+      },
+      "stability": {
+        "IDH1": 0.9071,
+        "EGFR": 0.8914,
+        "PTEN": 0.8948,
+        "TP53": 0.8963,
+        "NF1": 0.8538,
+        "PDGFRA": 0.8538
+      }
+    },
+    "Alzheimers": {
+      "disease": "Alzheimers",
+      "baseline_phi_distance": 0.383,
+      "calibrated_phi_distance": 0.383,
+      "delta_phi": 0.0,
+      "n_sign_violations": 0,
+      "sign_violations": [],
+      "n_bound_violations": 0,
+      "bound_violations": [],
+      "calibration_score": 0.4807,
+      "sis_vectors": {
+        "APP": {
+          "gene": "APP",
+          "plddt": 0.737,
+          "stability": 1.0,
+          "pocket": 0.0,
+          "active_site": 1.0,
+          "druggability": 0.94
+        },
+        "PSEN1": {
+          "gene": "PSEN1",
+          "plddt": 0.894,
+          "stability": 0.98,
+          "pocket": 0.0,
+          "active_site": 0.0,
+          "druggability": 0.939
+        },
+        "MAPT": {
+          "gene": "MAPT",
+          "plddt": 0.894,
+          "stability": 0.98,
+          "pocket": 0.0,
+          "active_site": 0.0,
+          "druggability": 0.939
+        },
+        "APOE": {
+          "gene": "APOE",
+          "plddt": 0.894,
+          "stability": 0.98,
+          "pocket": 0.0,
+          "active_site": 0.0,
+          "druggability": 0.939
+        },
+        "BACE1": {
+          "gene": "BACE1",
+          "plddt": 0.721,
+          "stability": 1.0,
+          "pocket": 0.0,
+          "active_site": 1.0,
+          "druggability": 0.939
+        },
+        "GSK3B": {
+          "gene": "GSK3B",
+          "plddt": 0.894,
+          "stability": 0.98,
+          "pocket": 0.0,
+          "active_site": 0.0,
+          "druggability": 0.939
+        }
+      },
+      "delta_theta": {},
+      "stability": {
+        "APP": 0.9053,
+        "PSEN1": 0.8538,
+        "MAPT": 0.8538,
+        "APOE": 0.8538,
+        "BACE1": 0.9068,
+        "GSK3B": 0.8538
+      }
+    }
+  }
+}

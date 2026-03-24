@@ -9,4 +9,8 @@ Modules:
     ode_system          : 15D SAEM nonlinear ODE system
     immune_dynamics     : Multi-compartment immune force field
     intervention        : Drug library with PK/PD modeling
+    alphafold_client    : AlphaFold DB REST client + pocket detection
+    structure_bridge    : Protein structure → ODE parameter mapping
+    structural_docking  : Geometric drug-target docking heuristics
+    complexity_calibrator : Staged calibration pipeline (Genotype→SIS→Δθ→Φ)
 """

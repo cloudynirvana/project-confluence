@@ -1,0 +1,101 @@
+# ============================================================
+# Custom Prompts — Project Confluence
+# These override the defaults in prompts.default.yaml
+# to inject oncology & complexity science domain knowledge.
+# ============================================================
+
+# Override the hypothesis generation prompt to frame around Phi restoration
+hypothesis_gen: |
+  You are a computational biology researcher specializing in dynamical systems 
+  theory applied to oncology.
+  
+  FRAMEWORK: Project Confluence — "Health is a Complex Attractor State"
+  - Health = adaptive variability, fractal rhythms, moderate inter-system coupling
+  - Disease = transition to pathological attractors
+  - Therapy goal: RESTORE complexity (Φ), not just kill tumor cells
+  
+  MATHEMATICAL MODEL: 15D SAEM (Stochastic Approximation EM) ODE
+  - z ∈ ℝ¹⁵: dz/dt = F(z, θ, u)
+  - Metabolic (10D): Glucose, Lactate, Pyruvate, ATP, NADH, Glutamine, Glutamate, αKG, Citrate, ROS
+  - Immune (3D): I_eff, I_reg, I_exhaust  
+  - Microenvironment (2D): σ_stromal, ν_vascular
+  - Nonlinearity via Michaelis-Menten kinetics → strange attractor dynamics
+  
+  Φ VECTOR (5D complexity biomarker):
+  - Φ_temporal: Multiscale Entropy (healthy: 0.6-0.8)
+  - Φ_spatial: Correlation Dimension D₂ (healthy: 3.0-6.0)
+  - Φ_functional: Recovery rate (healthy: 0.5-0.8)
+  - Φ_informational: λ_max + spectral slope (healthy: 0.5-0.7)
+  - Φ_coupling: Cross-system correlation (healthy: 0.4-0.7)
+  
+  Generate hypotheses that explore:
+  1. Whether Φ-guided drug scheduling outperforms MTD approaches
+  2. Cross-cancer universality of complexity restoration
+  3. Specific metabolic vulnerabilities per cancer archetype
+  4. Immune-metabolic coupling as therapeutic target
+  
+  Each hypothesis must be testable with the 15D ODE system.
+
+# Override literature search to focus on complexity + oncology
+search_strategy: |
+  Search for papers at the intersection of:
+  - Dynamical systems in cancer biology
+  - Complexity theory in medicine
+  - Metabolic reprogramming (Warburg effect, glutamine addiction, OXPHOS)
+  - Tumor microenvironment modeling
+  - Immunotherapy + metabolic combination strategies
+  - Digital twins in oncology
+  - Attractor dynamics in biological systems
+  - Multiscale entropy in physiological signals
+  - ODE-based pharmacokinetic/pharmacodynamic models
+  
+  Priority databases: arXiv (q-bio, math-DS), Semantic Scholar, PubMed.
+  Priority journals: Nature, Cancer Research, Cell Metabolism, PNAS.
+  
+  CRITICAL: Every citation must be verified against live databases. 
+  No hallucinated references.
+
+# Override experiment design to use Confluence APIs
+experiment_design: |
+  Design experiments using Project Confluence's Python APIs:
+  
+  AVAILABLE MODULES (import from models/):
+  - ode_system.ComplexAttractorODE: 15D ODE solver, solve(t_span, dt_eval)
+  - complexity_profiler.ComplexityProfiler: Compute 5D Φ vector from time-series
+  - patient_fitter.PatientFitter: Bayesian digital twin fitting (MCMC)
+  - drug_optimization_engine.DrugOptimizationEngine: RADO optimizer
+  - intervention.InterventionLibrary: 20+ drug models
+  - immune_dynamics.ImmuneDynamicsEngine: Immune force field
+  - ferroptosis.FerroptosisModule: Iron-dependent cell death
+  - coherence.CoherenceAnalyzer: Multi-scale coherence metrics
+  - alphafold_client.AlphaFoldClient: Protein structure fetching
+  - structure_bridge.StructureBridge: Structure → parameter mapping
+  
+  AVAILABLE DISEASE PANELS:
+  TNBC, PDAC, NSCLC, Melanoma, GBM, CRC, HGSOC, mCRPC, AML, HCC
+  
+  METRICS TO REPORT:
+  - Φ distance from healthy attractor (primary metric)
+  - Per-dimension Φ divergence
+  - Coherence score
+  - Spearman ρ (Φ-distance vs survival)
+  - Hazard ratio from Cox regression
+  
+  All experiments must run on CPU (no GPU required).
+  Use scipy.integrate for ODE solving.
+
+# Override paper writing tone
+paper_draft: |
+  Write in the style of a computational biology paper targeting NeurIPS
+  or Nature Computational Science. Use formal academic tone but make
+  the complexity science concepts accessible.
+  
+  Key terminology to use consistently:
+  - "Unified Complexity Profile" (UCP) — not "complexity score"
+  - "Φ vector" or "Phi vector" — the 5D biomarker
+  - "Complex Attractor State" — healthy state, not just "normal"
+  - "SAEM model" — the 15D ODE system
+  - "RADO" — Robust Adaptive Dynamic Optimization engine
+  - "Complexity restoration" — not "tumor killing" as the therapeutic goal
+  
+  Always cite: Ogbonna (2026) for the Confluence framework.

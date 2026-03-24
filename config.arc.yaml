@@ -1,0 +1,103 @@
+# ============================================================
+# AutoResearchClaw Config — Project Confluence
+# Complexity-Restoring Precision Oncology Research
+# ============================================================
+
+project:
+  name: "project-confluence"
+  mode: "full-auto"
+
+research:
+  topic: >-
+    Investigate whether the Unified Complexity Profile (UCP) framework,
+    using a 5D Phi vector (temporal, spatial, functional, informational,
+    coupling), can serve as a universal biomarker for disease severity
+    and therapeutic response prediction across cancer types. Specifically,
+    test the hypothesis that restoring dynamical complexity (Phi) toward
+    healthy attractor states via optimized drug scheduling produces
+    superior outcomes compared to traditional maximum-tolerated-dose
+    approaches. Use the 15D SAEM ODE system modeling metabolic (10D),
+    immune (3D), and microenvironment (2D) dynamics with Michaelis-Menten
+    nonlinearities. Validate against pan-cancer profiles: TNBC, PDAC,
+    NSCLC, Melanoma, GBM, CRC, HGSOC, mCRPC, AML.
+  domains: ["computational-biology", "dynamical-systems", "oncology", "precision-medicine"]
+  daily_paper_count: 10
+  quality_threshold: 3.5
+
+runtime:
+  timezone: "Africa/Lagos"
+  max_parallel_tasks: 2
+  approval_timeout_hours: 24
+  retry_limit: 3
+
+llm:
+  provider: "openai-compatible"
+  base_url: "https://integrate.api.nvidia.com/v1"
+  api_key_env: "NEMOTRON_API_KEY"
+  primary_model: "nvidia/llama-3.1-nemotron-70b-instruct"
+  fallback_models: ["nvidia/llama-3.1-nemotron-70b-instruct"]
+  s2_api_key: ""
+
+experiment:
+  mode: "sandbox"
+  time_budget_sec: 900
+  max_iterations: 10
+  metric_key: "phi_distance"
+  metric_direction: "minimize"
+  sandbox:
+    python_path: "python"
+    gpu_required: false
+    allowed_imports:
+      - math
+      - random
+      - json
+      - csv
+      - os
+      - sys
+      - numpy
+      - scipy
+      - torch
+      - sklearn
+      - matplotlib
+      - pandas
+      # Project Confluence modules
+      - models.ode_system
+      - models.complexity_profiler
+      - models.patient_fitter
+      - models.drug_optimization_engine
+      - models.intervention
+      - models.immune_dynamics
+      - models.ferroptosis
+      - models.coherence
+      - models.alphafold_client
+      - models.structure_bridge
+    max_memory_mb: 4096
+
+export:
+  target_conference: "neurips_2025"
+  authors: "Ogbonna, Kelechi"
+  bib_file: "references"
+
+prompts:
+  custom_file: "prompts.confluence.yaml"
+
+security:
+  hitl_required_stages: []  # Full auto with --auto-approve
+  allow_publish_without_approval: false
+  redact_sensitive_logs: true
+
+knowledge_base:
+  backend: "markdown"
+  root: "docs/kb"
+
+notifications:
+  channel: "console"
+  target: ""
+
+openclaw_bridge:
+  use_cron: false
+  use_message: false
+  use_memory: true
+  use_sessions_spawn: false
+  use_web_fetch: true
+  use_browser: false

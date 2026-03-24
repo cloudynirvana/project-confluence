@@ -1,0 +1,160 @@
+{
+  "disease": "TNBC",
+  "timestamp": "2026-03-15T00:33:41.948017",
+  "mode": "mock",
+  "genes_analyzed": 6,
+  "aggregate_vulnerability": 0.9851,
+  "top_drug_targets": [
+    "TP53",
+    "EGFR",
+    "BRCA1",
+    "MYC",
+    "PTEN"
+  ],
+  "gene_profiles": {
+    "BRCA1": {
+      "gene": "BRCA1",
+      "uniprot_id": "P38398",
+      "mutation_position": 61,
+      "stability_score": 1.0,
+      "pocket_accessibility": 0.0,
+      "ode_parameter_multiplier": 2.5,
+      "local_plddt": 74.0,
+      "is_in_pocket": true,
+      "is_in_active_site": true,
+      "nearby_pocket_druggability": 0.939,
+      "confidence_tier": "confident"
+    },
+    "TP53": {
+      "gene": "TP53",
+      "uniprot_id": "P04637",
+      "mutation_position": 175,
+      "stability_score": 1.0,
+      "pocket_accessibility": 0.358,
+      "ode_parameter_multiplier": 2.5,
+      "local_plddt": 89.8,
+      "is_in_pocket": true,
+      "is_in_active_site": true,
+      "nearby_pocket_druggability": 0.939,
+      "confidence_tier": "confident"
+    },
+    "EGFR": {
+      "gene": "EGFR",
+      "uniprot_id": "P00533",
+      "mutation_position": 719,
+      "stability_score": 0.95,
+      "pocket_accessibility": 0.1,
+      "ode_parameter_multiplier": 2.5,
+      "local_plddt": 0.0,
+      "is_in_pocket": false,
+      "is_in_active_site": true,
+      "nearby_pocket_druggability": 0.0,
+      "confidence_tier": "disordered"
+    },
+    "MYC": {
+      "gene": "MYC",
+      "uniprot_id": "P01106",
+      "mutation_position": 200,
+      "stability_score": 0.98,
+      "pocket_accessibility": 0.0,
+      "ode_parameter_multiplier": 1.971,
+      "local_plddt": 89.4,
+      "is_in_pocket": true,
+      "is_in_active_site": false,
+      "nearby_pocket_druggability": 0.939,
+      "confidence_tier": "confident"
+    },
+    "PTEN": {
+      "gene": "PTEN",
+      "uniprot_id": "P60484",
+      "mutation_position": 124,
+      "stability_score": 1.0,
+      "pocket_accessibility": 0.0,
+      "ode_parameter_multiplier": 2.5,
+      "local_plddt": 84.7,
+      "is_in_pocket": true,
+      "is_in_active_site": true,
+      "nearby_pocket_druggability": 0.939,
+      "confidence_tier": "confident"
+    },
+    "PIK3CA": {
+      "gene": "PIK3CA",
+      "uniprot_id": "P42336",
+      "mutation_position": 200,
+      "stability_score": 0.98,
+      "pocket_accessibility": 0.0,
+      "ode_parameter_multiplier": 1.971,
+      "local_plddt": 89.4,
+      "is_in_pocket": true,
+      "is_in_active_site": false,
+      "nearby_pocket_druggability": 0.939,
+      "confidence_tier": "confident"
+    }
+  },
+  "top_drug_matches": [
+    {
+      "drug": "Vorinostat (SAHA, HDACi)",
+      "target": "BRCA1",
+      "score": 0.554,
+      "efficacy_mult": 1.054,
+      "pocket_idx": 0,
+      "notes": "Poor volume fit"
+    },
+    {
+      "drug": "Vorinostat (SAHA, HDACi)",
+      "target": "TP53",
+      "score": 0.554,
+      "efficacy_mult": 1.054,
+      "pocket_idx": 0,
+      "notes": "Poor volume fit"
+    },
+    {
+      "drug": "Vorinostat (SAHA, HDACi)",
+      "target": "EGFR",
+      "score": 0.554,
+      "efficacy_mult": 1.054,
+      "pocket_idx": 0,
+      "notes": "Poor volume fit"
+    },
+    {
+      "drug": "Vorinostat (SAHA, HDACi)",
+      "target": "MYC",
+      "score": 0.554,
+      "efficacy_mult": 1.054,
+      "pocket_idx": 0,
+      "notes": "Poor volume fit"
+    },
+    {
+      "drug": "Vorinostat (SAHA, HDACi)",
+      "target": "PTEN",
+      "score": 0.554,
+      "efficacy_mult": 1.054,
+      "pocket_idx": 0,
+      "notes": "Poor volume fit"
+    }
+  ],
+  "phi_analysis": {
+    "healthy_phi": [
+      0.4607,
+      0.2853,
+      0.9742,
+      0.3758,
+      0.6419
+    ],
+    "baseline_phi": [
+      0.476,
+      0.313,
+      0.9738,
+      0.0902,
+      0.4562
+    ],
+    "baseline_phi_distance": 0.3421
+  },
+  "structural_impact": {
+    "top_gene": "BRCA1",
+    "ode_multiplier": 2.5,
+    "baseline_phi_distance": 0.3421,
+    "modified_phi_distance": 0.4163,
+    "structural_impact_delta": 0.0742
+  }
+}
