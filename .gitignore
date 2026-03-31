@@ -35,7 +35,7 @@ Thumbs.db
 *.key
 api_keys.json
 
-# Local validation logs
+# Local validation logs & output
 poc_output.txt
 tcga_output.txt
 test_out.log
@@ -45,3 +45,17 @@ poc_results.txt
 test_af_out.txt
 test_af_output.txt
 .pytest_cache/
+
+# Development artifacts
+alphacode_prompt.json
+article.html
+tracked_files*.txt
+validation/*_output.txt
+validation/poc_output*.txt
+validation/crc_output.txt
+validation/pathology_test.txt
+
+# Trading/market scripts (not part of research framework)
+scripts/biotech_trader_daemon.py
+scripts/mirofish_market_simulator.py
+scripts/biotech_alpha_generator.py

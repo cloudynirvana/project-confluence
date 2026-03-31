@@ -139,12 +139,12 @@ print(phi.to_json())
 
 Generate a full conference paper from Project Confluence's models with one command:
 
-`ash
+```bash
 python scripts/run_autoresearch.py phi-universality
 python scripts/run_autoresearch.py --list-topics
-`
+```
 
-**Pre-built topics:** phi-universality · drug-scheduling · immune-metabolic · erroptosis-complexity · digital-twin
+**Pre-built topics:** phi-universality · drug-scheduling · immune-metabolic · ferroptosis-complexity · digital-twin
 
 AutoResearchClaw runs 23 stages autonomously — literature review, hypothesis debate, experiments using Confluence's ODE system, peer review, and LaTeX paper. No GPU required.
 
