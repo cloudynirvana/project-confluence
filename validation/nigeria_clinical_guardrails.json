@@ -1,0 +1,165 @@
+{
+  "meta": {
+    "version": "1.0",
+    "framework": "Project Confluence — Nigeria Extension",
+    "standard": "Nigeria Standard Treatment Guidelines (NSTG) 2022",
+    "source": "Federal Ministry of Health, Nigeria",
+    "license": "CC-BY-4.0",
+    "attribution": "Dataset curated by Chisom Rutherford. Source: chisomrutherford/nigeria-clinical-guidelines-dataset (HuggingFace)",
+    "n_conditions": 270,
+    "description": "Nigeria-specific clinical guardrails derived from NSTG 2022 for use by the Adaptive Therapy Controller's safety layer"
+  },
+  "oncology_protocols": {
+    "BREAST_CANCER": {
+      "first_line_early": {
+        "regimen": "Tamoxifen (hormone-receptor positive)",
+        "drugs": [
+          {"name": "Tamoxifen", "dosage": "20mg", "route": "oral", "frequency": "daily", "duration": "5 years"}
+        ],
+        "monitoring": ["Gynaecological exam (endometrial risk)", "Liver function tests"],
+        "contraindications": ["Pregnancy", "History of thromboembolic events"]
+      },
+      "first_line_advanced": {
+        "regimen": "FAC (5-FU/Doxorubicin/Cyclophosphamide)",
+        "drugs": [
+          {"name": "Doxorubicin", "dosage_mg_per_m2": 60, "route": "IV", "frequency": "every 3 weeks", "max_cycles": 6},
+          {"name": "Cyclophosphamide", "dosage_mg_per_m2": 600, "route": "IV", "frequency": "every 3 weeks", "max_cycles": 6},
+          {"name": "5-Fluorouracil", "dosage_mg_per_m2": 500, "route": "IV", "frequency": "every 3 weeks", "max_cycles": 6}
+        ],
+        "dose_limits": {
+          "doxorubicin_cumulative_max_mg_per_m2": 450,
+          "rationale": "Cardiotoxicity threshold — irreversible cardiomyopathy above this dose"
+        },
+        "adverse_reactions_critical": [
+          "Myelosuppression — FBC before each cycle",
+          "Cardiotoxicity (doxorubicin) — ECHO/MUGA baseline + periodic",
+          "Neutropenic fever — emergency management protocol"
+        ]
+      }
+    },
+    "CERVICAL_CANCER": {
+      "first_line": {
+        "regimen": "Concurrent chemoradiation with weekly cisplatin",
+        "drugs": [
+          {"name": "Cisplatin", "dosage_mg_per_m2": 40, "route": "IV", "frequency": "weekly", "duration": "5-6 weeks"}
+        ],
+        "dose_limits": {
+          "cisplatin_max_dose_per_cycle_mg_per_m2": 40,
+          "hydration_required": true,
+          "rationale": "Nephrotoxicity — aggressive hydration mandatory"
+        },
+        "monitoring": ["Renal function (creatinine, eGFR)", "Audiometry", "Peripheral neuropathy assessment"],
+        "contraindications": ["eGFR < 60 mL/min", "Pre-existing hearing loss (grade ≥ 2)"]
+      }
+    }
+  },
+  "common_comorbidities_nigeria": {
+    "HIV_coinfection": {
+      "prevalence_context": "Nigeria has one of the largest HIV burdens globally. HIV-positive cancer patients require ART coordination.",
+      "first_line_art": {
+        "regimen": "TLD (Tenofovir/Lamivudine/Dolutegravir)",
+        "dosage": "300/300/50mg once daily"
+      },
+      "drug_interactions": [
+        "Rifampicin (TB co-treatment) — reduces dolutegravir levels, dose adjustment needed",
+        "Cisplatin + Tenofovir — additive nephrotoxicity risk, monitor creatinine closely",
+        "Doxorubicin + ART — monitor for hepatotoxicity overlap"
+      ],
+      "controller_constraints": {
+        "max_nephrotoxic_drugs_concurrent": 1,
+        "renal_monitoring_frequency_days": 14,
+        "rationale": "Tenofovir + chemotherapy nephrotoxicity risk"
+      }
+    },
+    "malaria_coinfection": {
+      "prevalence_context": "Malaria is endemic in Nigeria. Cancer patients on chemotherapy have increased susceptibility.",
+      "interaction_risks": [
+        "Thrombocytopenia overlap (malaria + myelosuppressive chemo)",
+        "Fever differential diagnosis complication (malaria vs neutropenic fever)",
+        "Artemisinin-based combination therapy (ACT) generally safe with most chemo"
+      ],
+      "controller_constraints": {
+        "mandatory_malaria_test_before_chemo": true,
+        "fever_workup": "mRDT + blood culture before assuming neutropenic fever",
+        "platelet_threshold_for_chemo_cells_per_uL": 75000
+      }
+    },
+    "sickle_cell_disease": {
+      "prevalence_context": "2-3% of Nigerian population is HbSS. Critical comorbidity affecting drug metabolism and organ function.",
+      "drug_interactions": [
+        "Hydroxyurea already causes myelosuppression — additive with chemotherapy",
+        "Chronic haemolysis affects bilirubin levels — confounds hepatotoxicity monitoring",
+        "Vaso-occlusive crises may mimic treatment side effects"
+      ],
+      "controller_constraints": {
+        "baseline_hb_minimum_g_per_dL": 7.0,
+        "transfusion_trigger_hb_g_per_dL": 6.0,
+        "avoid_dehydration": true,
+        "rationale": "Dehydration triggers sickling crises; aggressive hydration during chemo"
+      }
+    },
+    "anaemia": {
+      "prevalence_context": "Highly prevalent in Nigeria. Significant comorbidity in cancer patients undergoing chemotherapy.",
+      "controller_constraints": {
+        "hb_threshold_delay_chemo_g_per_dL": 8.0,
+        "iron_supplementation_if_deficient": true,
+        "transfusion_trigger_g_per_dL": 7.0
+      }
+    }
+  },
+  "resource_aware_constraints": {
+    "description": "Nigeria-specific resource availability constraints for realistic treatment planning",
+    "laboratory_availability": {
+      "tier_1_always_available": ["FBC", "Blood glucose", "mRDT", "Urinalysis", "LFT (basic)"],
+      "tier_2_major_centres": ["Histopathology", "Immunohistochemistry", "CT scan", "ECHO"],
+      "tier_3_limited": ["PET-CT", "Genomic profiling", "Flow cytometry", "MRI"],
+      "not_routinely_available": ["Next-gen sequencing", "Circulating tumour DNA", "Mass spectrometry"]
+    },
+    "drug_availability": {
+      "commonly_available": [
+        "Tamoxifen", "Cyclophosphamide", "5-Fluorouracil", "Methotrexate",
+        "Cisplatin", "Carboplatin", "Doxorubicin", "Vincristine",
+        "Paclitaxel", "Hydroxyurea", "Prednisolone", "Dexamethasone"
+      ],
+      "intermittently_available": [
+        "Trastuzumab", "Rituximab", "Imatinib", "Docetaxel"
+      ],
+      "rarely_available": [
+        "Pembrolizumab", "Nivolumab", "Bevacizumab", "Osimertinib",
+        "Palbociclib", "Olaparib"
+      ]
+    },
+    "controller_impact": {
+      "drug_selection_priority": "commonly_available first, then intermittently_available",
+      "avoid_protocols_requiring": "rarely_available drugs unless confirmed in stock",
+      "rationale": "Treatment interruptions due to drug unavailability are common — controller should prefer robust, available regimens"
+    }
+  },
+  "safety_thresholds_nigeria": {
+    "description": "Adjusted safety thresholds accounting for Nigerian patient population characteristics",
+    "hematologic": {
+      "ANC_min_cells_per_uL": 1500,
+      "ANC_rationale": "Higher threshold than CTCAE default (1000) due to higher baseline infection risk in tropical setting",
+      "platelets_min_per_uL": 75000,
+      "platelets_rationale": "Higher threshold due to endemic malaria-related thrombocytopenia risk",
+      "hemoglobin_min_g_per_dL": 8.0,
+      "hemoglobin_rationale": "Adjusted for high baseline anaemia prevalence"
+    },
+    "renal": {
+      "creatinine_max_fold": 1.3,
+      "eGFR_min": 50,
+      "rationale": "More conservative due to dehydration risk, sickle cell nephropathy prevalence"
+    },
+    "hepatic": {
+      "ALT_max_fold": 2.5,
+      "bilirubin_max_fold": 1.5,
+      "rationale": "Adjusted for endemic hepatitis B/C and sickle cell haemolysis"
+    },
+    "infection": {
+      "mandatory_malaria_screen": true,
+      "mandatory_hiv_screen": true,
+      "mandatory_hep_b_screen": true,
+      "tb_screening_if_prolonged_steroids": true
+    }
+  }
+}

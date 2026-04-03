@@ -83,10 +83,12 @@ All policies are bounded by hard safety constraints that **cannot be overridden*
 
 | Metric | MTD (Standard Care) | Confluence Adaptive |
 |--------|---------------------|---------------------|
-| **Resistant Takeover Rate** | 89% | **0%** |
-| **Tumor Controlled at Day 180** | 100% | 18% |
+| **Resistant Takeover Rate** | 178/200 (89.0%) | **1/200 (0.5%)** |
+| **Tumor Controlled at Day 180** | 200/200 (100%) | 36/200 (18.0%) |
+| **Mean Final Tumor Burden** | 0.271 | 0.952 |
+| **Mean Final Resistant Fraction** | 91.5% | **11.9%** |
 
-The adaptive policy achieves **zero resistant takeover** across all 200 random biological parameter sets sampled from the uncertainty set. It trades partial volume control for complete evolutionary containment — the correct tradeoff from first principles.
+The adaptive policy achieves near-zero resistant takeover (1/200 scenarios) across 200 random biological parameter sets sampled from the uncertainty set. The tradeoff is explicit: it preserves evolutionary containment at the cost of short-horizon tumor shrinkage. MTD keeps burden smaller but selects for resistance in 89% of scenarios. The adaptive controller maintains sensitive-cell competitive suppression of resistant clones — the ecological mechanism adaptive therapy is designed to exploit.
 
 ```bash
 # Run the comparison
@@ -316,6 +318,89 @@ powershell -File scripts/pin_requirements.ps1
 - Φ dimensions mapped to LOINC / SNOMED-CT codes
 - FDA MIDD (Model-Informed Drug Development) aligned
 - See [DISCLAIMER.md](DISCLAIMER.md) for medical use limitations
+
+## 🇳🇬 Nigeria Clinical Guidelines Integration
+
+Project Confluence integrates the **Nigeria Standard Treatment Guidelines (NSTG 2022)** — 270 structured clinical conditions published by the Federal Ministry of Health, Nigeria — as a RAG (Retrieval-Augmented Generation) layer for guideline-aware precision oncology.
+
+> **Data Source**: [chisomrutherford/nigeria-clinical-guidelines-dataset](https://huggingface.co/datasets/chisomrutherford/nigeria-clinical-guidelines-dataset)
+> **License**: CC-BY-4.0 | **Curated by**: Chisom Rutherford
+
+### What This Adds
+
+| Feature | Description |
+|---------|-------------|
+| **NigeriaGuidelineRetriever** | Semantic search (RAG) over all 270 NSTG conditions with FAISS + sentence-transformers |
+| **Nigeria-Specific Guardrails** | Adjusted safety thresholds for malaria, HIV, sickle cell, anaemia comorbidities |
+| **Guideline-Aware Controller** | Adaptive therapy controller with NSTG 2022 safety layer |
+| **Resource-Aware Dosing** | Drug availability tiers (commonly/intermittently/rarely available in Nigeria) |
+| **Clinical Query API** | FastAPI endpoints for real-time guideline retrieval |
+
+### Quick Start
+
+```python
+from agents.nigeria_guideline_retriever import NigeriaGuidelineRetriever
+
+# Initialize (downloads from HuggingFace on first run, or uses built-in mock data)
+retriever = NigeriaGuidelineRetriever()
+
+# Semantic search
+results = retriever.retrieve("first-line treatment for breast cancer in Nigeria")
+for r in results:
+    print(f"[{r.score:.3f}] {r.chunk.condition_name}: {r.chunk.text[:100]}")
+
+# Structured clinical answer
+print(retriever.answer("What is the dosing for cisplatin in cervical cancer?"))
+
+# Direct protocol lookup
+protocol = retriever.get_treatment_protocol("BREAST CANCER")
+
+# Drug-specific constraints
+constraints = retriever.get_dosing_constraints("doxorubicin")
+```
+
+### Guideline-Aware Adaptive Controller
+
+```python
+from models.adaptive_controller import AdaptiveController, PolicyMode
+
+# Controller auto-loads Nigeria guardrails if JSON exists
+controller = AdaptiveController(
+    policy_mode=PolicyMode.ROBUST_ADAPTIVE,
+    guideline_retriever=retriever,
+    cancer_type="TNBC",
+)
+
+# Summary includes Nigeria guidelines status
+print(controller.get_summary())
+# → {"nigeria_guidelines_active": true, ...}
+```
+
+### API Endpoints
+
+```bash
+# Query guidelines (semantic search)
+curl -X POST http://localhost:8000/guideline_query \
+  -H "Content-Type: application/json" \
+  -d '{"query": "management of neutropenia during chemotherapy", "top_k": 5}'
+
+# List all 270 conditions
+curl http://localhost:8000/guideline_conditions
+
+# Get specific protocol
+curl http://localhost:8000/guideline_protocol/breast%20cancer
+
+# Get drug constraints
+curl http://localhost:8000/guideline_drug/doxorubicin
+```
+
+### Install Optional Dependencies
+
+```bash
+pip install sentence-transformers faiss-cpu datasets
+```
+
+Without these, the retriever falls back to TF-IDF/keyword matching (still functional, lower accuracy).
 
 ## Contributing
 

@@ -234,18 +234,62 @@ class PatientFitter:
                  patient_id: str = "anonymous",
                  param_bounds: Optional[List[ParameterBounds]] = None,
                  targets: Optional[Dict[str, Dict]] = None,
-                 inference_mode: str = "mcmc"):
+                 inference_mode: str = "mcmc",
+                 guideline_priors: Optional[Dict] = None):
         self.cancer_type = cancer_type
         self.patient_id = patient_id
         self.param_bounds = param_bounds or DEFAULT_PARAM_BOUNDS
         self.targets = targets or CCLE_CURVATURE_TARGETS
         self.n_params = len(self.param_bounds)
         self.inference_mode = inference_mode
+        self.guideline_priors = guideline_priors
         self.memory_controller = DigitalTwinMemory(patient_id=self.patient_id)
+        
+        # Apply Nigeria-specific guideline priors if provided
+        if self.guideline_priors:
+            self._apply_guideline_priors()
         
         if self.inference_mode == "neural" and not (HAS_TORCH and TORCHDIFFEQ_AVAILABLE):
              warnings.warn("Neural inference requested but torch/torchdiffeq is not installed. Falling back to MCMC.")
              self.inference_mode = "mcmc"
+    
+    def _apply_guideline_priors(self):
+        """
+        Narrow MCMC parameter bounds using Nigeria-specific guideline constraints.
+        
+        When NSTG 2022 guidelines are provided, certain ODE parameters can be
+        constrained to clinically realistic ranges for the Nigerian patient
+        population. For example, higher baseline anaemia prevalence in Nigeria
+        may inform tighter bounds on ATP-related parameters.
+        
+        This is called at init and only modifies bounds if guideline_priors
+        contains relevant parameter constraints.
+        """
+        gp = self.guideline_priors
+        if not gp:
+            return
+        
+        param_adjustments = gp.get("parameter_adjustments", {})
+        for i, bound in enumerate(self.param_bounds):
+            if bound.name in param_adjustments:
+                adj = param_adjustments[bound.name]
+                if "lower" in adj:
+                    self.param_bounds[i] = ParameterBounds(
+                        name=bound.name,
+                        lower=max(bound.lower, adj["lower"]),
+                        upper=min(bound.upper, adj.get("upper", bound.upper)),
+                        display_name=bound.display_name,
+                        unit=bound.unit,
+                    )
+                    
+        # Log guideline prior application
+        n_adjusted = sum(
+            1 for b in self.param_bounds
+            if b.name in param_adjustments
+        )
+        if n_adjusted > 0:
+            print(f"[PatientFitter] Applied Nigeria guideline priors: "
+                  f"{n_adjusted} parameters adjusted")
 
     def _theta_to_params(self, theta: np.ndarray) -> ODEParams:
         """Convert parameter vector to ODEParams object."""

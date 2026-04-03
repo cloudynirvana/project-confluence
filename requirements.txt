@@ -38,3 +38,9 @@ biopython>=1.83        # PDB/mmCIF parsing for AlphaFold structures
 # Testing
 pytest>=7.0.0
 pytest-cov>=4.0.0
+
+# Nigeria Guidelines RAG (optional — enables NSTG 2022 integration)
+# License: Dataset is CC-BY-4.0 (Federal Ministry of Health, Nigeria)
+sentence-transformers>=2.2.0    # Embedding model for semantic retrieval
+faiss-cpu>=1.7.0                # Vector similarity search index
+datasets>=2.14.0                # HuggingFace dataset loader

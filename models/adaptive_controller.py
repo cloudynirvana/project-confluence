@@ -27,8 +27,10 @@ References:
       "The optimal therapy is an algorithm, not a prescription."
 """
 
+import json
 import numpy as np
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Callable
 from enum import Enum
 
@@ -114,10 +116,87 @@ class AdaptiveController:
     
     def __init__(self, 
                  policy_mode: PolicyMode = PolicyMode.ROBUST_ADAPTIVE,
-                 policy_params: Optional[PolicyParams] = None):
+                 policy_params: Optional[PolicyParams] = None,
+                 guideline_retriever=None,
+                 cancer_type: str = "TNBC"):
         self.mode = policy_mode
         self.params = policy_params or PolicyParams()
         self.ctrl_state = ControllerState()
+        self.guideline_retriever = guideline_retriever
+        self.cancer_type = cancer_type
+        
+        # Load Nigeria-specific guardrails if available
+        self.nigeria_guardrails = self._load_nigeria_guardrails()
+        if self.nigeria_guardrails:
+            self._apply_nigeria_guardrails()
+    
+    def _load_nigeria_guardrails(self) -> Optional[Dict]:
+        """Load Nigeria-specific clinical guardrails from NSTG 2022."""
+        guardrails_path = (
+            Path(__file__).resolve().parent.parent
+            / "validation" / "nigeria_clinical_guardrails.json"
+        )
+        if guardrails_path.exists():
+            try:
+                with open(guardrails_path) as f:
+                    data = json.load(f)
+                self.ctrl_state.decision_log.append(
+                    f"NIGERIA_GUARDRAILS: Loaded NSTG 2022 guardrails "
+                    f"({data.get('meta', {}).get('n_conditions', '?')} conditions)"
+                )
+                return data
+            except Exception:
+                return None
+        return None
+    
+    def _apply_nigeria_guardrails(self):
+        """
+        Layer Nigeria-specific safety thresholds on top of default policy params.
+        
+        This adjusts the controller's safety margins based on Nigerian patient
+        population characteristics (endemic infections, comorbidity prevalence,
+        drug availability).
+        """
+        ng = self.nigeria_guardrails
+        if not ng:
+            return
+        
+        safety = ng.get("safety_thresholds_nigeria", {})
+        resources = ng.get("resource_aware_constraints", {})
+        
+        # Increase uncertainty margin for Nigerian context
+        # (higher comorbidity burden = more conservative)
+        if safety:
+            self.params.uncertainty_margin = max(
+                self.params.uncertainty_margin, 0.18
+            )
+            self.ctrl_state.decision_log.append(
+                f"NIGERIA_ADJUST: uncertainty_margin → {self.params.uncertainty_margin:.2f} "
+                f"(NSTG 2022 comorbidity-aware)"
+            )
+        
+        # If resource constraints indicate limited drug availability,
+        # reduce max dose to favor commonly available drugs
+        commonly_available = resources.get("drug_availability", {}).get(
+            "commonly_available", []
+        )
+        if commonly_available:
+            self.ctrl_state.decision_log.append(
+                f"NIGERIA_DRUGS: {len(commonly_available)} commonly available drugs loaded"
+            )
+    
+    def get_guideline_context(self, query: str) -> Optional[str]:
+        """
+        Query Nigerian clinical guidelines for context (if retriever is set).
+        
+        Used to inform dosing decisions with guideline-compliant recommendations.
+        """
+        if self.guideline_retriever is None:
+            return None
+        try:
+            return self.guideline_retriever.answer(query)
+        except Exception:
+            return None
     
     def reset(self):
         """Reset controller to initial state."""
@@ -245,6 +324,9 @@ class AdaptiveController:
         """
         Apply hard safety constraints (the "Assurance Layer").
         These cannot be overridden by any policy.
+        
+        Includes both universal (CTCAE v5.0) and Nigeria-specific (NSTG 2022)
+        constraints when available.
         """
         p = self.params
         cs = self.ctrl_state
@@ -272,7 +354,45 @@ class AdaptiveController:
             dose = min(dose, budget_remaining / (p.toxicity_per_dose_unit * dt + 1e-10))
             cs.decision_log.append(f"TOXICITY_CAP: budget remaining={budget_remaining:.1f}")
         
+        # Constraint 5 (NSTG 2022): Nigeria-specific safety layer
+        dose = self._apply_nigeria_safety(dose, dt)
+        
         return max(0.0, dose)
+    
+    def _apply_nigeria_safety(self, dose: float, dt: float) -> float:
+        """
+        Apply Nigeria-specific safety constraints from NSTG 2022.
+        
+        These constraints account for:
+        - Higher baseline infection risk (malaria, HIV, Hep B)
+        - Endemic comorbidities (sickle cell, anaemia)
+        - Resource-aware drug selection
+        """
+        if not self.nigeria_guardrails:
+            return dose
+        
+        ng = self.nigeria_guardrails
+        comorbidities = ng.get("common_comorbidities_nigeria", {})
+        
+        # If malaria co-infection constraints exist, enforce higher platelet
+        # threshold (translated to dose reduction in high-toxicity scenarios)
+        malaria = comorbidities.get("malaria_coinfection", {})
+        malaria_constraints = malaria.get("controller_constraints", {})
+        if malaria_constraints and dose > 0:
+            # In a real clinical setting, this would check actual lab values.
+            # Here, we increase the safety margin as a proxy.
+            toxicity_fraction = (
+                self.ctrl_state.cumulative_toxicity
+                / (self.params.max_cumulative_toxicity + 1e-10)
+            )
+            if toxicity_fraction > 0.7:
+                dose *= 0.85  # 15% dose reduction in high-toxicity + endemic setting
+                self.ctrl_state.decision_log.append(
+                    f"NSTG_SAFETY: 15% dose reduction (toxicity={toxicity_fraction:.0%}, "
+                    f"malaria-endemic adjustment)"
+                )
+        
+        return dose
     
     # ── State Update ────────────────────────────────────────────────────
     
@@ -314,7 +434,7 @@ class AdaptiveController:
         
         dosing_fraction = np.mean(doses > 0) if len(doses) > 0 else 0
         
-        return {
+        summary = {
             "policy_mode": self.mode.value,
             "total_decisions": len(cs.dose_history),
             "dose_switches": cs.dose_switches,
@@ -330,8 +450,12 @@ class AdaptiveController:
                 "resistant_alarm": self.params.resistant_alarm_fraction,
                 "uncertainty_margin": self.params.uncertainty_margin,
             },
+            "nigeria_guidelines_active": self.nigeria_guardrails is not None,
+            "guideline_retriever_active": self.guideline_retriever is not None,
             "decisions_log_tail": cs.decision_log[-10:] if cs.decision_log else [],
         }
+        
+        return summary
 
 
 # ═══════════════════════════════════════════════════════════════════════════
