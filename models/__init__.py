@@ -18,4 +18,5 @@ Modules:
     geometric_pathways  : Freidlin-Wentzell minimum action pathway (MAP) optimizer
     fisher_geometry     : Fisher Information Matrix and stiff/sloppy decomposition
     network_curvature   : Forman-Ricci curvature for structural bottleneck detection
+    biologic_operator   : Biologic agents as geometric operators on Φ-space
 """
