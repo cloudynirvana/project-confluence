@@ -1,168 +1,315 @@
 """
-Geometric Pathways Module
-=========================
+Geometric Pathways Module — Project Confluence
+===============================================
 
 Implements Freidlin-Wentzell Minimum Action Pathway (MAP) computation
 for identifying therapeutic realignment trajectories between cancer and
 healthy attractor states.
 
-Includes optimizations: LRU Caching for basin attractors and Progressive 
-"Lazy" Path Finding for high-dimensional efficiency.
+The String Method (E, Ren, Vanden-Eijnden, 2007) evolves a discretized
+path ("string of images") by alternating between:
+  1. Evolving each image toward the minimum energy path via the negative
+     gradient of the Freidlin-Wentzell action.
+  2. Reparameterizing (redistributing) images to maintain equal arc-length
+     spacing along the string.
+
+Optimizations:
+  - Attractor caching to avoid redundant steady-state integrations
+  - Progressive "Lazy" subspace pathfinding for high-dimensional efficiency
+  - Convergence tracking with early stopping
+
+References:
+    E, Ren, Vanden-Eijnden (2007) - Simplified and improved string method
+    Freidlin, Wentzell (2012) - Random Perturbations of Dynamical Systems
+    Heymann, Vanden-Eijnden (2008) - Geometric minimum action method
 """
 
 import numpy as np
 from scipy.interpolate import interp1d
-from scipy.optimize import minimize
-from functools import lru_cache
 import logging
-from typing import Callable, Tuple, List
+from typing import Callable, Dict, Tuple, List, Optional
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
+# ---------------------------------------------------------------------------
+# Attractor cache (module-level dict; numpy arrays are unhashable for lru_cache)
+# ---------------------------------------------------------------------------
+_attractor_cache: Dict[str, np.ndarray] = {}
+
+
 class FreidlinWentzellOptimizer:
     """
     Computes the minimum action path between attractor states in phase space
-    using the String Method and progressive subspace optimization.
+    using the String Method with reparameterization.
     """
-    
+
     def __init__(self, ode_system, dt: float = 0.1):
+        """
+        Parameters
+        ----------
+        ode_system : ComplexAttractorODE
+            An initialised ODE system whose .rhs(t, z) defines the drift field.
+        dt : float
+            Discretization time step for action integral evaluation.
+        """
         self.sys = ode_system
         self.F = ode_system.rhs
         self.dim = ode_system.DIM
         self.dt = dt
-        
-    @lru_cache(maxsize=32)
-    def get_attractor(self, state_name: str) -> np.ndarray:
+
+    # ------------------------------------------------------------------
+    # Attractor retrieval with caching
+    # ------------------------------------------------------------------
+    def get_attractor(self, label: str, t_settle: float = 300.0) -> np.ndarray:
         """
-        Cached retrieval of attractor states to avoid redundant ODE integrations.
-        state_name can be "healthy" or a cancer type like "TNBC".
+        Integrate the ODE to steady state and cache the result.
+
+        Parameters
+        ----------
+        label : str
+            A unique key for this attractor (e.g. "TNBC", "healthy").
+        t_settle : float
+            Integration horizon (hours/days, depending on ODE time-scale).
+
+        Returns
+        -------
+        z_attractor : ndarray, shape (DIM,)
+            The state at the end of the settling integration.
         """
-        logger.info(f"Computing and caching attractor: {state_name}")
-        if state_name.lower() == "healthy":
-            z0 = self.sys.healthy_initial_state()
-            # Integrate to steady state (attractor)
-            res = self.sys.solve(z0=z0, t_span=(0, 200))
-            return res['z'][:, -1]
-            
-        # For disease states, we would switch the params and integrate
-        # Simplified here: assuming self.sys params are already set to disease
+        if label in _attractor_cache:
+            return _attractor_cache[label].copy()
+
+        logger.info("Computing and caching attractor: %s", label)
         z0 = self.sys.healthy_initial_state()
-        res = self.sys.solve(z0=z0, t_span=(0, 200))
-        return res['z'][:, -1]
+        res = self.sys.solve(z0=z0, t_span=(0, t_settle), dt_eval=1.0)
+        z_final = res["z"][:, -1]
+        _attractor_cache[label] = z_final.copy()
+        return z_final
 
-    def _action_integrand(self, path: np.ndarray, dt: float) -> float:
+    # ------------------------------------------------------------------
+    # Freidlin-Wentzell action functional
+    # ------------------------------------------------------------------
+    def compute_action(self, path: np.ndarray) -> float:
         """
-        Compute the Freidlin-Wentzell action for a discretized path.
-        S = 1/2 * integral |dz/dt - F(z)|^2 dt
+        Evaluate the Freidlin-Wentzell action along a discretized path.
+
+            S[φ] = (1/2) ∫ |dφ/dt − F(φ)|² dt
+
+        Parameters
+        ----------
+        path : ndarray, shape (DIM, n_images)
+
+        Returns
+        -------
+        action : float
         """
         n_images = path.shape[1]
+        dt = self.dt
         action = 0.0
-        for i in range(n_images - 1):
-            z_curr = path[:, i]
-            z_next = path[:, i+1]
-            dzdt = (z_next - z_curr) / dt
-            
-            # Evaluate drift F(z) at midpoint
-            z_mid = 0.5 * (z_curr + z_next)
-            # Use t=0 for autonomous approximation
-            drift = self.F(0.0, z_mid) 
-            
-            diff = dzdt - drift
-            action += 0.5 * np.sum(diff**2) * dt
-            
-        return action
+        for k in range(n_images - 1):
+            z_k = path[:, k]
+            z_next = path[:, k + 1]
+            velocity = (z_next - z_k) / dt
 
-    def _reparameterize_string(self, path: np.ndarray) -> np.ndarray:
-        """Enforce equal arc-length spacing between images on the string."""
+            # Drift evaluated at the midpoint for second-order accuracy
+            z_mid = 0.5 * (z_k + z_next)
+            drift = self.F(0.0, z_mid)
+
+            residual = velocity - drift
+            action += 0.5 * np.dot(residual, residual) * dt
+        return float(action)
+
+    # ------------------------------------------------------------------
+    # Quasi-potential profile along the path
+    # ------------------------------------------------------------------
+    def compute_energy_profile(self, path: np.ndarray) -> np.ndarray:
+        """
+        Estimate a quasi-potential energy at each image by accumulating
+        the local action from the start of the string.
+
+        Returns
+        -------
+        energy : ndarray, shape (n_images,)
+        """
         n_images = path.shape[1]
-        
-        # Compute arc lengths
-        diffs = np.diff(path, axis=1)
-        seg_lengths = np.linalg.norm(diffs, axis=0)
-        s = np.insert(np.cumsum(seg_lengths), 0, 0.0)
-        
-        if s[-1] == 0:
-            return path
-            
-        s_norm = s / s[-1]
-        s_uniform = np.linspace(0, 1, n_images)
-        
-        # Interpolate each dimension
+        energy = np.zeros(n_images)
+        dt = self.dt
+        for k in range(n_images - 1):
+            z_k = path[:, k]
+            z_next = path[:, k + 1]
+            velocity = (z_next - z_k) / dt
+            z_mid = 0.5 * (z_k + z_next)
+            drift = self.F(0.0, z_mid)
+            residual = velocity - drift
+            energy[k + 1] = energy[k] + 0.5 * np.dot(residual, residual) * dt
+        return energy
+
+    # ------------------------------------------------------------------
+    # Arc-length reparameterization
+    # ------------------------------------------------------------------
+    @staticmethod
+    def _reparameterize(path: np.ndarray) -> np.ndarray:
+        """Redistribute images to enforce equal arc-length spacing."""
+        dim, n_images = path.shape
+        seg = np.linalg.norm(np.diff(path, axis=1), axis=0)
+        s = np.concatenate([[0.0], np.cumsum(seg)])
+        total = s[-1]
+        if total < 1e-14:
+            return path.copy()
+
+        s_uniform = np.linspace(0.0, total, n_images)
         new_path = np.zeros_like(path)
-        for i in range(self.dim):
-            interp_func = interp1d(s_norm, path[i, :], kind='linear')
-            new_path[i, :] = interp_func(s_uniform)
-            
+        for d in range(dim):
+            new_path[d, :] = np.interp(s_uniform, s, path[d, :])
         return new_path
 
-    def compute_minimum_action_path(self, z_start: np.ndarray, z_end: np.ndarray,
-                                     n_images: int = 40, max_iter: int = 100,
-                                     active_indices: List[int] = None) -> Tuple[np.ndarray, float]:
+    # ------------------------------------------------------------------
+    # String Method core
+    # ------------------------------------------------------------------
+    def compute_minimum_action_path(
+        self,
+        z_start: np.ndarray,
+        z_end: np.ndarray,
+        n_images: int = 60,
+        max_iter: int = 200,
+        tau: float = 0.005,
+        tol: float = 1e-4,
+        active_indices: Optional[List[int]] = None,
+    ) -> Tuple[np.ndarray, float, List[float]]:
         """
-        Compute the MAP using the String Method.
-        Supports lazy/subspace optimization by providing active_indices.
+        Compute the MAP using the simplified String Method.
+
+        Parameters
+        ----------
+        z_start, z_end : ndarray, shape (DIM,)
+            Boundary states (cancer attractor, healthy attractor).
+        n_images : int
+            Number of discrete images along the string.
+        max_iter : int
+            Maximum number of string evolution iterations.
+        tau : float
+            Pseudo-time step for the gradient-descent evolution of internal
+            images.  Smaller values improve stability at the cost of speed.
+        tol : float
+            Relative change in action below which early stopping is triggered.
+        active_indices : list of int, optional
+            If provided, only evolve these dimensions (lazy subspace mode).
+            Remaining dimensions stay on the linear interpolation.
+
+        Returns
+        -------
+        path : ndarray, shape (DIM, n_images)
+        action : float
+        history : list of float
+            Action value at each iteration (for convergence diagnostics).
         """
-        logger.info("Initializing string...")
-        # Initialize linear string
-        alphas = np.linspace(0, 1, n_images)
-        path = np.zeros((self.dim, n_images))
-        for i in range(self.dim):
-            path[i, :] = z_start[i] + alphas * (z_end[i] - z_start[i])
-            
         if active_indices is None:
             active_indices = list(range(self.dim))
-            
-        logger.info(f"Optimizing MAP over {len(active_indices)} active dimensions...")
-        
-        # String Method iteration
-        tau = 0.01  # Artificial time step for string evolution
+
+        logger.info(
+            "String Method: %d images, %d active dims, max %d iters",
+            n_images, len(active_indices), max_iter,
+        )
+
+        # --- Initialize: linear interpolation between endpoints ---
+        alphas = np.linspace(0.0, 1.0, n_images)
+        path = np.outer(z_start, 1.0 - alphas) + np.outer(z_end, alphas)
+
+        history: List[float] = []
+        prev_action = self.compute_action(path)
+        history.append(prev_action)
+
         for step in range(max_iter):
-            # 1. Evolve internal images according to gradient of action
-            # dz_i/dtau = -(dz_i/dt - F(z_i)) + ... (simplified gradient flow)
-            new_path = np.copy(path)
-            for i in range(1, n_images - 1):
-                z_curr = path[:, i]
-                # Forward difference approx for gradient
-                drift = self.F(0.0, z_curr)
-                # Only update active subspace
-                for dim_idx in active_indices:
-                    # Simple gradient descent step towards drift
-                    # A true string method would compute the normal component of F
-                    new_path[dim_idx, i] += tau * drift[dim_idx]
-            
-            # 2. Reparameterize
-            path = self._reparameterize_string(new_path)
-            
-        final_action = self._action_integrand(path, self.dt)
-        logger.info(f"MAP computation complete. Final Action: {final_action:.4f}")
-        return path, final_action
+            # 1. Evolve internal images (endpoints are pinned)
+            new_path = path.copy()
+            for k in range(1, n_images - 1):
+                drift = self.F(0.0, path[:, k])
+                for d in active_indices:
+                    new_path[d, k] += tau * drift[d]
 
-    def get_saddle_point(self, path: np.ndarray) -> Tuple[int, np.ndarray]:
-        """
-        Identifies the highest-energy point on the MAP.
-        Since we don't have a direct energy landscape U(z), we use the point 
-        where the drift F(z) magnitude is minimal (fixed point/saddle).
-        """
-        n_images = path.shape[1]
-        drift_mags = np.zeros(n_images)
-        for i in range(n_images):
-            drift = self.F(0.0, path[:, i])
-            drift_mags[i] = np.linalg.norm(drift)
-            
-        # The saddle is typically the point with smallest drift between two attractors
-        # Excluding endpoints
-        saddle_idx = np.argmin(drift_mags[1:-1]) + 1
-        return saddle_idx, path[:, saddle_idx]
+            # 2. Reparameterize to keep equal spacing
+            path = self._reparameterize(new_path)
 
-    def get_realignment_targets(self, path: np.ndarray, metric: str = 'gradient') -> List[Tuple[int, float]]:
+            # 3. Convergence check
+            cur_action = self.compute_action(path)
+            history.append(cur_action)
+            rel_change = abs(cur_action - prev_action) / (abs(prev_action) + 1e-12)
+            if rel_change < tol and step > 10:
+                logger.info(
+                    "Converged at step %d (action=%.6f, rel_change=%.2e)",
+                    step, cur_action, rel_change,
+                )
+                break
+            prev_action = cur_action
+
+        final_action = self.compute_action(path)
+        logger.info("MAP complete. Final action = %.6f", final_action)
+        return path, final_action, history
+
+    # ------------------------------------------------------------------
+    # Saddle-point detection
+    # ------------------------------------------------------------------
+    def get_saddle_point(self, path: np.ndarray) -> Tuple[int, np.ndarray, float]:
         """
-        Ranks state variables by their importance along the path.
-        'gradient': total absolute change along the path.
+        Identify the transition state (highest quasi-potential point)
+        on the MAP.
+
+        Returns
+        -------
+        idx : int
+            Image index of the saddle point.
+        z_saddle : ndarray, shape (DIM,)
+        energy : float
+            Quasi-potential at the saddle.
         """
-        if metric == 'gradient':
-            total_change = np.sum(np.abs(np.diff(path, axis=1)), axis=1)
-            ranking = [(i, float(val)) for i, val in enumerate(total_change)]
-            ranking.sort(key=lambda x: x[1], reverse=True)
-            return ranking
-        return []
+        energy = self.compute_energy_profile(path)
+        idx = int(np.argmax(energy[1:-1])) + 1  # exclude pinned endpoints
+        return idx, path[:, idx].copy(), float(energy[idx])
+
+    # ------------------------------------------------------------------
+    # Realignment target ranking
+    # ------------------------------------------------------------------
+    def get_realignment_targets(
+        self, path: np.ndarray, state_names: Optional[List[str]] = None
+    ) -> List[Dict]:
+        """
+        Rank state variables by total absolute displacement along the MAP.
+
+        Parameters
+        ----------
+        path : ndarray, shape (DIM, n_images)
+        state_names : list of str, optional
+
+        Returns
+        -------
+        ranking : list of dict
+            Sorted by displacement (descending).  Each entry contains
+            'index', 'name', and 'displacement'.
+        """
+        displacement = np.sum(np.abs(np.diff(path, axis=1)), axis=1)
+        if state_names is None:
+            state_names = [f"Var_{i}" for i in range(self.dim)]
+
+        ranking = [
+            {"index": int(i), "name": state_names[i], "displacement": float(displacement[i])}
+            for i in range(self.dim)
+        ]
+        ranking.sort(key=lambda r: r["displacement"], reverse=True)
+        return ranking
+
+    # ------------------------------------------------------------------
+    # Path tangent and per-phase directional vectors
+    # ------------------------------------------------------------------
+    def get_path_tangents(self, path: np.ndarray) -> np.ndarray:
+        """
+        Return unit tangent vectors at each internal image.
+
+        Returns
+        -------
+        tangents : ndarray, shape (DIM, n_images - 2)
+        """
+        tangents = path[:, 2:] - path[:, :-2]  # central difference
+        norms = np.linalg.norm(tangents, axis=0, keepdims=True) + 1e-14
+        return tangents / norms

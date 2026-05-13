@@ -15,4 +15,7 @@ Modules:
     structural_docking  : Geometric drug-target docking heuristics
     complexity_calibrator : Staged calibration pipeline (Genotype→SIS→Δθ→Φ)
     adaptive_controller : Closed-loop controller with NSTG 2022 guideline-aware safety
+    geometric_pathways  : Freidlin-Wentzell minimum action pathway (MAP) optimizer
+    fisher_geometry     : Fisher Information Matrix and stiff/sloppy decomposition
+    network_curvature   : Forman-Ricci curvature for structural bottleneck detection
 """

@@ -157,7 +157,7 @@ AutoResearchClaw runs 23 stages autonomously — literature review, hypothesis d
 ```
 project-confluence/
 ├── models/                          # Core computational modules
-│   ├── adaptive_controller.py       # NEW: Closed-loop adaptive therapy controller
+│   ├── adaptive_controller.py       # Closed-loop adaptive therapy controller
 │   ├── clonal_dynamics.py           # Lotka-Volterra clonal competition engine
 │   ├── resistance_model.py          # Multi-mechanism resistance tracker
 │   ├── complexity_profiler.py       # Module 1: 5D Φ vector
@@ -166,10 +166,15 @@ project-confluence/
 │   ├── ode_system.py                # 15D SAEM ODE
 │   ├── immune_dynamics.py           # Immune force field
 │   ├── intervention.py              # Drug library (20+ drugs)
+│   ├── geometric_optimization.py    # Basin curvature, Kramers escape, Flatten-Heat-Push
+│   ├── geometric_pathways.py        # Freidlin-Wentzell MAP via String Method
+│   ├── fisher_geometry.py           # Fisher Information Matrix / stiff-sloppy (MBAM)
+│   ├── network_curvature.py         # Forman-Ricci curvature bottleneck detection
 │   ├── realistic_failure.py         # Stochastic failure model
 │   └── ferroptosis.py               # Iron-dependent cell death
 ├── scripts/
-│   ├── monte_carlo_uncertainty.py   # NEW: 200-sample uncertainty validation
+│   ├── monte_carlo_uncertainty.py   # 200-sample uncertainty validation
+│   ├── test_pathways.py             # Geometric calibration integration test
 │   ├── clonal_evolution_sim.py      # Adaptive vs MTD comparison
 │   ├── confluence_runner.py         # Full pipeline runner
 │   └── ...                          # Data agents, validation scripts
@@ -179,6 +184,7 @@ project-confluence/
 │   ├── clinical_guardrails.json     # CTCAE v5.0 constraints
 │   └── gene_to_parameter_map.json   # Omics → ODE mapping
 ├── theory/                          # Mathematical framework
+│   └── geometric_calibration_research.md  # Geometric calibration research proposal
 ├── tests/                           # Test suite (9 test files)
 ├── docs/                            # User documentation
 └── notebooks/                       # Validation pipelines
