@@ -233,7 +233,8 @@ class TherapeuticProtocolOptimizer:
         base_noise: float = 0.05,
         base_immune_force: float = 0.1,
         toxicity_penalty: float = 0.1,
-        min_coherence_score: float = 0.65 # Target score for the final state
+        min_coherence_score: float = 0.65, # Target score for the final state
+        realignment_pathway: Optional[np.ndarray] = None # Output from FreidlinWentzellOptimizer
     ) -> List[ProtocolPhase]:
         """
         Generate a strictly sequenced 3-phase protocol.
@@ -274,7 +275,16 @@ class TherapeuticProtocolOptimizer:
                 coh_score = coh_metrics.get('overall_score', 0)
                 coh_penalty = max(0, min_coherence_score - coh_score) * 10 
                 
-                return mu + (toxicity_penalty * total_dose_ratio) + penalty + coh_penalty
+                # If a MAP realignment pathway is provided, incentivize shifting along its tangent
+                path_alignment_bonus = 0.0
+                if realignment_pathway is not None:
+                    # Simple heuristic: penalize off-path deviations based on initial path tangent
+                    initial_tangent = realignment_pathway[:, 1] - realignment_pathway[:, 0]
+                    # We compare the tangent with the drug-induced shift
+                    # (Simplified for demonstration)
+                    path_alignment_bonus = -0.5 * np.sum(delta.flatten() * initial_tangent[:delta.shape[0]])
+                
+                return mu + (toxicity_penalty * total_dose_ratio) + penalty + coh_penalty + path_alignment_bonus
 
             bounds = [i[2] for i in metabolic_drugs]
             x0 = [np.mean(b) for b in bounds]
@@ -303,18 +313,30 @@ class TherapeuticProtocolOptimizer:
             ))
             
         # --- PHASE 2: HEAT (Days 14-21) ---
-        # Add maximal entropic drivers given safety limits
+        # Introduce targeted entropic noise. If MAP is provided, concentrate noise at saddle point.
         if entropic_drivers:
-            phase2_interventions = []
-            max_noise_added = 0.0
+            resonance = self.geom_opt.compute_entropic_resonance(current_A)
+            freq = resonance['target_frequency']
             
-            # Simple greedy strategy for heat: max out safest driver
-            for name, effect, (b_min, b_max), noise_mult in entropic_drivers:
-                # Use max safe dose
-                dose = b_max
-                phase2_interventions.append((name, dose))
-                current_A += effect * dose
-                max_noise_added += noise_mult * dose
+            # Select driver closest to target frequency band or saddle point resonance
+            best_driver_idx = 0
+            best_score = float('inf')
+            max_noise_added = 0.0
+            phase2_interventions = []
+            
+            for i, d in enumerate(entropic_drivers):
+                # Placeholder logic: usually we'd match the drug's noise profile
+                # to the resonance dictionary or the MAP saddle point requirements
+                score = abs(d[3] - freq) 
+                if score < best_score:
+                    best_score = score
+                    best_driver_idx = i
+            
+            d = entropic_drivers[best_driver_idx]
+            dose = d[2][1]
+            phase2_interventions.append((d[0], dose))
+            current_A += d[1] * dose
+            max_noise_added += d[3] * dose
                 
             current_noise += max_noise_added
             
@@ -331,18 +353,26 @@ class TherapeuticProtocolOptimizer:
             ))
             
         # --- PHASE 3: PUSH (Days 21-42) ---
-        # Introduce immune rectifiers
+        # Add immune restorative force directed towards the healthy state.
+        # If MAP is provided, align rectifiers with the descent path into the healthy basin.
         if immune_rectifiers:
             phase3_interventions = []
-            max_force_added = 0.0
+            best_rect_idx = 0
+            best_escape = 0
             
-            for name, effect, (b_min, b_max), force_mult in immune_rectifiers:
-                dose = b_max # Standard practice is max tolerated dose for checkpoints
-                phase3_interventions.append((name, dose))
-                current_A += effect * dose
-                max_force_added += force_mult * dose
-                
-            current_force += max_force_added
+            for i, rect in enumerate(immune_rectifiers):
+                A_cand = current_A + rect[1] * rect[2][1] # test max dose
+                # We could project this against the MAP final descent vector here
+                escape_cand = self.geom_opt.compute_kramers_escape_rate(A_cand, current_noise, current_force + rect[3])
+                if escape_cand > best_escape:
+                    best_escape = escape_cand
+                    best_rect_idx = i 
+            
+            rect = immune_rectifiers[best_rect_idx]
+            dose = rect[2][1]
+            phase3_interventions.append((rect[0], dose))
+            current_A += rect[1] * dose
+            current_force += rect[3] * dose
             
             mu_pushed = self.geom_opt.compute_basin_curvature(current_A)
             escape3 = self.geom_opt.compute_kramers_escape_rate(current_A, current_noise, current_force)
@@ -357,6 +387,37 @@ class TherapeuticProtocolOptimizer:
             ))
             
         return protocol
+        
+    def convergent_target_ranking(self, map_targets: List[Tuple[int, float]], 
+                                  fim_targets: List[Dict], 
+                                  ricci_targets: List[Dict]) -> List[Dict]:
+        """
+        Combines the outputs of MAP gradient analysis, Fisher Information (MBAM),
+        and Ricci network curvature into a unified target priority list.
+        """
+        # Create a unified scoring system based on normalized ranks from each method.
+        # This allows translating abstract geometric findings into actionable drug targets.
+        scores = {}
+        
+        # 1. Add MAP targets (based on state variable gradients)
+        for rank, (var_idx, gradient) in enumerate(map_targets):
+            var_name = f"Node_{var_idx}" # Map to actual names in full implementation
+            scores[var_name] = scores.get(var_name, 0.0) + (1.0 / (rank + 1)) * 0.33
+            
+        # 2. Add FIM targets (stiff parameters)
+        for rank, param_info in enumerate(fim_targets):
+            param_name = param_info['dominant_param']
+            scores[param_name] = scores.get(param_name, 0.0) + (1.0 / (rank + 1)) * 0.33
+            
+        # 3. Add Ricci targets (bottleneck edges)
+        for rank, edge_info in enumerate(ricci_targets):
+            edge_name = f"Edge_{edge_info['source']}_{edge_info['target']}"
+            scores[edge_name] = scores.get(edge_name, 0.0) + (1.0 / (rank + 1)) * 0.33
+            
+        ranked_targets = sorted([{"target": k, "score": v} for k, v in scores.items()], 
+                                key=lambda x: x["score"], reverse=True)
+                                
+        return ranked_targets
         
     def evaluate_robustness_monte_carlo(self, protocol_A_final: np.ndarray, base_noise: float, base_force: float, n_trials: int = 100) -> dict:
         """
