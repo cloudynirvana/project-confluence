@@ -105,3 +105,59 @@ Create a new executable simulation script that:
 - Simulates the aging trajectory over a 100-year human scale.
 - Compares **Continuous Reprogramming** (MTD equivalent - dangerous) vs. **Sequential Synergistic Reversal** (Adaptive TPE + Pulsatile OSKM).
 - Proves that the sequential synergistic protocol yields a durable, stable restoration of both the coupling tensor $C(t)$ and the local entropy rates $\dot{s}_k(t)$, extending the simulated system's lifespan.
+
+---
+
+## 5. Steering Biological States as a Goal-Oriented "Language Game"
+
+Integrating the pioneering framework of **Zhang & Levin (arXiv:2605.16321)**, we formalize the steering of aging biological networks as a **goal-oriented Language Game**. In this paradigm, biological rejuvenation is no longer treated as a brute-force biochemical repair process, but as an **informational dialogue** between the controller (the clinical therapist as the "prompter") and the multicellular network (the biological substrate as the "interpreter").
+
+```
+┌────────────────────────────────────────────────────────┐
+│             CLINICAL CONTROLLER ("Prompter")           │
+│   - Constructs biological prompt sequence u(t)        │
+│   - Interventions = Semantic tokens in biological space │
+└───────────────────────────┬────────────────────────────┘
+                            │
+                            │ Prompt: u(t) = {TPE, sEV, OSKM}
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│             MULTICELLULAR NETWORK ("Interpreter")      │
+│   - Inductive Bias: Coupling Tensor C_ij(t)            │
+│   - Decodes systemic prompts via cross-scale dynamics │
+│   - Objective: Reach Youthful Attractor Basin          │
+└────────────────────────────────────────────────────────┘
+```
+
+### 5.1 Formal Grammar of Biological Prompting
+
+We define a therapeutic protocol as a sequence of semantic tokens (biological interventions) in a shared control lexicon $\mathcal{L}$:
+
+$$u(t) = \{w_1, w_2, \dots, w_k\} \in \mathcal{L}^*$$
+
+where each word $w_i$ represents a specific, targeted physiological stimulus (e.g., clearance of circulating IL-6, transfection of Oct4/Sox2/Klf4, or activation of lysosomal proton pumps).
+
+The response of the 15D multicellular network $z(t)$ is modeled as a decoding function $f_d$ parameterized by the coupling tensor $C(t)$, which acts as the network's **internal grammatical inductive bias**:
+
+$$\dot{z}(t) = \mathcal{G}\big(z(t), u(t); C(t)\big)$$
+
+### 5.2 Propositions for Dialogic steering
+
+> [!NOTE]
+> **Proposition 1 (Inductive Bias of the Coupling Tensor)**  
+> The capacity of the multicellular network to correctly interpret a local cellular prompt (such as Yamanaka factor activation) is bounded by the integrity of the off-diagonal coupling tensor. If the tissue-organism coupling $C_{24} \to 0$, local prompts are interpreted as random noise or pathogenic insults, triggering apoptotic collapse or neoplastic transformation rather than rejuvenation.
+
+> [!NOTE]
+> **Proposition 2 (Semantic Cleansing as Context Window Reset)**  
+> Systemic Milieu Recalibration (TPE) acts as a **context window reset** in the language game. By stripping the accumulated chronic "noise" (SASP, circulating senescent sEVs, inflammatory cytokines), it clears the biological context window, restoring the signal-to-noise ratio so that subsequent high-level epigenetic prompts ($u_{cell}(t)$) can be parsed with high fidelity.
+
+### 5.3 Goal-Oriented Steering Optimization
+
+The optimal clinical dialogue is formulated as a reward-maximization game where the reward is the system's viability functional $V(t) = \sigma_{\min}(C(t)) - \max_k [\dot{s}_k(t)]$. We seek to discover the shortest semantic sequence $u^*(t)$ that transitions the aging attractor basin $\mathcal{A}_{\text{senescent}}$ into the youthful basin $\mathcal{A}_{\text{youth}}$:
+
+$$\min_{u(t)} \quad \text{Length}\big(u(t)\big)$$
+
+$$\text{subject to} \quad \lim_{t \to T} \mathbb{P}\left( z(t) \in \mathcal{A}_{\text{youth}} \mid z(0) \in \mathcal{A}_{\text{senescent}}, u(t) \right) \ge 1 - \epsilon$$
+
+By treating age reversal as a Levin-inspired language game, we shift our focus from exhausting molecular repair targets to **speaking the correct grammatical sequence** to the biological network, using $C_{ij}$ as our primary diagnostic of semantic receptive capacity.
+
