@@ -17,6 +17,22 @@ Traditional Oncology:   Kill Cancer Cells → Measure Tumor Shrinkage
 Project Confluence:     Restore Complexity → Measure Φ Improvement
 ```
 
+## Theoretical Foundation: Bounded Adaptive Coherence (BAC)
+
+> *A biological system sustains viable complexity if and only if the minimum singular value of its cross-scale coupling tensor exceeds the maximum normalised rate of local entropy production at any organisational scale.*
+
+The BAC framework provides a **first-principles unification** of aging, cancer, and health as states of a single mathematical object — the **coupling tensor** $C(t)$, which governs causal coordination across biological scales (molecular → cellular → tissue → organism → evolutionary).
+
+| Failure Mode | Coupling Tensor Signature | BAC Violation Type |
+|---|---|---|
+| **Aging** | Global off-diagonal decay of $C_{ij}$ | $\sigma_{\min}(C) \to 0$ uniformly |
+| **Cancer** | Selective collapse of organism-scale pairs | $\sigma_{\min}(C) \to 0$ in specific sectors |
+| **Health** | BAC condition satisfied with positive margin | $V(t) = \sigma_{\min}(C) - \max_k[\dot{s}_k] > 0$ |
+
+The Φ vector is a **partial measurement** of the coupling tensor — the elements most relevant to cancer pathology. Biologics act as **coupling restoration operators** on specific $C_{ij}$ elements.
+
+📄 **Full derivation:** [theory/bounded_adaptive_coherence.md](theory/bounded_adaptive_coherence.md)
+
 ## Unified Complexity Profile (UCP)
 
 The framework operates on two complexity dimensions:
@@ -184,6 +200,7 @@ project-confluence/
 │   ├── clinical_guardrails.json     # CTCAE v5.0 constraints
 │   └── gene_to_parameter_map.json   # Omics → ODE mapping
 ├── theory/                          # Mathematical framework
+│   ├── bounded_adaptive_coherence.md     # BAC first-principles theory
 │   └── geometric_calibration_research.md  # Geometric calibration research proposal
 ├── tests/                           # Test suite (9 test files)
 ├── docs/                            # User documentation
