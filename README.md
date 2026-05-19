@@ -200,6 +200,7 @@ project-confluence/
 │   ├── clinical_guardrails.json     # CTCAE v5.0 constraints
 │   └── gene_to_parameter_map.json   # Omics → ODE mapping
 ├── theory/                          # Mathematical framework
+│   ├── age_reversal_transfer.md          # Scaling BAC & C_ij framework to biogerontology
 │   ├── bounded_adaptive_coherence.md     # BAC first-principles theory
 │   ├── complexity_sustainment.md         # Optimal complexity maintenance (cancer vs aging)
 │   └── geometric_calibration_research.md  # Geometric calibration research proposal
