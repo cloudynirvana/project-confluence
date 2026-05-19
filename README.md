@@ -203,6 +203,7 @@ project-confluence/
 │   ├── age_reversal_transfer.md          # Scaling BAC & C_ij framework to biogerontology
 │   ├── bounded_adaptive_coherence.md     # BAC first-principles theory
 │   ├── complexity_sustainment.md         # Optimal complexity maintenance (cancer vs aging)
+│   ├── optimal_inference_design.md       # Inference of C_ij from sparse clinical observations
 │   └── geometric_calibration_research.md  # Geometric calibration research proposal
 ├── tests/                           # Test suite (9 test files)
 ├── docs/                            # User documentation
