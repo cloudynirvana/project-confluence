@@ -34,7 +34,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 # Add root path for models/
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from models.ode_system import TNBCODESystem
+from models.ode_system import TNBCODESystem, ComplexAttractorODE, ExtendedParams
 from models.intervention import InterventionMapper, TherapeuticIntervention
 from models.geometric_optimization import GeometricOptimizer
 from models.coherence import CoherenceAnalyzer
@@ -45,6 +45,7 @@ from models.protocol_translator import ProtocolTranslator
 from models.resistance_model import ResistanceTracker, ResistanceParams
 from models.realistic_failure import RealisticFailureModel
 from models.ferroptosis import FerroptosisEngine
+from models.coupling_tensor import CouplingTensorAnalyzer
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -82,6 +83,30 @@ CANCER_META = {
     "mCRPC":    {"immune_suppression": 0.65, "stromal_barrier": 0.35, "stress_load": 0.27},
     "HCC":      {"immune_suppression": 0.60, "stromal_barrier": 0.50, "stress_load": 0.88},
 }
+
+def get_treated_ode_for_cancer(cancer_type: str) -> ComplexAttractorODE:
+    p = ExtendedParams()
+    # Partially restore metabolism toward healthy
+    p.glucose_uptake = -0.75
+    p.glycolysis_flux = 0.55
+    p.lactate_clearance = -0.55
+    p.glutamine_utilization = -0.55
+    p.ros_clearance = -0.70
+    p.r_prime = 0.06
+    p.k_exhaust = 0.07
+    p.r_rescue = 0.05
+    p.r_fibrosis = 0.03
+    
+    # Customize based on cancer type specific severity
+    if cancer_type == "PDAC":
+        # PDAC has dense stroma, slower restoration
+        p.r_fibrosis = 0.06
+    elif cancer_type == "GBM":
+        p.glucose_uptake = -0.90
+        
+    return ComplexAttractorODE(params=p, use_nonlinear=True, use_immune=True, use_microenv=True)
+
+
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -524,6 +549,42 @@ def run_single_cancer(cancer_type: str, mapper: InterventionMapper,
     cont_rf = clonal_result["continuous"]["final_resistant_fraction"]
     print(f"  Clonal: Adaptive resistant={adapt_rf:.1%} vs Continuous={cont_rf:.1%}")
     
+    # 7.5 Coupling Tensor Viability Check (Gate 7)
+    print("  Calculating Coupling Tensor trajectory...", end=" ", flush=True)
+    try:
+        analyzer = CouplingTensorAnalyzer()
+        ode_treated = get_treated_ode_for_cancer(cancer_type)
+        z0 = ode_treated.healthy_initial_state()
+        # Disturb initial state slightly as cancer recovery state
+        z0[0] *= 1.5
+        z0[9] *= 1.5
+        
+        sol = ode_treated.solve(z0=z0, t_span=(0, 30), dt_eval=1.0)
+        if sol["success"]:
+            # Compute C_ij(t) time-series
+            C_series = analyzer.compute_from_jacobian(ode_treated, sol["z"], sol["t"])
+            # Compute scale entropy rates
+            entropy_series = analyzer.scale_entropy_rates(sol["z"], dt=1.0, window=5)
+            # Compute viability trajectory
+            V_t = [analyzer.viability(C_series[:, :, t_idx], entropy_series[:, t_idx]) 
+                   for t_idx in range(len(sol["t"]))]
+            
+            mean_viability = float(np.mean(V_t))
+            min_viability = float(np.min(V_t))
+            # Gate 7 requirement: strictly positive viability (recovery)
+            gate7_passed = min_viability > 0.0 and mean_viability > 0.15
+            print(f"Viability: mean={mean_viability:.3f} min={min_viability:.3f} | {'✅' if gate7_passed else '❌'}")
+        else:
+            mean_viability = 0.0
+            min_viability = -1.0
+            gate7_passed = False
+            print("❌ Solver failed")
+    except Exception as e:
+        mean_viability = 0.0
+        min_viability = -1.0
+        gate7_passed = False
+        print(f"❌ Error: {str(e)}")
+        
     # 8. Generate lab protocol (if requested)
     lab_protocol = None
     if generate_lab_protocol:
@@ -563,6 +624,9 @@ def run_single_cancer(cancer_type: str, mapper: InterventionMapper,
         "resistance_comparison": resistance_cmp,
         "clonal_dynamics": clonal_result,
         "recommended_strategy": winner,
+        "coupling_viability_mean": round(mean_viability, 4),
+        "coupling_viability_min": round(min_viability, 4),
+        "gate7_passed": bool(gate7_passed),
     }
 
 
@@ -649,13 +713,18 @@ def run_all_cancers(generate_lab_protocols: bool = True,
     gate6 = clonal_pass >= 8
     print(f"  {'✅' if gate6 else '❌'} Clonal Dynamics (adaptive < continuous resistant): {clonal_pass}/{len(CANCER_TYPES)}")
     
-    all_pass = all([gate1, gate2, gate3, gate4, gate5, gate6])
+    # Gate 7 (NEW): Coupling Tensor Viability Check
+    gate7_count = sum(1 for r in results if r["gate7_passed"])
+    gate7 = gate7_count >= 8
+    print(f"  {'✅' if gate7 else '❌'} Coupling Tensor Viability: {gate7_count}/{len(CANCER_TYPES)}")
+    
+    all_pass = all([gate1, gate2, gate3, gate4, gate5, gate6, gate7])
     
     print("\n" + ("🏆 ALL GATES PASSED" if all_pass else "⚠️ SOME GATES FAILED"))
     
     # ── Summary Report ──
     summary = {
-        "framework": "SAEM — Project Confluence v2.0",
+        "framework": "SAEM — Project Confluence v3.0",
         "date": "auto-generated",
         "cancer_types": len(CANCER_TYPES),
         "drug_library_size": len(mapper.intervention_library),
@@ -668,6 +737,7 @@ def run_all_cancers(generate_lab_protocols: bool = True,
             "non_uniform_outcomes": {"pass": gate4, "score": f"range={dist_range:.3f}"},
             "safety_clearance": {"pass": gate5, "score": f"{safe_count}/{len(CANCER_TYPES)}"},
             "clonal_dynamics": {"pass": gate6, "score": f"{clonal_pass}/{len(CANCER_TYPES)}"},
+            "coupling_viability": {"pass": gate7, "score": f"{gate7_count}/{len(CANCER_TYPES)}"},
         },
         "all_gates_pass": all_pass,
         "results": results,
@@ -714,8 +784,8 @@ def generate_confluence_report(summary: Dict, output_dir: str):
     
     # Per-cancer results
     lines.append("## Per-Cancer Results\n")
-    lines.append("| Cancer | Remission Prob. | 95% CI | Escape Dist | Strategy | Safety | Failure Modes |")
-    lines.append("|---|---|---|---|---|---|---|")
+    lines.append("| Cancer | Remission Prob. | 95% CI | Escape Dist | Strategy | Safety | Viability ($C_{ij}$) | Failure Modes |")
+    lines.append("|---|---|---|---|---|---|---|---|")
     for r in sorted(results, key=lambda x: -x["seriousness"]):
         safety_icon = "✅" if r["safety"]["is_safe"] else "⚠️"
         strategy = r.get("recommended_strategy", "Adaptive")
@@ -724,11 +794,12 @@ def generate_confluence_report(summary: Dict, output_dir: str):
         evasion = fs.get('immune_evasion', 0)
         switch = fs.get('metabolic_switch', 0)
         failures = f"R:{resist:.0%} E:{evasion:.0%} S:{switch:.0%}"
+        viability_str = f"{r.get('coupling_viability_mean', 0.0):.3f} ({'✅' if r.get('gate7_passed', False) else '❌'})"
         lines.append(
             f"| **{r['cancer_type']}** | {r['remission_probability']:.0%} | "
             f"[{r['remission_ci'][0]:.0%}, {r['remission_ci'][1]:.0%}] | "
             f"{r['escape_distance']:.3f} | {strategy} | {safety_icon} | "
-            f"{failures} |"
+            f"{viability_str} | {failures} |"
         )
     lines.append("")
     
