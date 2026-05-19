@@ -201,6 +201,7 @@ project-confluence/
 │   └── gene_to_parameter_map.json   # Omics → ODE mapping
 ├── theory/                          # Mathematical framework
 │   ├── bounded_adaptive_coherence.md     # BAC first-principles theory
+│   ├── complexity_sustainment.md         # Optimal complexity maintenance (cancer vs aging)
 │   └── geometric_calibration_research.md  # Geometric calibration research proposal
 ├── tests/                           # Test suite (9 test files)
 ├── docs/                            # User documentation
