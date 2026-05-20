@@ -129,6 +129,31 @@ Microenvironment (2D): σ_stromal, ν_vascular
 
 Nonlinearity via Michaelis-Menten kinetics → **strange attractor dynamics**.
 
+```mermaid
+graph TD
+    subgraph Scale 0: Molecular (z0-z4)
+        M1[Glucose/Lactate Flux] <--> M2[ATP/NADH Energetics]
+    end
+
+    subgraph Scale 1: Cellular (z5-z9)
+        C1[Glutamine/alpha-KG] <--> C2[ROS Accumulation]
+    end
+
+    subgraph Scale 2: Organismal (z10-z12)
+        O1[Effector T-Cells] <--> O2[Tregs / Exhaustion]
+    end
+
+    subgraph Scale 3: Tissue (z13-z14)
+        T1[Stromal Density] <--> T2[Vascular Integrity]
+    end
+
+    %% Cross-Scale Coupling Tensor Channels C_ij
+    M2 -- "C_01 (Metabolic feedback)" --> C2
+    C2 -- "C_12 (Stress-immune gating)" --> O1
+    O2 -- "C_23 (Immune-stroma pruning)" --> T1
+    T2 -- "C_30 (Vascular glucose supply)" --> M1
+```
+
 ## Quick Start
 
 ```bash
@@ -213,6 +238,20 @@ project-confluence/
 ├── docs/                            # User documentation
 └── notebooks/                       # Validation pipelines
 ```
+
+## 🗺️ Mathematical-to-Code Mapping Registry
+
+To bridge abstract biophysical theory with verified computational executions, use the following translation map linking the mathematical papers to their Python modules:
+
+| Biophysical Equation / Concept | Mathematical Theory Paper | Executable Python Module | Verification Test Suite |
+| :--- | :--- | :--- | :--- |
+| **15D Spectral Attractor (SAEM)** | [`theory/optimal_inference_design.md`](theory/optimal_inference_design.md) | [`models/ode_system.py`](models/ode_system.py) | `tests/test_ode_system.py` |
+| **4x4 Cross-Scale Coupling Tensor $C_{ij}$** | [`theory/complexity_sustainment.md`](theory/complexity_sustainment.md) | [`models/coupling_tensor.py`](models/coupling_tensor.py) | [`tests/test_coupling_tensor.py`](tests/test_coupling_tensor.py) |
+| **EKF Continuous-Discrete Observer** | [`theory/optimal_inference_design.md`](theory/optimal_inference_design.md) | [`models/optimal_inference.py`](models/optimal_inference.py) | [`tests/test_optimal_inference.py`](tests/test_optimal_inference.py) |
+| **OED Sensor Selection Matrix $H$** | [`theory/optimal_inference_design.md`](theory/optimal_inference_design.md) | [`scripts/optimize_biomarker_panel.py`](scripts/optimize_biomarker_panel.py) | *Runs combinatorial validation* |
+| **Stochastic Laboratory Calibration** | [`theory/problem_statement_and_justification.md`](theory/problem_statement_and_justification.md) | [`scripts/stochastic_noise_sweep.py`](scripts/stochastic_noise_sweep.py) | *Assay noise sweeps* |
+| **Bioinformatics Parameter Mapping** | [`theory/geometric_calibration_research.md`](theory/geometric_calibration_research.md) | [`agents/bioinformatics_miner.py`](agents/bioinformatics_miner.py) | `tests/test_bioinformatics.py` |
+| **Genomic Cohort Reconstructor** | [`theory/problem_statement_and_justification.md`](theory/problem_statement_and_justification.md) | [`scripts/reconstruct_tcga_patients.py`](scripts/reconstruct_tcga_patients.py) | *TCGA diagnostic outputs* |
 
 ## Pan-Cancer Support
 
