@@ -206,6 +206,7 @@ project-confluence/
 │   ├── bounded_adaptive_coherence.md     # BAC first-principles theory
 │   ├── complexity_sustainment.md         # Optimal complexity maintenance (cancer vs aging)
 │   ├── optimal_inference_design.md       # Inference of C_ij from sparse clinical observations
+│   ├── deepmind_executive_brief.md       # Proposal for DeepMind & Isomorphic Labs integration
 │   └── geometric_calibration_research.md  # Geometric calibration research proposal
 ├── tests/                           # Test suite (11 test files)
 ├── docs/                            # User documentation
