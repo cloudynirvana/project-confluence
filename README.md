@@ -195,6 +195,7 @@ project-confluence/
 │   ├── test_pathways.py             # Geometric calibration integration test
 │   ├── clonal_evolution_sim.py      # Adaptive vs MTD comparison
 │   ├── confluence_runner.py         # Full pipeline runner
+│   ├── optimize_biomarker_panel.py  # EKF biomarker selection optimization
 │   └── ...                          # Data agents, validation scripts
 ├── agents/                          # Data agents
 │   └── bioinformatics_miner.py      # Module 4: TCGA/cBioPortal
