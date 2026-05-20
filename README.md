@@ -187,7 +187,9 @@ project-confluence/
 │   ├── fisher_geometry.py           # Fisher Information Matrix / stiff-sloppy (MBAM)
 │   ├── network_curvature.py         # Forman-Ricci curvature bottleneck detection
 │   ├── realistic_failure.py         # Stochastic failure model
-│   └── ferroptosis.py               # Iron-dependent cell death
+│   ├── ferroptosis.py               # Iron-dependent cell death
+│   ├── coupling_tensor.py           # Block Jacobian cross-scale C_ij tensor
+│   └── optimal_inference.py         # EKF state & coupling tensor observer
 ├── scripts/
 │   ├── monte_carlo_uncertainty.py   # 200-sample uncertainty validation
 │   ├── test_pathways.py             # Geometric calibration integration test
@@ -205,7 +207,7 @@ project-confluence/
 │   ├── complexity_sustainment.md         # Optimal complexity maintenance (cancer vs aging)
 │   ├── optimal_inference_design.md       # Inference of C_ij from sparse clinical observations
 │   └── geometric_calibration_research.md  # Geometric calibration research proposal
-├── tests/                           # Test suite (9 test files)
+├── tests/                           # Test suite (11 test files)
 ├── docs/                            # User documentation
 └── notebooks/                       # Validation pipelines
 ```
