@@ -214,10 +214,12 @@ project-confluence/
 │   ├── realistic_failure.py         # Stochastic failure model
 │   ├── ferroptosis.py               # Iron-dependent cell death
 │   ├── coupling_tensor.py           # Block Jacobian cross-scale C_ij tensor
-│   └── optimal_inference.py         # EKF state & coupling tensor observer
+│   ├── optimal_inference.py         # EKF state & coupling tensor observer
+│   └── lyapunov_certificate.py      # Universal Complexity Sustainment — CLF certifier
 ├── scripts/
 │   ├── monte_carlo_uncertainty.py   # 200-sample uncertainty validation
 │   ├── test_pathways.py             # Geometric calibration integration test
+│   ├── test_sustainment.py          # Sustainment Theorem validation (4 scenarios)
 │   ├── clonal_evolution_sim.py      # Adaptive vs MTD comparison
 │   ├── confluence_runner.py         # Full pipeline runner
 │   ├── optimize_biomarker_panel.py  # EKF biomarker selection optimization
@@ -234,7 +236,9 @@ project-confluence/
 │   ├── optimal_inference_design.md       # Inference of C_ij from sparse clinical observations
 │   ├── sustained_complexity_and_death.md # Biophysics & thermodynamics of death
 │   ├── deepmind_executive_brief.md       # Proposal for DeepMind & Isomorphic Labs integration
-│   └── geometric_calibration_research.md  # Geometric calibration research proposal
+│   ├── geometric_calibration_research.md  # Geometric calibration research proposal
+│   ├── quantum_criticality_and_unison.md  # Penrose Orch OR × BAC quantum-classical integration
+│   └── universal_sustainment_theorem.md   # Control Lyapunov proof for indefinite sustainment
 ├── tests/                           # Test suite (11 test files)
 ├── docs/                            # User documentation
 └── notebooks/                       # Validation pipelines
@@ -251,6 +255,7 @@ To bridge abstract biophysical theory with verified computational executions, us
 | **EKF Continuous-Discrete Observer** | [`theory/optimal_inference_design.md`](theory/optimal_inference_design.md) | [`models/optimal_inference.py`](models/optimal_inference.py) | [`tests/test_optimal_inference.py`](tests/test_optimal_inference.py) |
 | **OED Sensor Selection Matrix $H$** | [`theory/optimal_inference_design.md`](theory/optimal_inference_design.md) | [`scripts/optimize_biomarker_panel.py`](scripts/optimize_biomarker_panel.py) | *Runs combinatorial validation* |
 | **Stochastic Laboratory Calibration** | [`theory/problem_statement_and_justification.md`](theory/problem_statement_and_justification.md) | [`scripts/stochastic_noise_sweep.py`](scripts/stochastic_noise_sweep.py) | *Assay noise sweeps* |
+| **Universal Sustainment Theorem (CLF)** | [`theory/universal_sustainment_theorem.md`](theory/universal_sustainment_theorem.md) | [`models/lyapunov_certificate.py`](models/lyapunov_certificate.py) | [`scripts/test_sustainment.py`](scripts/test_sustainment.py) |
 | **Bioinformatics Parameter Mapping** | [`theory/geometric_calibration_research.md`](theory/geometric_calibration_research.md) | [`agents/bioinformatics_miner.py`](agents/bioinformatics_miner.py) | `tests/test_bioinformatics.py` |
 | **Genomic Cohort Reconstructor** | [`theory/problem_statement_and_justification.md`](theory/problem_statement_and_justification.md) | [`scripts/reconstruct_tcga_patients.py`](scripts/reconstruct_tcga_patients.py) | *TCGA diagnostic outputs* |
 

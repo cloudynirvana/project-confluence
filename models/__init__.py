@@ -19,4 +19,7 @@ Modules:
     fisher_geometry     : Fisher Information Matrix and stiff/sloppy decomposition
     network_curvature   : Forman-Ricci curvature for structural bottleneck detection
     biologic_operator   : Biologic agents as geometric operators on Φ-space
+    coupling_tensor     : BAC coupling tensor C_ij(t) computation and failure classification
+    optimal_inference   : Continuous-discrete EKF observer for hidden state reconstruction
+    lyapunov_certificate: Universal Complexity Sustainment Theorem — Control Lyapunov certifier
 """
