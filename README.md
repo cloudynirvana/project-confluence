@@ -215,11 +215,13 @@ project-confluence/
 │   ├── ferroptosis.py               # Iron-dependent cell death
 │   ├── coupling_tensor.py           # Block Jacobian cross-scale C_ij tensor
 │   ├── optimal_inference.py         # EKF state & coupling tensor observer
-│   └── lyapunov_certificate.py      # Universal Complexity Sustainment — CLF certifier
+│   ├── lyapunov_certificate.py      # Universal Complexity Sustainment — CLF certifier
+│   └── identity_tensor.py           # Φ-Unification Identity Tensor — consciousness preservation
 ├── scripts/
 │   ├── monte_carlo_uncertainty.py   # 200-sample uncertainty validation
 │   ├── test_pathways.py             # Geometric calibration integration test
 │   ├── test_sustainment.py          # Sustainment Theorem validation (4 scenarios)
+│   ├── test_identity.py             # Identity Tensor validation (5 scenarios)
 │   ├── clonal_evolution_sim.py      # Adaptive vs MTD comparison
 │   ├── confluence_runner.py         # Full pipeline runner
 │   ├── optimize_biomarker_panel.py  # EKF biomarker selection optimization
@@ -257,7 +259,7 @@ To bridge abstract biophysical theory with verified computational executions, us
 | **OED Sensor Selection Matrix $H$** | [`theory/optimal_inference_design.md`](theory/optimal_inference_design.md) | [`scripts/optimize_biomarker_panel.py`](scripts/optimize_biomarker_panel.py) | *Runs combinatorial validation* |
 | **Stochastic Laboratory Calibration** | [`theory/problem_statement_and_justification.md`](theory/problem_statement_and_justification.md) | [`scripts/stochastic_noise_sweep.py`](scripts/stochastic_noise_sweep.py) | *Assay noise sweeps* |
 | **Universal Sustainment Theorem (CLF)** | [`theory/universal_sustainment_theorem.md`](theory/universal_sustainment_theorem.md) | [`models/lyapunov_certificate.py`](models/lyapunov_certificate.py) | [`scripts/test_sustainment.py`](scripts/test_sustainment.py) |
-| **Φ-Unification (IIT × BAC Bridge)** | [`theory/consciousness_complexity_bridge.md`](theory/consciousness_complexity_bridge.md) | [`models/coupling_tensor.py`](models/coupling_tensor.py) | *Identity Tensor formalism — experimental predictions defined* |
+| **Φ-Unification (IIT × BAC Bridge)** | [`theory/consciousness_complexity_bridge.md`](theory/consciousness_complexity_bridge.md) | [`models/identity_tensor.py`](models/identity_tensor.py) | [`scripts/test_identity.py`](scripts/test_identity.py) |
 | **Bioinformatics Parameter Mapping** | [`theory/geometric_calibration_research.md`](theory/geometric_calibration_research.md) | [`agents/bioinformatics_miner.py`](agents/bioinformatics_miner.py) | `tests/test_bioinformatics.py` |
 | **Genomic Cohort Reconstructor** | [`theory/problem_statement_and_justification.md`](theory/problem_statement_and_justification.md) | [`scripts/reconstruct_tcga_patients.py`](scripts/reconstruct_tcga_patients.py) | *TCGA diagnostic outputs* |
 

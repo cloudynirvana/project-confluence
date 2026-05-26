@@ -22,4 +22,5 @@ Modules:
     coupling_tensor     : BAC coupling tensor C_ij(t) computation and failure classification
     optimal_inference   : Continuous-discrete EKF observer for hidden state reconstruction
     lyapunov_certificate: Universal Complexity Sustainment Theorem — Control Lyapunov certifier
+    identity_tensor     : Φ-Unification Identity Tensor I(t) — consciousness preservation engine
 """
