@@ -115,13 +115,13 @@ class TestDeterministicReproducibility(unittest.TestCase):
 
 
 class TestComplexAttractorODE(unittest.TestCase):
-    """Test the 15D nonlinear ODE system."""
+    """Test the 16D nonlinear ODE system."""
 
     def test_healthy_state_shape(self):
-        """Healthy initial state must be 15D."""
+        """Healthy initial state must be 16D."""
         ode = ComplexAttractorODE()
         z0 = ode.healthy_initial_state()
-        self.assertEqual(len(z0), 15)
+        self.assertEqual(len(z0), 16)
 
     def test_solve_succeeds(self):
         """Healthy initial conditions should integrate without error."""

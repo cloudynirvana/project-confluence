@@ -41,7 +41,7 @@ class ExtendedKalmanFilterObserver:
             Multiplier for the initial estimation uncertainty.
         """
         self.ode = ode_system
-        self.dim = 15
+        self.dim = getattr(self.ode, "DIM", len(self.ode.healthy_initial_state()))
         
         # State estimate initializing to healthy baseline
         self.z_hat = self.ode.healthy_initial_state()
@@ -167,18 +167,18 @@ class ExtendedKalmanFilterObserver:
 # PRE-CALIBRATED CLINICAL PANEL SELECTIONS
 # ═══════════════════════════════════════════════════════════════════════
 
-def get_clinical_measurement_matrix(selected_indices: List[int]) -> np.ndarray:
+def get_clinical_measurement_matrix(selected_indices: List[int], dim: int = 16) -> np.ndarray:
     """
-    Constructs the selection matrix H mapping the 15D state vector to the
+    Constructs the selection matrix H mapping the state vector to the
     biomarkers chosen in the clinical panel.
 
     Parameters
     ----------
     selected_indices : list of int
-        Indices (0-14) of the variables measured in the clinical panel.
+        Indices of the variables measured in the clinical panel.
     """
     M = len(selected_indices)
-    H = np.zeros((M, 15))
+    H = np.zeros((M, dim))
     for i, idx in enumerate(selected_indices):
         H[i, idx] = 1.0
     return H

@@ -41,10 +41,10 @@ class TestExtendedKalmanFilterObserver(unittest.TestCase):
         self.R = np.eye(len(self.selected_indices)) * 0.05  # Technical assay variance
 
     def test_initialization_dimensions(self):
-        """Initial state estimate must be 15D and error covariance must be 15x15."""
-        self.assertEqual(self.observer.z_hat.shape, (15,))
-        self.assertEqual(self.observer.P.shape, (15, 15))
-        self.assertEqual(self.H.shape, (4, 15))
+        """Initial state estimate must be 16D and error covariance must be 16x16."""
+        self.assertEqual(self.observer.z_hat.shape, (16,))
+        self.assertEqual(self.observer.P.shape, (16, 16))
+        self.assertEqual(self.H.shape, (4, 16))
 
     def test_predict_step_covariance_growth(self):
         """Without updates, the prediction step must propagate state and increase uncertainty (P)."""
@@ -81,16 +81,16 @@ class TestExtendedKalmanFilterObserver(unittest.TestCase):
         self.assertAlmostEqual(z_hat_post[7], 0.4, delta=0.5)
 
     def test_coupling_and_viability_reconstruction(self):
-        """Observer must successfully reconstruct the 4x4 coupling tensor and viability functional."""
+        """Observer must successfully reconstruct the 5x5 coupling tensor and viability functional."""
         C_est = self.observer.reconstruct_coupling_tensor(t_current=0.0)
         
-        # Check shape: 4 scales x 4 scales
-        self.assertEqual(C_est.shape, (4, 4))
+        # Check shape: 5 scales x 5 scales
+        self.assertEqual(C_est.shape, (5, 5))
         self.assertTrue(np.all(C_est >= 0.0))
         self.assertTrue(np.all(C_est <= 1.0))
         
         # Check viability calculation
-        entropy_rates = np.array([0.1, 0.1, 0.1, 0.1])
+        entropy_rates = np.array([0.1, 0.1, 0.1, 0.1, 0.1])
         V_est = self.observer.reconstruct_viability(entropy_rates, t_current=0.0)
         self.assertIsInstance(V_est, float)
 

@@ -71,10 +71,17 @@ class IdentityTensorAnalyzer:
             configurations lose influence on current identity.
         """
         self.bac = bac_analyzer or CouplingTensorAnalyzer()
-        self.neural_idx = neural_indices or self.DEFAULT_NEURAL_INDICES
+        self.neural_idx = neural_indices or self._default_neural_indices()
         self.N_neural = len(self.neural_idx)
         self.epsilon_identity = epsilon_identity
         self.tau_memory = tau_memory
+
+    def _default_neural_indices(self) -> List[int]:
+        """Choose neural-relevant scale indices for 4-scale or 5-scale BAC tensors."""
+        scale_names = getattr(self.bac, "scale_names", [])
+        if 'cellular' in scale_names and 'organism' in scale_names:
+            return [scale_names.index('cellular'), scale_names.index('organism')]
+        return self.DEFAULT_NEURAL_INDICES
 
     # ═══════════════════════════════════════════════════════════════════════
     # 1. NEURAL SUBSPACE PROJECTION
@@ -96,7 +103,10 @@ class IdentityTensorAnalyzer:
         C_neural : ndarray, shape (N_neural, N_neural)
             Neural subspace coupling tensor.
         """
-        return C[np.ix_(self.neural_idx, self.neural_idx)]
+        neural_idx = self.neural_idx
+        if C.shape[0] == 4 and neural_idx == [2, 3]:
+            neural_idx = self.DEFAULT_NEURAL_INDICES
+        return C[np.ix_(neural_idx, neural_idx)]
 
     def neural_integration(self, C: np.ndarray) -> float:
         """

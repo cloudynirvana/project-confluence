@@ -30,10 +30,11 @@ class CouplingTensorAnalyzer:
 
     # Scale definitions
     DEFAULT_SCALES = {
-        'molecular': [0, 1, 2, 3, 4],    # Glucose, Lactate, Pyruvate, ATP, NADH
-        'cellular':  [5, 6, 7, 8, 9],    # Glutamine, Glutamate, αKG, Citrate, ROS
+        'quantum':   [15],                # psi_coherent
+        'molecular': [0, 1, 2, 3, 4],     # Glucose, Lactate, Pyruvate, ATP, NADH
+        'cellular':  [5, 6, 7, 8, 9],     # Glutamine, Glutamate, alphaKG, Citrate, ROS
         'organism':  [10, 11, 12],        # I_eff, I_reg, I_exhaust
-        'tissue':    [13, 14],            # σ_stromal, ν_vascular
+        'tissue':    [13, 14],            # sigma_stromal, nu_vascular
     }
 
     # Reference baseline entropy rate for normalization (calibrated from healthy)
@@ -106,8 +107,10 @@ class CouplingTensorAnalyzer:
             block_norms = np.zeros((self.N_scales, self.N_scales))
             for i, scale_i in enumerate(self.scale_names):
                 for j, scale_j in enumerate(self.scale_names):
-                    idx_i = self.scales[scale_i]
-                    idx_j = self.scales[scale_j]
+                    idx_i = [idx for idx in self.scales[scale_i] if idx < dim]
+                    idx_j = [idx for idx in self.scales[scale_j] if idx < dim]
+                    if not idx_i or not idx_j:
+                        continue
                     
                     # Slicing the Jacobian block
                     block = J[np.ix_(idx_i, idx_j)]
@@ -119,6 +122,17 @@ class CouplingTensorAnalyzer:
                 C_series[:, :, t_idx] = block_norms / max_norm
             else:
                 C_series[:, :, t_idx] = block_norms
+
+            # k_0 -> k_2 direct transduction: coherent microtubule fraction
+            # survives only to the extent that ROS has not decohered it.
+            if 'quantum' in self.scales and 'cellular' in self.scales and dim > 15:
+                q_idx = self.scale_names.index('quantum')
+                c_idx = self.scale_names.index('cellular')
+                psi = np.clip(z[15], 0.0, 1.0)
+                ros = np.clip(z[9], 0.0, 1.0)
+                C_series[q_idx, c_idx, t_idx] = float(
+                    np.clip(psi * (1.0 - ros), 0.0, 1.0)
+                )
 
         return C_series
 
@@ -270,8 +284,12 @@ class CouplingTensorAnalyzer:
         # Uniformity = standard deviation / mean of the off-diagonal changes
         uniformity = np.std(offdiag_change) / (np.mean(np.abs(offdiag_change)) + 1e-10)
         
-        # Selectivity of cellular-organismal decoupling (indices: Cell=1, Organism=2)
-        cell_idx, organism_idx = 1, 2
+        # Selectivity of cellular-organismal decoupling.
+        name_to_idx = {name: idx for idx, name in enumerate(self.scale_names)}
+        cell_idx = name_to_idx.get('cellular', 1)
+        organism_idx = name_to_idx.get('organism', 2)
+        if C_current.shape[0] == 4 and cell_idx == 2 and organism_idx == 3:
+            cell_idx, organism_idx = 1, 2
         organism_coupling_loss = np.abs(delta[cell_idx, organism_idx]) + np.abs(delta[organism_idx, cell_idx])
         other_coupling_loss = np.mean(np.abs(offdiag_change))
         selectivity = organism_coupling_loss / (other_coupling_loss + 1e-10)
@@ -279,7 +297,7 @@ class CouplingTensorAnalyzer:
         # Cancer marker: high cellular coherence (C_11/C_12) relative to organism connectivity (C_12)
         # Note: mapping scales: 0=molecular, 1=cellular, 2=organism, 3=tissue
         # Internal cellular coherence is C[1, 1], cellular-organismal coupling is C[1, 2]
-        c22_c24_ratio = C_current[1, 1] / (C_current[1, 2] + 1e-10)
+        c22_c24_ratio = C_current[cell_idx, cell_idx] / (C_current[cell_idx, organism_idx] + 1e-10)
 
         # 3. Classify
         # Aging signature: uniform off-diagonal decay (low standard deviation of changes)
@@ -388,16 +406,22 @@ class CouplingTensorAnalyzer:
         # Take the diagonal entries of the biologic operator (direct action terms)
         direct_actions = np.diag(biologic_operator)
         
-        # Map Φ dimensions to C elements
-        C_pert[0, 0] = direct_actions[0]  # φ1 → molecular diagonal
-        C_pert[1, 1] = direct_actions[1]  # φ2 → cellular diagonal
-        C_pert[1, 2] = direct_actions[2]  # φ3 → cell-organism (C_24 counterpart)
-        C_pert[1, 3] = direct_actions[3]  # φ4 → cell-tissue (C_25 counterpart)
-        C_pert[2, 3] = direct_actions[4]  # φ5 → organism-tissue
+        name_to_idx = {name: idx for idx, name in enumerate(self.scale_names)}
+        molecular = name_to_idx.get('molecular', 0)
+        cellular = name_to_idx.get('cellular', 1)
+        organism = name_to_idx.get('organism', 2)
+        tissue = name_to_idx.get('tissue', 3)
 
-        # Symmeterise the off-diagonals for consistency
-        C_pert[2, 1] = C_pert[1, 2]
-        C_pert[3, 1] = C_pert[1, 3]
-        C_pert[3, 2] = C_pert[2, 3]
+        # Map Phi dimensions to named scale coordinates.
+        C_pert[molecular, molecular] = direct_actions[0]
+        C_pert[cellular, cellular] = direct_actions[1]
+        C_pert[cellular, organism] = direct_actions[2]
+        C_pert[cellular, tissue] = direct_actions[3]
+        C_pert[organism, tissue] = direct_actions[4]
+
+        # Symmetrise the off-diagonals for consistency.
+        C_pert[organism, cellular] = C_pert[cellular, organism]
+        C_pert[tissue, cellular] = C_pert[cellular, tissue]
+        C_pert[tissue, organism] = C_pert[organism, tissue]
 
         return C_pert

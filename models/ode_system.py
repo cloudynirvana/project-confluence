@@ -2,7 +2,7 @@
 ODE System Module - Project Confluence
 ========================================
 
-Unified 15D nonlinear ODE system with sustained oscillatory dynamics.
+Unified 16D nonlinear ODE system with sustained oscillatory dynamics.
 
 Design principles:
   - Every metabolite has production + degradation (homeostatic balance)
@@ -12,11 +12,12 @@ Design principles:
   - Cancer shifts the balance, producing genuinely different attractors
   - Backward compatible: frozen immune/microenv recovers linear SAEM
 
-Variables (15D):
+Variables (16D):
     Metabolic (10): Glucose, Lactate, Pyruvate, ATP, NADH,
                     Glutamine, Glutamate, aKG, Citrate, ROS
     Immune (3):     I_eff, I_reg, I_exhaust
     Microenv (2):   sigma_stromal, nu_vascular
+    Quantum (1):    psi_coherent
 
 References:
     Goldberger et al. (2002) - Fractal dynamics in physiology
@@ -40,6 +41,7 @@ I_REG = 11
 I_EXHAUST = 12
 SIGMA = 13
 NU = 14
+PSI_COHERENT = 15
 
 METABOLITE_NAMES = [
     "Glucose", "Lactate", "Pyruvate", "ATP", "NADH",
@@ -47,6 +49,7 @@ METABOLITE_NAMES = [
 ]
 STATE_NAMES = METABOLITE_NAMES + [
     "I_eff", "I_reg", "I_exhaust", "sigma_stromal", "nu_vascular",
+    "psi_coherent",
 ]
 METABOLITES = METABOLITE_NAMES
 
@@ -79,7 +82,7 @@ class ODEParams:
 
 @dataclass
 class ExtendedParams(ODEParams):
-    """Full parameter set for the 15D complex attractor system."""
+    """Full parameter set for the 16D complex attractor system."""
 
     # Michaelis-Menten saturation
     K_saturation: float = 2.0
@@ -143,6 +146,13 @@ class ExtendedParams(ODEParams):
     immune_metabolic_coupling: float = 1.0
     metabolic_immune_coupling: float = 1.0
     microenv_coupling: float = 1.0
+
+    # Quantum microtubule coherence dynamics
+    quantum_r_pump: float = 0.08
+    quantum_K_atp: float = 2.0
+    quantum_r_decohere: float = 0.10
+    quantum_r_collapse: float = 0.03
+    quantum_collapse_threshold: float = 0.92
 
 
 @dataclass
@@ -291,12 +301,12 @@ class GeneratorMetadata:
 
 
 # ==========================================================================
-# 15D COMPLEX ATTRACTOR ODE
+# 16D COMPLEX ATTRACTOR ODE
 # ==========================================================================
 
 class ComplexAttractorODE:
     """
-    15D nonlinear ODE with sustained oscillatory dynamics.
+    16D nonlinear ODE with sustained oscillatory dynamics.
 
     The system sustains complex dynamics via:
       1. Homeostatic production terms (prevent collapse to zero)
@@ -308,7 +318,7 @@ class ComplexAttractorODE:
     Treatment = partial restoration of healthy parameters.
     """
 
-    DIM = 15
+    DIM = 16
 
     def __init__(self, params=None, use_nonlinear=True,
                  use_immune=True, use_microenv=True):
@@ -368,7 +378,7 @@ class ComplexAttractorODE:
         return self._A.copy()
 
     def healthy_initial_state(self):
-        """Return the healthy baseline state vector z0 in R^15."""
+        """Return the healthy baseline state vector z0 in R^16."""
         p = self.params
         z0 = np.zeros(self.DIM)
         z0[0] = 2.0    # Glucose
@@ -386,6 +396,7 @@ class ComplexAttractorODE:
         z0[I_EXHAUST] = p.I_exhaust_healthy
         z0[SIGMA] = p.sigma_healthy
         z0[NU] = p.nu_healthy
+        z0[PSI_COHERENT] = 0.72
         return z0
 
     def _circadian_forcing(self, t):
@@ -399,7 +410,7 @@ class ComplexAttractorODE:
 
     def rhs(self, t, z):
         """
-        Right-hand side of the 15D ODE: dz/dt = F(z, t)
+        Right-hand side of the 16D ODE: dz/dt = F(z, t)
 
         Structure:
           dz/dt = Production + Decay(z) + NonlinearCoupling(z) + Forcing(t)
@@ -543,6 +554,17 @@ class ComplexAttractorODE:
         else:
             dzdt[SIGMA] = -0.1 * (z[SIGMA] - p.sigma_healthy)
             dzdt[NU] = -0.1 * (z[NU] - p.nu_healthy)
+
+        # == QUANTUM MICROTUBULE COHERENCE ==
+        # ATP-driven pumping sustains coherence; ROS and threshold collapse
+        # events dissipate it back toward the classical cellular manifold.
+        psi = np.clip(z[PSI_COHERENT], 0.0, 1.0)
+        atp = x[3]
+        ros = x[9]
+        atp_pump = p.quantum_r_pump * (atp / (atp + p.quantum_K_atp + 1e-10)) * (1.0 - psi)
+        ros_decoherence = p.quantum_r_decohere * ros * psi
+        collapse_event = p.quantum_r_collapse if psi >= p.quantum_collapse_threshold else 0.0
+        dzdt[PSI_COHERENT] = atp_pump - ros_decoherence - collapse_event
 
         return dzdt
 
@@ -767,7 +789,7 @@ class TrajectoryAnalyzer:
     @staticmethod
     def summary_stats(z_trajectory, t):
         stats = {}
-        names = STATE_NAMES if z_trajectory.shape[0] == 15 else METABOLITE_NAMES
+        names = STATE_NAMES if z_trajectory.shape[0] >= 15 else METABOLITE_NAMES
         for i, name in enumerate(names[:z_trajectory.shape[0]]):
             series = z_trajectory[i, :]
             stats[name] = {
@@ -787,7 +809,7 @@ class TrajectoryAnalyzer:
     @staticmethod
     def is_oscillating(z_trajectory, min_cv=0.01):
         result = {}
-        names = STATE_NAMES if z_trajectory.shape[0] == 15 else METABOLITE_NAMES
+        names = STATE_NAMES if z_trajectory.shape[0] >= 15 else METABOLITE_NAMES
         for i, name in enumerate(names[:z_trajectory.shape[0]]):
             series = z_trajectory[i, :]
             cv = np.std(series) / (np.mean(series) + 1e-10)

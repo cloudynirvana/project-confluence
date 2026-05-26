@@ -48,8 +48,8 @@ class TestCouplingTensorAnalyzer(unittest.TestCase):
 
         C_series = self.analyzer.compute_from_jacobian(ode, sol["z"], sol["t"])
         
-        # Check shape: 4 scales x 4 scales x T steps
-        self.assertEqual(C_series.shape, (4, 4, len(sol["t"])))
+        # Check shape: 5 scales x 5 scales x T steps
+        self.assertEqual(C_series.shape, (5, 5, len(sol["t"])))
         
         # Check bounds: all values in [0, 1]
         self.assertTrue(np.all(C_series >= 0.0))
@@ -64,7 +64,7 @@ class TestCouplingTensorAnalyzer(unittest.TestCase):
         dt = 0.5
         entropy_series = self.analyzer.scale_entropy_rates(sol["z"], dt, window=10)
         
-        self.assertEqual(entropy_series.shape, (4, len(sol["t"])))
+        self.assertEqual(entropy_series.shape, (5, len(sol["t"])))
         # Check that entropy rates are positive and reasonable
         self.assertTrue(np.all(entropy_series >= 0.0))
 
@@ -146,20 +146,20 @@ class TestCouplingTensorAnalyzer(unittest.TestCase):
         
         C_pert = self.analyzer.lift_biologic_to_coupling(biologic_op)
         
-        self.assertEqual(C_pert.shape, (4, 4))
+        self.assertEqual(C_pert.shape, (5, 5))
         # Asserts direct diagonal mappings
-        self.assertEqual(C_pert[0, 0], 0.1) # φ1 -> molecular diagonal
-        self.assertEqual(C_pert[1, 1], 0.2) # φ2 -> cellular diagonal
+        self.assertEqual(C_pert[1, 1], 0.1) # phi1 -> molecular diagonal
+        self.assertEqual(C_pert[2, 2], 0.2) # phi2 -> cellular diagonal
         
         # Asserts off-diagonal lifted terms (which must be symmetric)
-        self.assertEqual(C_pert[1, 2], 0.3) # φ3 -> cell-organism (1,2)
-        self.assertEqual(C_pert[2, 1], 0.3)
+        self.assertEqual(C_pert[2, 3], 0.3) # phi3 -> cell-organism
+        self.assertEqual(C_pert[3, 2], 0.3)
         
-        self.assertEqual(C_pert[1, 3], 0.4) # φ4 -> cell-tissue (1,3)
-        self.assertEqual(C_pert[3, 1], 0.4)
+        self.assertEqual(C_pert[2, 4], 0.4) # phi4 -> cell-tissue
+        self.assertEqual(C_pert[4, 2], 0.4)
         
-        self.assertEqual(C_pert[2, 3], 0.5) # φ5 -> organism-tissue (2,3)
-        self.assertEqual(C_pert[3, 2], 0.5)
+        self.assertEqual(C_pert[3, 4], 0.5) # phi5 -> organism-tissue
+        self.assertEqual(C_pert[4, 3], 0.5)
 
 
 if __name__ == '__main__':
