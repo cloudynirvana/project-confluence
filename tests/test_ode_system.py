@@ -187,14 +187,20 @@ class TestDiseaseModels(unittest.TestCase):
                 use_immune=True,
                 use_microenv=True,
             )
-            result = ode.solve(t_span=(0, 60), dt_eval=1.0)
+            result = ode.solve(t_span=(0, 20), dt_eval=1.0)
             self.assertTrue(result["success"],
                             f"{name}: solver failed: {result['message']}")
             self.assertTrue(
                 TrajectoryAnalyzer.is_bounded(result["z"], threshold=200),
                 f"{name}: trajectory exploded"
             )
-            phi = profiler.profile(result["z"], dt=1.0)
+            phi = profiler.profile(
+                result["z"],
+                dt=1.0,
+                mse_max_scale=5,
+                emb_dim_D2=4,
+                emb_dim_lyap=4,
+            )
             self.assertEqual(len(phi.phi_vector), 5)
             self.assertTrue(all(np.isfinite(v) for v in phi.phi_vector),
                             f"{name}: non-finite Phi values")

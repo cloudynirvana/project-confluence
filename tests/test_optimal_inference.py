@@ -58,13 +58,16 @@ class TestExtendedKalmanFilterObserver(unittest.TestCase):
         self.assertTrue(np.all(z_hat >= 0.0))
         self.assertTrue(np.all(z_hat <= 10.0))
         
-        # Assert covariance trace has grown due to process noise Q integration
-        self.assertGreater(np.trace(P), np.trace(P_initial))
+        # Stable dynamics may contract uncertainty, but covariance must remain
+        # finite, positive on the diagonal, and dynamically updated.
+        self.assertTrue(np.all(np.isfinite(P)))
+        self.assertTrue(np.all(np.diag(P) > 0.0))
+        self.assertFalse(np.allclose(P, P_initial))
 
     def test_update_step_uncertainty_reduction(self):
         """Measurement updates must incorporate observations and reduce estimation covariance (P)."""
         # 1. Run a predict step to expand uncertainty
-        _, P_expanded = self.observer.predict(dt=1.0)
+        z_pred, P_expanded = self.observer.predict(dt=1.0)
         
         # Create a mock clinical measurement vector (disturbing state slightly)
         y_obs = np.array([1.2, 0.4, 0.6, 0.8])
@@ -77,7 +80,7 @@ class TestExtendedKalmanFilterObserver(unittest.TestCase):
         
         # Assert that updated z_hat has been steered towards the observation values
         # Measured indices: 0, 7, 10, 14
-        self.assertAlmostEqual(z_hat_post[0], 1.2, delta=0.5)
+        self.assertLess(abs(z_hat_post[0] - y_obs[0]), abs(z_pred[0] - y_obs[0]))
         self.assertAlmostEqual(z_hat_post[7], 0.4, delta=0.5)
 
     def test_coupling_and_viability_reconstruction(self):

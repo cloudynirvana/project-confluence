@@ -274,8 +274,11 @@ class CouplingTensorAnalyzer:
         
         avg_offdiag_loss = np.mean(np.abs(offdiag_change))
         
-        # 1. Healthy check
-        if avg_offdiag_loss < threshold:
+        max_offdiag_loss = np.max(np.abs(offdiag_change)) if offdiag_change.size else 0.0
+
+        # 1. Healthy check. A tensor is only healthy if both average drift
+        # and single-edge collapse stay below threshold.
+        if avg_offdiag_loss < threshold and max_offdiag_loss < threshold:
             return 'healthy', 1.0 - (avg_offdiag_loss / threshold), {
                 'avg_offdiag_loss': avg_offdiag_loss
             }
@@ -290,7 +293,9 @@ class CouplingTensorAnalyzer:
         organism_idx = name_to_idx.get('organism', 2)
         if C_current.shape[0] == 4 and cell_idx == 2 and organism_idx == 3:
             cell_idx, organism_idx = 1, 2
-        organism_coupling_loss = np.abs(delta[cell_idx, organism_idx]) + np.abs(delta[organism_idx, cell_idx])
+        organism_coupling_loss = 0.5 * (
+            np.abs(delta[cell_idx, organism_idx]) + np.abs(delta[organism_idx, cell_idx])
+        )
         other_coupling_loss = np.mean(np.abs(offdiag_change))
         selectivity = organism_coupling_loss / (other_coupling_loss + 1e-10)
         
@@ -361,20 +366,24 @@ class CouplingTensorAnalyzer:
         best_target = (0, 0)
 
         # We evaluate off-diagonal elements (cross-system couplings)
-        for i in range(self.N_scales):
-            for j in range(self.N_scales):
+        N = C_t.shape[0]
+        for i in range(N):
+            for j in range(N):
                 if i == j:
                     continue  # Skip diagonal elements (internal scale coherence)
                 
                 # Apply positive perturbation to C_ij
                 C_perturbed = C_t.copy()
                 C_perturbed[i, j] = np.clip(C_perturbed[i, j] + delta, 0.0, 1.0)
+                C_perturbed[j, i] = np.clip(C_perturbed[j, i] + delta, 0.0, 1.0)
                 
                 perturbed_viability = self.viability(C_perturbed, entropy_rates)
                 gain = perturbed_viability - base_viability
+                bottleneck_weight = (1.0 - C_t[i, j]) / (C_t[i, j] + 1e-10)
+                priority_score = gain * bottleneck_weight
                 
-                if gain > best_gain:
-                    best_gain = gain
+                if priority_score > best_gain:
+                    best_gain = priority_score
                     best_target = (i, j)
 
         gradient = best_gain / delta
