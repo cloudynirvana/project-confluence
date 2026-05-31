@@ -43,6 +43,7 @@ class PolicyMode(Enum):
     THRESHOLD = "threshold"
     PROPORTIONAL = "proportional"
     ROBUST_ADAPTIVE = "robust_adaptive"
+    EPIGENETIC_STEERING = "epigenetic_steering"
 
 
 @dataclass
@@ -70,6 +71,21 @@ class PolicyParams:
     min_holiday_days: float = 3.0       # Minimum consecutive days off
     max_continuous_dose_days: float = 14.0  # Max consecutive days on before forced holiday
 
+    # OSKM epigenetic steering params
+    oskm_max_dose: float = 0.35
+    oskm_identity_margin_target: float = 0.05
+    oskm_memory_integrity_target: float = 0.75
+    oskm_pulse_period_days: float = 4.0
+    oskm_duty_fraction: float = 0.25
+
+    # Landauer thermal safety budget
+    k_B: float = 1.380649e-23
+    body_temperature_kelvin: float = 310.15
+    max_cell_temperature_delta: float = 1.5
+    landauer_bits_per_full_dose: float = 1.0e12
+    landauer_heat_to_kelvin_gain: float = 1.0e8
+    cell_cooling_rate: float = 1.2
+
 
 @dataclass 
 class ControllerState:
@@ -81,11 +97,84 @@ class ControllerState:
     cumulative_toxicity: float = 0.0
     cumulative_dose: float = 0.0
     dose_switches: int = 0
+    elapsed_days: float = 0.0
+    cell_temperature_kelvin: float = 310.15
+    thermal_overrides: int = 0
+    last_oskm_dose: float = 0.0
     
     # History for analysis
     dose_history: List[float] = field(default_factory=list)
     state_history: List[Dict] = field(default_factory=list)
     decision_log: List[str] = field(default_factory=list)
+
+
+class EpigeneticSteeringPolicy:
+    """
+    Pulsatile OSKM policy with a hard Landauer heat safety budget.
+
+    Inputs are expected to come from IdentityTensorAnalyzer certificates
+    or compatible dictionaries containing margin/regime/memory integrity.
+    """
+
+    def __init__(self, params: PolicyParams):
+        self.params = params
+
+    def decide(self, identity_metrics: Optional[Dict],
+               controller_state: ControllerState,
+               dt: float) -> Tuple[float, Dict]:
+        p = self.params
+        metrics = identity_metrics or {}
+
+        margin = float(metrics.get("margin", 0.0))
+        memory_integrity = float(metrics.get("memory_integrity", 1.0))
+        regime = str(metrics.get("regime", "coherent"))
+
+        needs_steering = (
+            margin < p.oskm_identity_margin_target
+            or memory_integrity < p.oskm_memory_integrity_target
+            or regime in {"degraded", "critical"}
+        )
+
+        phase = controller_state.elapsed_days % max(p.oskm_pulse_period_days, 1e-10)
+        pulse_width = p.oskm_pulse_period_days * np.clip(p.oskm_duty_fraction, 0.0, 1.0)
+        in_pulse = phase < pulse_width
+
+        raw_dose = p.oskm_max_dose if needs_steering and in_pulse else 0.0
+        raw_dose = float(np.clip(raw_dose, 0.0, p.robust_max_dose))
+
+        energy_joules = (
+            p.k_B
+            * p.body_temperature_kelvin
+            * np.log(2.0)
+            * p.landauer_bits_per_full_dose
+            * raw_dose
+        )
+        heat_rate = p.landauer_heat_to_kelvin_gain * energy_joules
+        cooling = p.cell_cooling_rate * (
+            controller_state.cell_temperature_kelvin - p.body_temperature_kelvin
+        )
+        projected_temperature = controller_state.cell_temperature_kelvin + (
+            heat_rate - cooling
+        ) * dt
+
+        threshold = p.body_temperature_kelvin + p.max_cell_temperature_delta
+        thermal_override = projected_temperature > threshold
+        dose = 0.0 if thermal_override else raw_dose
+
+        if thermal_override:
+            # Recompute passive cooling without additional OSKM heat.
+            projected_temperature = controller_state.cell_temperature_kelvin - cooling * dt
+            projected_temperature = max(projected_temperature, p.body_temperature_kelvin)
+
+        diagnostics = {
+            "needs_steering": needs_steering,
+            "in_pulse": in_pulse,
+            "raw_oskm_dose": raw_dose,
+            "landauer_energy_joules": float(energy_joules),
+            "projected_temperature_kelvin": float(projected_temperature),
+            "thermal_override": bool(thermal_override),
+        }
+        return dose, diagnostics
 
 
 class AdaptiveController:
@@ -122,6 +211,8 @@ class AdaptiveController:
         self.mode = policy_mode
         self.params = policy_params or PolicyParams()
         self.ctrl_state = ControllerState()
+        self.ctrl_state.cell_temperature_kelvin = self.params.body_temperature_kelvin
+        self.epigenetic_policy = EpigeneticSteeringPolicy(self.params)
         self.guideline_retriever = guideline_retriever
         self.cancer_type = cancer_type
         
@@ -201,10 +292,12 @@ class AdaptiveController:
     def reset(self):
         """Reset controller to initial state."""
         self.ctrl_state = ControllerState()
+        self.ctrl_state.cell_temperature_kelvin = self.params.body_temperature_kelvin
     
     def decide(self, sensitive: float, resistant: float,
                carrying_capacity: float, dt: float,
-               resistance_efficacy: float = 1.0) -> float:
+               resistance_efficacy: float = 1.0,
+               identity_metrics: Optional[Dict] = None) -> float:
         """
         Core policy function: π(state) → action.
         
@@ -229,6 +322,19 @@ class AdaptiveController:
             raw_dose = self._proportional_policy(V_frac, R_frac)
         elif self.mode == PolicyMode.ROBUST_ADAPTIVE:
             raw_dose = self._robust_adaptive_policy(V_frac, R_frac, resistance_efficacy)
+        elif self.mode == PolicyMode.EPIGENETIC_STEERING:
+            raw_dose, oskm_diag = self.epigenetic_policy.decide(
+                identity_metrics, self.ctrl_state, dt
+            )
+            self.ctrl_state.cell_temperature_kelvin = oskm_diag["projected_temperature_kelvin"]
+            self.ctrl_state.last_oskm_dose = raw_dose
+            if oskm_diag["thermal_override"]:
+                self.ctrl_state.thermal_overrides += 1
+                self.ctrl_state.decision_log.append(
+                    "LANDAUER_THERMAL_OVERRIDE: "
+                    f"T_cell={self.ctrl_state.cell_temperature_kelvin:.2f}K, "
+                    "forcing OSKM holiday"
+                )
         else:
             raw_dose = 0.0
         
@@ -416,6 +522,8 @@ class AdaptiveController:
         
         if was_dosing != cs.is_dosing:
             cs.dose_switches += 1
+
+        cs.elapsed_days += dt
         
         cs.dose_history.append(round(dose, 4))
         cs.state_history.append({
@@ -423,6 +531,7 @@ class AdaptiveController:
             "R_frac": round(R_frac, 4),
             "dose": round(dose, 4),
             "cumulative_tox": round(cs.cumulative_toxicity, 2),
+            "T_cell_K": round(cs.cell_temperature_kelvin, 4),
         })
     
     # ── Analysis & Reporting ────────────────────────────────────────────
@@ -443,12 +552,16 @@ class AdaptiveController:
                 float(np.mean(doses[doses > 0])) if np.any(doses > 0) else 0, 4),
             "cumulative_toxicity": round(cs.cumulative_toxicity, 2),
             "cumulative_dose": round(cs.cumulative_dose, 2),
+            "cell_temperature_kelvin": round(cs.cell_temperature_kelvin, 4),
+            "thermal_overrides": cs.thermal_overrides,
+            "last_oskm_dose": round(cs.last_oskm_dose, 4),
             "policy_params": {
                 "dose_on_threshold": self.params.dose_on_threshold,
                 "dose_off_threshold": self.params.dose_off_threshold,
                 "robust_max_dose": self.params.robust_max_dose,
                 "resistant_alarm": self.params.resistant_alarm_fraction,
                 "uncertainty_margin": self.params.uncertainty_margin,
+                "oskm_max_dose": self.params.oskm_max_dose,
             },
             "nigeria_guidelines_active": self.nigeria_guardrails is not None,
             "guideline_retriever_active": self.guideline_retriever is not None,

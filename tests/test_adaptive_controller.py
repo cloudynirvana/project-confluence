@@ -13,7 +13,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from models.adaptive_controller import (
     AdaptiveController, PolicyParams, PolicyMode, 
-    ControllerState, run_adaptive_simulation, compare_policies,
+    ControllerState, EpigeneticSteeringPolicy,
+    run_adaptive_simulation, compare_policies,
 )
 from models.clonal_dynamics import ClonalDynamicsEngine, ClonalParams
 
@@ -157,6 +158,76 @@ class TestSafetyConstraints:
         dose = ctrl.decide(sensitive=0.5, resistant=0.1, carrying_capacity=1.0, dt=0.1)
         assert dose == 0.0, \
             f"Expected min holiday to block re-dosing, got {dose}"
+
+
+class TestEpigeneticSteeringPolicy:
+    """Test OSKM steering with Landauer thermal safety."""
+
+    def test_oskm_pulses_when_identity_degraded(self):
+        params = PolicyParams(
+            robust_max_dose=0.7,
+            oskm_max_dose=0.3,
+            min_holiday_days=0,
+        )
+        ctrl = AdaptiveController(PolicyMode.EPIGENETIC_STEERING, params)
+
+        dose = ctrl.decide(
+            sensitive=0.1,
+            resistant=0.0,
+            carrying_capacity=1.0,
+            dt=0.1,
+            identity_metrics={
+                "margin": 0.01,
+                "memory_integrity": 0.6,
+                "regime": "degraded",
+            },
+        )
+
+        assert dose > 0.0
+        assert dose <= params.oskm_max_dose
+        assert ctrl.ctrl_state.last_oskm_dose > 0.0
+
+    def test_landauer_thermal_override_forces_holiday(self):
+        params = PolicyParams(
+            robust_max_dose=1.0,
+            oskm_max_dose=1.0,
+            min_holiday_days=0,
+            landauer_bits_per_full_dose=1.0e18,
+            landauer_heat_to_kelvin_gain=1.0e10,
+        )
+        ctrl = AdaptiveController(PolicyMode.EPIGENETIC_STEERING, params)
+
+        dose = ctrl.decide(
+            sensitive=0.1,
+            resistant=0.0,
+            carrying_capacity=1.0,
+            dt=1.0,
+            identity_metrics={
+                "margin": -0.01,
+                "memory_integrity": 0.2,
+                "regime": "critical",
+            },
+        )
+
+        assert dose == 0.0
+        assert ctrl.ctrl_state.thermal_overrides == 1
+        assert any("LANDAUER_THERMAL_OVERRIDE" in msg for msg in ctrl.ctrl_state.decision_log)
+
+    def test_epigenetic_summary_exposes_thermal_state(self):
+        params = PolicyParams(min_holiday_days=0)
+        ctrl = AdaptiveController(PolicyMode.EPIGENETIC_STEERING, params)
+        ctrl.decide(
+            sensitive=0.1,
+            resistant=0.0,
+            carrying_capacity=1.0,
+            dt=0.1,
+            identity_metrics={"margin": 1.0, "memory_integrity": 1.0, "regime": "coherent"},
+        )
+
+        summary = ctrl.get_summary()
+        assert summary["policy_mode"] == "epigenetic_steering"
+        assert "cell_temperature_kelvin" in summary
+        assert "thermal_overrides" in summary
 
 
 class TestIntegratedSimulation:
