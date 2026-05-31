@@ -21,7 +21,11 @@ import numpy as np
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from models.ode_system import ComplexAttractorODE
-from models.optimal_inference import ExtendedKalmanFilterObserver, get_clinical_measurement_matrix
+from models.optimal_inference import (
+    ExtendedKalmanFilterObserver,
+    get_clinical_measurement_matrix,
+    get_neuroidentity_measurement_matrix,
+)
 
 
 class TestExtendedKalmanFilterObserver(unittest.TestCase):
@@ -41,9 +45,11 @@ class TestExtendedKalmanFilterObserver(unittest.TestCase):
         self.R = np.eye(len(self.selected_indices)) * 0.05  # Technical assay variance
 
     def test_initialization_dimensions(self):
-        """Initial state estimate must be 16D and error covariance must be 16x16."""
+        """Initial estimate must include 16D biology plus hidden memory kernel."""
         self.assertEqual(self.observer.z_hat.shape, (16,))
-        self.assertEqual(self.observer.P.shape, (16, 16))
+        self.assertEqual(self.observer.M_hat.shape, (2, 2))
+        self.assertEqual(self.observer.x_hat.shape, (20,))
+        self.assertEqual(self.observer.P.shape, (20, 20))
         self.assertEqual(self.H.shape, (4, 16))
 
     def test_predict_step_covariance_growth(self):
@@ -96,6 +102,40 @@ class TestExtendedKalmanFilterObserver(unittest.TestCase):
         entropy_rates = np.array([0.1, 0.1, 0.1, 0.1, 0.1])
         V_est = self.observer.reconstruct_viability(entropy_rates, t_current=0.0)
         self.assertIsInstance(V_est, float)
+
+    def test_memory_kernel_reconstruction(self):
+        """Observer must expose hidden memory kernel and covariance estimates."""
+        for _ in range(3):
+            self.observer.predict(dt=0.1, t_current=0.0)
+
+        M_est = self.observer.reconstruct_memory_kernel()
+        P_M = self.observer.reconstruct_memory_covariance()
+        confidence = self.observer.identity_confidence_margin()
+
+        self.assertEqual(M_est.shape, (2, 2))
+        self.assertEqual(P_M.shape, (4, 4))
+        self.assertTrue(np.all(np.isfinite(M_est)))
+        self.assertTrue(np.all(np.isfinite(P_M)))
+        self.assertIn("confidence", confidence)
+        self.assertGreaterEqual(confidence["confidence"], 0.0)
+
+    def test_neuroidentity_measurement_channels(self):
+        """DMN coherence and EEG PCI should update hidden memory covariance."""
+        H_neuro = get_neuroidentity_measurement_matrix(self.observer)
+        self.assertEqual(H_neuro.shape, (2, 20))
+
+        P_before = self.observer.P.copy()
+        self.observer.update_neuroidentity_channels(
+            dmn_coherence=0.7,
+            eeg_pci=0.65,
+            R=np.eye(2) * 0.02,
+        )
+        P_after = self.observer.P
+
+        self.assertLess(
+            np.trace(P_after[self.observer.bio_dim:, self.observer.bio_dim:]),
+            np.trace(P_before[self.observer.bio_dim:, self.observer.bio_dim:]),
+        )
 
 
 if __name__ == '__main__':

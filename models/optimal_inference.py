@@ -1,184 +1,277 @@
 """
-Optimal Inference Observer — Project Confluence
+Optimal Inference Observer - Project Confluence
 ===============================================
 
-Implements the continuous-discrete Extended Kalman Filter (EKF) observer to
-reconstruct the full 15D biological state vector z(t) and its corresponding
-4x4 cross-scale coupling tensor C_ij(t) from sparse, noisy clinical biomarkers.
+Continuous-discrete Extended Kalman Filter (EKF) observer for reconstructing:
+  1. the biological state vector z(t),
+  2. the cross-scale coupling tensor C_ij(t),
+  3. the hidden neural memory kernel M(t).
 
-Governing equations between measurements:
-    dẑ/dt = F(ẑ, u)
-    dP/dt = J(ẑ) P + P J(ẑ)^T + Q
+The augmented EKF state is:
+    x_hat = [z_hat, vec(M_neural)]
 
-Governing update equations at discrete measurement times t_k:
-    K = P H^T (H P H^T + R)^-1
-    ẑ = ẑ + K (y - H ẑ)
-    P = (I - K H) P
+Memory dynamics:
+    dM/dt = gamma * (C_neural - M)
+
+Clinical neural observation channels:
+    - DMN coherence: diagonal readout of M_neural
+    - EEG PCI: broad integrated readout of M_neural
 """
 
 import numpy as np
 from typing import Dict, List, Tuple, Optional
+
 from models.ode_system import ComplexAttractorODE
 from models.coupling_tensor import CouplingTensorAnalyzer
+from models.identity_tensor import IdentityTensorAnalyzer
 
 
 class ExtendedKalmanFilterObserver:
     """
-    Continuous-Discrete Extended Kalman Filter (EKF) observer for the 15D SAEM.
+    Continuous-discrete EKF observer for biological state plus hidden memory.
     """
 
-    def __init__(self, ode_system: ComplexAttractorODE, 
+    def __init__(self,
+                 ode_system: ComplexAttractorODE,
                  Q_diagonal: Optional[np.ndarray] = None,
-                 initial_covariance_scale: float = 0.1):
+                 initial_covariance_scale: float = 0.1,
+                 memory_gamma: float = 0.02):
         """
         Parameters
         ----------
         ode_system : ComplexAttractorODE
-            The 15D biological attractor model exposing `rhs(t, z)`.
-        Q_diagonal : ndarray, shape (15,), optional
-            Diagonal elements of the process noise covariance matrix Q.
+            Biological attractor model exposing rhs(t, z).
+        Q_diagonal : ndarray, optional
+            Diagonal process-noise values. Can be length bio_dim or total_dim.
         initial_covariance_scale : float
-            Multiplier for the initial estimation uncertainty.
+            Initial uncertainty multiplier.
+        memory_gamma : float
+            Relaxation rate in dM/dt = gamma * (C_neural - M).
         """
         self.ode = ode_system
-        self.dim = getattr(self.ode, "DIM", len(self.ode.healthy_initial_state()))
-        
-        # State estimate initializing to healthy baseline
-        self.z_hat = self.ode.healthy_initial_state()
-        
-        # Error covariance matrix P (15x15)
-        self.P = np.eye(self.dim) * initial_covariance_scale
-        
-        # Process noise covariance Q (15x15)
-        if Q_diagonal is not None:
-            self.Q = np.diag(Q_diagonal)
-        else:
-            # Calibrated process noise (higher on cellular and metabolic scales)
-            q_diag = np.ones(self.dim) * 0.01
-            q_diag[0:5] *= 2.0   # Molecular fluctuations
-            q_diag[5:10] *= 1.5  # Cellular metabolic fluctuations
-            self.Q = np.diag(q_diag)
-
+        self.bio_dim = getattr(self.ode, "DIM", len(self.ode.healthy_initial_state()))
+        self.dim = self.bio_dim  # Backward-compatible biological dimension alias.
         self.analyzer = CouplingTensorAnalyzer()
+        self.identity_analyzer = IdentityTensorAnalyzer(self.analyzer)
+        self.memory_shape = (
+            self.identity_analyzer.N_neural,
+            self.identity_analyzer.N_neural,
+        )
+        self.memory_dim = int(np.prod(self.memory_shape))
+        self.total_dim = self.bio_dim + self.memory_dim
+        self.memory_gamma = memory_gamma
+
+        self.z_hat = self.ode.healthy_initial_state()
+        self.M_hat = self.identity_analyzer.project_neural(
+            self.reconstruct_coupling_tensor_from_z(self.z_hat, 0.0)
+        )
+        self.x_hat = self._pack_state()
+
+        self.P = np.eye(self.total_dim) * initial_covariance_scale
+
+        if Q_diagonal is not None:
+            q_diag = np.asarray(Q_diagonal, dtype=float)
+            if len(q_diag) == self.bio_dim:
+                q_diag = np.concatenate([q_diag, np.ones(self.memory_dim) * 0.005])
+            if len(q_diag) != self.total_dim:
+                raise ValueError(
+                    f"Q_diagonal must have length {self.bio_dim} or {self.total_dim}"
+                )
+        else:
+            q_diag = np.ones(self.total_dim) * 0.01
+            q_diag[0:5] *= 2.0
+            q_diag[5:10] *= 1.5
+            q_diag[self.bio_dim:] *= 0.5
+        self.Q = np.diag(q_diag)
 
     def predict(self, dt: float, t_current: float = 0.0) -> Tuple[np.ndarray, np.ndarray]:
         """
-        Propagate the state estimate and error covariance forward in time (Prediction Step).
-        Uses Euler-Maruyama equivalent deterministic flow.
-
-        Parameters
-        ----------
-        dt : float
-            Integration step size.
-        t_current : float
-            Current simulation time.
+        Propagate the biological state, memory kernel, and covariance.
         """
-        # 1. State propagation: dẑ/dt = F(ẑ, t)
         f_val = self.ode.rhs(t_current, self.z_hat)
-        self.z_hat = np.clip(self.z_hat + f_val * dt, 0.0, 10.0)  # Bound to physiological limits
-        
-        # 2. Numerical Jacobian J(ẑ) at current state
-        J = self._compute_jacobian(t_current, self.z_hat)
-        
-        # 3. Covariance propagation: dP/dt = J P + P J^T + Q
+        self.z_hat = np.clip(self.z_hat + f_val * dt, 0.0, 10.0)
+
+        C_neural = self.identity_analyzer.project_neural(
+            self.reconstruct_coupling_tensor_from_z(self.z_hat, t_current)
+        )
+        self.M_hat = self.M_hat + self.memory_gamma * (C_neural - self.M_hat) * dt
+        self.M_hat = np.clip(self.M_hat, 0.0, 1.0)
+        self.x_hat = self._pack_state()
+
+        J = self._compute_augmented_jacobian(t_current, self.z_hat)
         dP = J @ self.P + self.P @ J.T + self.Q
         self.P += dP * dt
-        
-        # Symmeterise P to prevent numerical drift
         self.P = (self.P + self.P.T) / 2.0
-        
+
         return self.z_hat.copy(), self.P.copy()
 
     def update(self, y_obs: np.ndarray, H: np.ndarray, R: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """
-        Correct the state estimate using clinical observations (Update Step).
+        Correct the augmented state estimate using clinical observations.
 
-        Parameters
-        ----------
-        y_obs : ndarray, shape (M,)
-            Sparse clinical observations.
-        H : ndarray, shape (M, 15)
-            Measurement matrix mapping 15D state to M-dimensional observations.
-        R : ndarray, shape (M, M)
-            Assay measurement noise covariance matrix.
+        H may map either the biological state only (bio_dim columns) or the
+        full augmented state (total_dim columns).
         """
-        # 1. Measurement residual: ỹ = y - H ẑ
-        y_pred = H @ self.z_hat
+        y_obs = np.asarray(y_obs, dtype=float)
+        H_aug = self._ensure_augmented_measurement_matrix(H)
+        R = np.asarray(R, dtype=float)
+
+        y_pred = H_aug @ self.x_hat
         residual = y_obs - y_pred
-        
-        # 2. Residual covariance: S = H P H^T + R
-        S = H @ self.P @ H.T + R
-        
-        # 3. Kalman Gain: K = P H^T S^-1
+        S = H_aug @ self.P @ H_aug.T + R
+
         try:
             S_inv = np.linalg.inv(S)
-            K = self.P @ H.T @ S_inv
         except np.linalg.LinAlgError:
-            # Fallback to pseudo-inverse if S is singular or ill-conditioned
             S_inv = np.linalg.pinv(S)
-            K = self.P @ H.T @ S_inv
-            
-        # 4. Corrected State: ẑ = ẑ + K ỹ
-        self.z_hat = np.clip(self.z_hat + K @ residual, 0.0, 10.0)
-        
-        # 5. Corrected Covariance: P = (I - K H) P
-        I_KH = np.eye(self.dim) - K @ H
+        K = self.P @ H_aug.T @ S_inv
+
+        self.x_hat = self.x_hat + K @ residual
+        self.z_hat = np.clip(self.x_hat[:self.bio_dim], 0.0, 10.0)
+        self.M_hat = self.x_hat[self.bio_dim:].reshape(self.memory_shape)
+        self.M_hat = np.clip(self.M_hat, 0.0, 1.0)
+        self.x_hat = self._pack_state()
+
+        I_KH = np.eye(self.total_dim) - K @ H_aug
         self.P = I_KH @ self.P
-        
-        # Symmeterise P
         self.P = (self.P + self.P.T) / 2.0
-        
+
         return self.z_hat.copy(), self.P.copy()
 
+    def update_neuroidentity_channels(self,
+                                      dmn_coherence: Optional[float] = None,
+                                      eeg_pci: Optional[float] = None,
+                                      R: Optional[np.ndarray] = None) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Update from direct DMN coherence and EEG PCI clinical channels.
+
+        Both channels are modeled as normalized values in [0, 1].
+        """
+        rows = []
+        values = []
+        if dmn_coherence is not None:
+            rows.append(self._dmn_coherence_row())
+            values.append(float(dmn_coherence))
+        if eeg_pci is not None:
+            rows.append(self._eeg_pci_row())
+            values.append(float(eeg_pci))
+        if not rows:
+            return self.z_hat.copy(), self.P.copy()
+
+        H = np.vstack(rows)
+        y_obs = np.array(values)
+        if R is None:
+            R = np.eye(len(values)) * 0.03
+        return self.update(y_obs, H, R)
+
     def reconstruct_coupling_tensor(self, t_current: float = 0.0) -> np.ndarray:
-        """
-        Compute the estimated 4x4 coupling tensor Ĉ_ij from the EKF state estimate.
-        """
-        # Dummy trajectory of 1 step to reuse existing analyzer
-        traj = self.z_hat.reshape(-1, 1)
+        """Compute the estimated coupling tensor C_hat from z_hat."""
+        return self.reconstruct_coupling_tensor_from_z(self.z_hat, t_current)
+
+    def reconstruct_coupling_tensor_from_z(self, z: np.ndarray,
+                                           t_current: float = 0.0) -> np.ndarray:
+        """Compute a coupling tensor from an arbitrary biological state."""
+        traj = z.reshape(-1, 1)
         t_arr = np.array([t_current])
         C_series = self.analyzer.compute_from_jacobian(self.ode, traj, t_arr)
         return C_series[:, :, 0]
 
-    def reconstruct_viability(self, entropy_rates: np.ndarray, t_current: float = 0.0) -> float:
-        """
-        Compute the estimated viability margin ∇(t) from the estimated coupling tensor.
-        """
+    def reconstruct_viability(self, entropy_rates: np.ndarray,
+                              t_current: float = 0.0) -> float:
+        """Compute the estimated viability margin from the coupling tensor."""
         C_est = self.reconstruct_coupling_tensor(t_current)
         return self.analyzer.viability(C_est, entropy_rates)
 
+    def reconstruct_memory_kernel(self) -> np.ndarray:
+        """Return the estimated hidden neural memory kernel M_hat."""
+        return self.M_hat.copy()
+
+    def reconstruct_memory_covariance(self) -> np.ndarray:
+        """Return the covariance block over vec(M_hat)."""
+        return self.P[self.bio_dim:, self.bio_dim:].copy()
+
+    def identity_confidence_margin(self) -> Dict:
+        """Return a compact confidence summary for identity survival estimates."""
+        sigma_min_memory = float(np.linalg.svd(self.M_hat, compute_uv=False)[-1])
+        covariance_trace = float(np.trace(self.reconstruct_memory_covariance()))
+        return {
+            "sigma_min_memory": sigma_min_memory,
+            "memory_covariance_trace": covariance_trace,
+            "confidence": float(1.0 / (1.0 + covariance_trace)),
+        }
+
+    def _pack_state(self) -> np.ndarray:
+        return np.concatenate([self.z_hat, self.M_hat.reshape(-1)])
+
     def _compute_jacobian(self, t: float, z: np.ndarray, h: float = 1e-5) -> np.ndarray:
-        """Helper to calculate numerical Jacobian at the current state estimate."""
-        J = np.zeros((self.dim, self.dim))
-        for j in range(self.dim):
+        """Numerical biological-state Jacobian."""
+        J = np.zeros((self.bio_dim, self.bio_dim))
+        for j in range(self.bio_dim):
             z_plus = z.copy()
             z_minus = z.copy()
             z_plus[j] += h
             z_minus[j] -= h
-
             F_plus = self.ode.rhs(t, z_plus)
             F_minus = self.ode.rhs(t, z_minus)
-
             J[:, j] = (F_plus - F_minus) / (2.0 * h)
         return J
 
+    def _compute_augmented_jacobian(self, t: float, z: np.ndarray) -> np.ndarray:
+        """
+        Approximate augmented Jacobian for [z, vec(M)].
 
-# ═══════════════════════════════════════════════════════════════════════
-# PRE-CALIBRATED CLINICAL PANEL SELECTIONS
-# ═══════════════════════════════════════════════════════════════════════
+        The M dependence on z through C_neural is intentionally treated as a
+        process-noise source here; the stabilizing memory self-dynamics are
+        represented directly by -gamma I.
+        """
+        J = np.zeros((self.total_dim, self.total_dim))
+        J[:self.bio_dim, :self.bio_dim] = self._compute_jacobian(t, z)
+        J[self.bio_dim:, self.bio_dim:] = -self.memory_gamma * np.eye(self.memory_dim)
+        return J
+
+    def _ensure_augmented_measurement_matrix(self, H: np.ndarray) -> np.ndarray:
+        H = np.asarray(H, dtype=float)
+        if H.shape[1] == self.total_dim:
+            return H
+        if H.shape[1] != self.bio_dim:
+            raise ValueError(
+                f"H has {H.shape[1]} columns; expected {self.bio_dim} or {self.total_dim}"
+            )
+        H_aug = np.zeros((H.shape[0], self.total_dim))
+        H_aug[:, :self.bio_dim] = H
+        return H_aug
+
+    def _dmn_coherence_row(self) -> np.ndarray:
+        row = np.zeros(self.total_dim)
+        diag_indices = np.diag_indices(self.memory_shape[0])
+        flat_diag = np.ravel_multi_index(diag_indices, self.memory_shape)
+        row[self.bio_dim + flat_diag] = 1.0 / len(flat_diag)
+        return row
+
+    def _eeg_pci_row(self) -> np.ndarray:
+        row = np.zeros(self.total_dim)
+        row[self.bio_dim:] = 1.0 / self.memory_dim
+        return row
+
 
 def get_clinical_measurement_matrix(selected_indices: List[int], dim: int = 16) -> np.ndarray:
     """
-    Constructs the selection matrix H mapping the state vector to the
-    biomarkers chosen in the clinical panel.
-
-    Parameters
-    ----------
-    selected_indices : list of int
-        Indices of the variables measured in the clinical panel.
+    Construct a selection matrix H mapping state entries to biomarkers.
     """
     M = len(selected_indices)
     H = np.zeros((M, dim))
     for i, idx in enumerate(selected_indices):
         H[i, idx] = 1.0
     return H
+
+
+def get_neuroidentity_measurement_matrix(observer: ExtendedKalmanFilterObserver,
+                                        include_dmn: bool = True,
+                                        include_pci: bool = True) -> np.ndarray:
+    """Build direct DMN/PCI observation rows for an augmented EKF observer."""
+    rows = []
+    if include_dmn:
+        rows.append(observer._dmn_coherence_row())
+    if include_pci:
+        rows.append(observer._eeg_pci_row())
+    return np.vstack(rows) if rows else np.zeros((0, observer.total_dim))

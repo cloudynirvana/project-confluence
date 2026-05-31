@@ -177,6 +177,24 @@ print(phi.to_json())
 "
 ```
 
+## Convergence Implementation Status
+
+The current computational stack now implements the four Codex convergence prompts:
+
+| Layer | Implementation | Verification |
+|-------|----------------|--------------|
+| Quantum scale k0 | `ComplexAttractorODE` is extended to 16D with `psi_coherent`; `CouplingTensorAnalyzer` computes a 5-scale tensor and direct `C_02` quantum-to-cellular coupling. | `tests/test_ode_system.py`, `tests/test_coupling_tensor.py` |
+| OSKM steering | `PolicyMode.EPIGENETIC_STEERING` emits pulsatile OSKM dosing from identity metrics with Landauer thermal override holidays. | `tests/test_adaptive_controller.py` |
+| Curvature bottlenecks | `scripts/detect_curvature_bottlenecks.py` exports a Forman-Ricci JSON report and network plot for cellular-organismal bottlenecks. | `results/curvature_bottlenecks/` |
+| Memory-kernel EKF | `ExtendedKalmanFilterObserver` estimates `[z, vec(M_neural)]` and accepts DMN coherence plus EEG PCI measurement channels. | `tests/test_optimal_inference.py` |
+
+Focused validation:
+
+```bash
+python -B -m pytest tests/test_adaptive_controller.py tests/test_ode_system.py tests/test_coupling_tensor.py tests/test_optimal_inference.py -q
+python -B scripts/detect_curvature_bottlenecks.py
+```
+
 
 ## 🦞 AutoResearchClaw Integration
 
@@ -253,9 +271,9 @@ To bridge abstract biophysical theory with verified computational executions, us
 
 | Biophysical Equation / Concept | Mathematical Theory Paper | Executable Python Module | Verification Test Suite |
 | :--- | :--- | :--- | :--- |
-| **15D Spectral Attractor (SAEM)** | [`theory/optimal_inference_design.md`](theory/optimal_inference_design.md) | [`models/ode_system.py`](models/ode_system.py) | `tests/test_ode_system.py` |
-| **4x4 Cross-Scale Coupling Tensor $C_{ij}$** | [`theory/complexity_sustainment.md`](theory/complexity_sustainment.md) | [`models/coupling_tensor.py`](models/coupling_tensor.py) | [`tests/test_coupling_tensor.py`](tests/test_coupling_tensor.py) |
-| **EKF Continuous-Discrete Observer** | [`theory/optimal_inference_design.md`](theory/optimal_inference_design.md) | [`models/optimal_inference.py`](models/optimal_inference.py) | [`tests/test_optimal_inference.py`](tests/test_optimal_inference.py) |
+| **16D Spectral Attractor (SAEM + k0)** | [`theory/optimal_inference_design.md`](theory/optimal_inference_design.md), [`theory/quantum_criticality_and_unison.md`](theory/quantum_criticality_and_unison.md) | [`models/ode_system.py`](models/ode_system.py) | `tests/test_ode_system.py` |
+| **5x5 Cross-Scale Coupling Tensor $C_{ij}$** | [`theory/complexity_sustainment.md`](theory/complexity_sustainment.md) | [`models/coupling_tensor.py`](models/coupling_tensor.py) | [`tests/test_coupling_tensor.py`](tests/test_coupling_tensor.py) |
+| **EKF Observer + Memory Kernel $M(t)$** | [`theory/optimal_inference_design.md`](theory/optimal_inference_design.md), [`theory/consciousness_complexity_bridge.md`](theory/consciousness_complexity_bridge.md) | [`models/optimal_inference.py`](models/optimal_inference.py) | [`tests/test_optimal_inference.py`](tests/test_optimal_inference.py) |
 | **OED Sensor Selection Matrix $H$** | [`theory/optimal_inference_design.md`](theory/optimal_inference_design.md) | [`scripts/optimize_biomarker_panel.py`](scripts/optimize_biomarker_panel.py) | *Runs combinatorial validation* |
 | **Stochastic Laboratory Calibration** | [`theory/problem_statement_and_justification.md`](theory/problem_statement_and_justification.md) | [`scripts/stochastic_noise_sweep.py`](scripts/stochastic_noise_sweep.py) | *Assay noise sweeps* |
 | **Universal Sustainment Theorem (CLF)** | [`theory/universal_sustainment_theorem.md`](theory/universal_sustainment_theorem.md) | [`models/lyapunov_certificate.py`](models/lyapunov_certificate.py) | [`scripts/test_sustainment.py`](scripts/test_sustainment.py) |
