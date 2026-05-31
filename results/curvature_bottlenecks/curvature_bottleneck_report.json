@@ -1,0 +1,173 @@
+{
+  "generated_at": "2026-05-31T09:05:36.768937+00:00",
+  "method": "Forman-Ricci curvature on simulated BAC block-Jacobian coupling network",
+  "threshold": -0.8,
+  "scale_names": [
+    "quantum",
+    "molecular",
+    "cellular",
+    "organism",
+    "tissue"
+  ],
+  "target_scales": {
+    "neural_scale": "cellular",
+    "organismal_scale": "organism",
+    "note": "Current codebase maps neural-relevant coupling onto cellular-organismal BAC scales."
+  },
+  "network": {
+    "n_nodes": 5,
+    "n_edges": 20,
+    "adjacency": [
+      [
+        0.0,
+        0.68,
+        0.56,
+        0.42,
+        0.35
+      ],
+      [
+        0.62,
+        0.0,
+        0.74,
+        0.52,
+        0.45
+      ],
+      [
+        0.48,
+        0.82,
+        0.0,
+        0.45,
+        0.57
+      ],
+      [
+        0.38,
+        0.55,
+        0.46,
+        0.0,
+        0.76
+      ],
+      [
+        0.32,
+        0.44,
+        0.58,
+        0.81,
+        0.0
+      ]
+    ]
+  },
+  "bottlenecks": [
+    {
+      "source": "cellular",
+      "target": "organism",
+      "source_index": 2,
+      "target_index": 3,
+      "weight": 0.46,
+      "curvature": -1.1454,
+      "curvature_augmented": 0.2346,
+      "n_triangles": 3,
+      "priority": "high"
+    },
+    {
+      "source": "organism",
+      "target": "cellular",
+      "source_index": 3,
+      "target_index": 2,
+      "weight": 0.45,
+      "curvature": -1.134,
+      "curvature_augmented": 0.216,
+      "n_triangles": 3,
+      "priority": "high"
+    }
+  ],
+  "top_negative_edges": [
+    {
+      "source": "molecular",
+      "target": "cellular",
+      "source_index": 1,
+      "target_index": 2,
+      "weight": 0.82,
+      "curvature": -2.3042,
+      "curvature_augmented": 0.1558,
+      "n_triangles": 3,
+      "priority": "high"
+    },
+    {
+      "source": "cellular",
+      "target": "molecular",
+      "source_index": 2,
+      "target_index": 1,
+      "weight": 0.74,
+      "curvature": -1.9758,
+      "curvature_augmented": 0.2442,
+      "n_triangles": 3,
+      "priority": "high"
+    },
+    {
+      "source": "organism",
+      "target": "tissue",
+      "source_index": 3,
+      "target_index": 4,
+      "weight": 0.81,
+      "curvature": -1.9035,
+      "curvature_augmented": 0.5265,
+      "n_triangles": 3,
+      "priority": "high"
+    },
+    {
+      "source": "tissue",
+      "target": "organism",
+      "source_index": 4,
+      "target_index": 3,
+      "weight": 0.76,
+      "curvature": -1.7328,
+      "curvature_augmented": 0.5472,
+      "n_triangles": 3,
+      "priority": "high"
+    },
+    {
+      "source": "molecular",
+      "target": "quantum",
+      "source_index": 1,
+      "target_index": 0,
+      "weight": 0.68,
+      "curvature": -1.7,
+      "curvature_augmented": 0.34,
+      "n_triangles": 3,
+      "priority": "high"
+    },
+    {
+      "source": "molecular",
+      "target": "organism",
+      "source_index": 1,
+      "target_index": 3,
+      "weight": 0.55,
+      "curvature": -1.452,
+      "curvature_augmented": 0.198,
+      "n_triangles": 3,
+      "priority": "high"
+    },
+    {
+      "source": "cellular",
+      "target": "tissue",
+      "source_index": 2,
+      "target_index": 4,
+      "weight": 0.58,
+      "curvature": -1.4442,
+      "curvature_augmented": 0.2958,
+      "n_triangles": 3,
+      "priority": "high"
+    },
+    {
+      "source": "tissue",
+      "target": "cellular",
+      "source_index": 4,
+      "target_index": 2,
+      "weight": 0.57,
+      "curvature": -1.3965,
+      "curvature_augmented": 0.3135,
+      "n_triangles": 3,
+      "priority": "high"
+    }
+  ],
+  "clinical_interpretation": "Highly negative cellular-organismal curvature suggests a fragile communication bridge where neural/cellular state regulation is poorly coupled to organism-level control. Prioritize biomarker panels that measure immune exhaustion, vascular integrity, ROS, and ATP."
+}
