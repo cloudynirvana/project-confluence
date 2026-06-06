@@ -14,14 +14,18 @@ Outputs:
 This is the Proof of Concept for the "Assurance Layer" of the thesis.
 """
 
+import sys, os
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+os.environ.setdefault("MPLCONFIGDIR", os.path.join(PROJECT_ROOT, ".matplotlib-cache"))
+
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
-import sys, os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, PROJECT_ROOT)
 
 from models.clonal_dynamics import ClonalDynamicsEngine, ClonalParams
 from models.adaptive_controller import (
@@ -199,7 +203,7 @@ def plot_results(mtd_results, adaptive_results, save_path):
          f"-{(mtd_takeover - ada_takeover)*100:.0f}pp"],
         ["Mean Final Tumor Burden",
          f"{mtd_final_V:.3f}", f"{ada_final_V:.3f}",
-         f"{((mtd_final_V - ada_final_V)/mtd_final_V)*100:.0f}% lower" if mtd_final_V > ada_final_V else "—"],
+        f"{((mtd_final_V - ada_final_V)/mtd_final_V)*100:.0f}% lower" if mtd_final_V > ada_final_V else "n/a"],
     ]
     
     table = ax3.table(
@@ -226,25 +230,21 @@ def plot_results(mtd_results, adaptive_results, save_path):
     )
     
     fig.savefig(save_path, dpi=150, bbox_inches="tight")
-    print(f"\n✅ Monte Carlo figure saved to: {save_path}")
+    print(f"\nMonte Carlo figure saved to: {save_path}")
     
     # Print summary
     print(f"\n{'='*60}")
     print(f"MONTE CARLO RESULTS ({N_SAMPLES} samples)")
     print(f"{'='*60}")
-    print(f"  MTD — Controlled: {mtd_controlled:.0%} | R-Takeover: {mtd_takeover:.0%}")
-    print(f"  Adaptive — Controlled: {ada_controlled:.0%} | R-Takeover: {ada_takeover:.0%}")
+    print(f"  MTD - Controlled: {mtd_controlled:.0%} | R-Takeover: {mtd_takeover:.0%}")
+    print(f"  Adaptive - Controlled: {ada_controlled:.0%} | R-Takeover: {ada_takeover:.0%}")
     print(f"{'='*60}")
 
 
 if __name__ == "__main__":
-    save_path = os.path.join(
-        os.path.dirname(__file__), "..", "..", "..", "brain",
-        "3a007900-82e4-4191-98bc-5c0fc710ae33",
-        "monte_carlo_results.png"
-    )
-    # Use absolute path
-    save_path = r"C:\Users\Kelechi\.gemini\antigravity\brain\3a007900-82e4-4191-98bc-5c0fc710ae33\monte_carlo_results.png"
+    output_dir = os.path.join(PROJECT_ROOT, "results", "monte_carlo")
+    os.makedirs(output_dir, exist_ok=True)
+    save_path = os.path.join(output_dir, "monte_carlo_results.png")
     
     mtd, adaptive = run_monte_carlo()
     plot_results(mtd, adaptive, save_path)

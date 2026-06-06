@@ -1,6 +1,12 @@
 # 🧬 Project Confluence
 
+> ⚠️ Status: Phase 1 computational validation only. No real patient data used.
+
 > **Redefining Precision Oncology: From Tumor Killing to Complexity Restoration**
+
+> Citation and attribution: this repository is MIT-licensed for open review and collaboration. If you use the code, theory, figures, or documentation, please cite the repository and credit Kelechi Ogbonna / cloudynirvana.
+
+> Expert review invited: oncology, systems biology, control theory, clinical trial design, mathematical biology, and research-software reviewers are encouraged to audit assumptions, reproduce simulations, and challenge the validation plan before any translational claims are made.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9+-green.svg)](https://python.org)

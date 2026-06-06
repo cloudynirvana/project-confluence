@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+title: "Project Confluence: Complexity-Aware Adaptive Oncology"
+message: "If you use this software, theory, figures, or documentation, please cite this repository and credit the author."
+type: software
+authors:
+  - family-names: Ogbonna
+    given-names: Kelechi
+repository-code: "https://github.com/cloudynirvana/project-confluence"
+license: MIT
+date-released: "2026-06-06"
+abstract: "A computational framework for complexity-aware adaptive oncology, dynamical complexity profiling, and simulation-stage adaptive therapy validation."
