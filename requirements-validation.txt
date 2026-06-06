@@ -1,0 +1,9 @@
+# Optional dependencies for external-data validation.
+# These are intentionally separated from core requirements because some users
+# may only need the synthetic Confluence simulations.
+
+mne>=1.6.0
+wfdb>=4.1.0
+requests>=2.28.0
+pandas>=2.0.0
+datasets>=2.14.0

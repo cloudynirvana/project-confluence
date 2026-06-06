@@ -31,6 +31,14 @@ Thumbs.db
 *.npz
 *.npy
 
+# External validation data: keep raw biomedical files local.
+data/external/**
+!data/external/**/
+!data/external/**/.gitkeep
+data/derived_external/**
+!data/derived_external/**/
+!data/derived_external/**/.gitkeep
+
 # Secrets
 .env
 *.key

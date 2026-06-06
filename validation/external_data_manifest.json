@@ -1,0 +1,141 @@
+{
+  "schema": "project-confluence.external-validation-manifest/v1",
+  "status": "preparation",
+  "principle": "Use canonical, citable biomedical repositories first. Treat mirrors and secondary hubs as convenience layers only after provenance, license, and dataset-card review.",
+  "sources": [
+    {
+      "id": "physionet_sleep_edf_expanded",
+      "name": "Sleep-EDF Database Expanded",
+      "provider": "PhysioNet",
+      "url": "https://physionet.org/content/sleep-edfx/",
+      "access": "open",
+      "workflow": "individuality-dynamics",
+      "validation_question": "Does causal-closure lambda* or perturbational complexity separate Wake, REM, N1, N2, and N3 sleep stages?",
+      "data_modalities": ["EEG", "EOG", "EMG", "sleep_stage_annotations"],
+      "loader_candidates": ["mne.datasets.sleep_physionet.age.fetch_data", "mne.io.read_raw_edf"],
+      "primary_metrics": ["lambda_star_by_epoch", "closure_score_by_epoch", "PCI_like_response", "stage_separation_effect_size"],
+      "success_criteria": [
+        "End-to-end loader reproduces subject-level EDF plus hypnogram pairing.",
+        "Windowed metrics are finite for at least 95 percent of artifact-screened epochs.",
+        "At least one organizational persistence metric differs across sleep stages under subject-wise cross-validation."
+      ],
+      "license_review_required": true,
+      "credentialing_required": false,
+      "priority": 1
+    },
+    {
+      "id": "physionet_mit_bih_nsrdb",
+      "name": "MIT-BIH Normal Sinus Rhythm Database",
+      "provider": "PhysioNet",
+      "url": "https://physionet.org/content/nsrdb/",
+      "access": "open",
+      "workflow": "project-confluence_phi_vector",
+      "validation_question": "Can Phi_temporal and Phi_informational reproduce healthy physiologic complexity from RR/ECG signals?",
+      "data_modalities": ["ECG", "RR_intervals"],
+      "loader_candidates": ["wfdb.rdrecord", "wfdb.rdann", "wfdb.dl_database"],
+      "primary_metrics": ["Phi_temporal", "Phi_informational", "multiscale_entropy", "spectral_slope"],
+      "success_criteria": [
+        "WFDB loader obtains records and annotations reproducibly.",
+        "Healthy-subject complexity metrics are finite and stable under record-wise resampling.",
+        "Outputs define external healthy reference ranges rather than synthetic-only ranges."
+      ],
+      "license_review_required": true,
+      "credentialing_required": false,
+      "priority": 2
+    },
+    {
+      "id": "physionet_mimic_iv_waveform",
+      "name": "MIMIC-IV Waveform Database",
+      "provider": "PhysioNet",
+      "url": "https://physionet.org/content/mimic4wdb/",
+      "access": "credentialed",
+      "workflow": "project-confluence_phi_vector",
+      "validation_question": "Do Phi metrics track ICU physiologic deterioration or recovery in real multimodal waveforms?",
+      "data_modalities": ["ECG", "PPG", "ABP", "respiration", "ICU_waveforms"],
+      "loader_candidates": ["wfdb.rdrecord", "wfdb.dl_database"],
+      "primary_metrics": ["Phi_temporal", "Phi_coupling", "Phi_functional", "clinical_event_alignment"],
+      "success_criteria": [
+        "Credentialing and data-use requirements are satisfied before access.",
+        "No restricted data are committed to Git.",
+        "Patient-wise splits are enforced for all validation reports."
+      ],
+      "license_review_required": true,
+      "credentialing_required": true,
+      "priority": 3
+    },
+    {
+      "id": "gdc_tcga",
+      "name": "Genomic Data Commons TCGA Harmonized Data",
+      "provider": "NCI GDC",
+      "url": "https://portal.gdc.cancer.gov/",
+      "access": "open_and_controlled",
+      "workflow": "project-confluence_oncology",
+      "validation_question": "Can Confluence map real tumor cohorts into reproducible Phi-like complexity signatures and disease archetypes?",
+      "data_modalities": ["clinical", "RNA_seq", "mutation", "copy_number", "survival"],
+      "loader_candidates": ["GDC API", "GDC Data Transfer Tool"],
+      "primary_metrics": ["cohort_phi_signature", "survival_association", "archetype_stability", "gene_to_parameter_mapping_coverage"],
+      "success_criteria": [
+        "Open harmonized files are queried reproducibly by project and data type.",
+        "Controlled-access files are used only after dbGaP/GDC authorization.",
+        "Results are split by cancer type and never presented as patient-level clinical advice."
+      ],
+      "license_review_required": true,
+      "credentialing_required": "for controlled data",
+      "priority": 2
+    },
+    {
+      "id": "cbioportal_public_studies",
+      "name": "cBioPortal Public Cancer Genomics API",
+      "provider": "cBioPortal",
+      "url": "https://www.cbioportal.org/api",
+      "access": "open_api",
+      "workflow": "project-confluence_oncology",
+      "validation_question": "Can public study-level cancer genomics reproduce disease-panel and parameter-map signals?",
+      "data_modalities": ["mutations", "copy_number", "clinical", "study_metadata"],
+      "loader_candidates": ["cBioPortal REST API", "bravado Swagger client"],
+      "primary_metrics": ["panel_gene_hit_rate", "archetype_enrichment", "cross_study_stability"],
+      "success_criteria": [
+        "API queries are cached with study IDs and timestamps.",
+        "Gene-panel outputs are reproducible from public studies.",
+        "All claims remain cohort-level and exploratory."
+      ],
+      "license_review_required": true,
+      "credentialing_required": false,
+      "priority": 3
+    },
+    {
+      "id": "huggingface_biomedical_timeseries_candidates",
+      "name": "Hugging Face biomedical EEG/ECG/time-series dataset candidates",
+      "provider": "Hugging Face Hub",
+      "url": "https://huggingface.co/datasets",
+      "access": "varies_by_dataset",
+      "workflow": "discovery_and_secondary_validation",
+      "validation_question": "Are there well-documented public mirrors or derived datasets suitable for fast benchmark prototyping?",
+      "data_modalities": ["varies"],
+      "loader_candidates": ["datasets.load_dataset"],
+      "primary_metrics": ["dataset_card_completeness", "license_compatibility", "provenance_to_primary_source"],
+      "success_criteria": [
+        "Dataset card names primary source, license, preprocessing, and subject split policy.",
+        "Dataset license is compatible with open scientific validation.",
+        "No Hugging Face dataset is treated as canonical if an official PhysioNet/GDC/cBioPortal source exists."
+      ],
+      "license_review_required": true,
+      "credentialing_required": "varies",
+      "priority": 4
+    }
+  ],
+  "local_paths": {
+    "raw_data_root": "data/external",
+    "derived_data_root": "data/derived_external",
+    "results_root": "results/external_validation",
+    "reports_root": "validation/reports"
+  },
+  "do_not_commit": [
+    "raw biomedical data",
+    "restricted PhysioNet data",
+    "GDC controlled-access files",
+    "access tokens",
+    "patient identifiers",
+    "large derived arrays unless explicitly anonymized and documented"
+  ]
+}

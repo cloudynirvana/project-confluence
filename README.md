@@ -8,6 +8,8 @@
 
 > Expert review invited: oncology, systems biology, control theory, clinical trial design, mathematical biology, and research-software reviewers are encouraged to audit assumptions, reproduce simulations, and challenge the validation plan before any translational claims are made.
 
+> External validation preparation: see [validation/external_validation_pipeline.md](validation/external_validation_pipeline.md) for the PhysioNet, GDC, cBioPortal, and Hugging Face data-readiness plan.
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9+-green.svg)](https://python.org)
 [![Status: Computational Validation](https://img.shields.io/badge/Status-Computational%20Validation-orange.svg)](#validation-roadmap)
