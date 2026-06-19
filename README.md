@@ -203,6 +203,26 @@ python -B -m pytest tests/test_adaptive_controller.py tests/test_ode_system.py t
 python -B scripts/detect_curvature_bottlenecks.py
 ```
 
+## PDAC Rogue Closure Model
+
+Project Confluence now includes a disease-specific executable scaffold for pancreatic ductal adenocarcinoma (PDAC):
+
+```text
+PDAC persistence = KRAS/RAS driver closure
+                 + EGFR/STAT3 bypass recovery
+                 + stromal/glycocalyx shielding
+                 + immune exclusion
+                 + therapy-selected resistance
+```
+
+Run the synthetic workflow:
+
+```bash
+python scripts/run_pdac_rogue_closure.py --all-scenarios
+```
+
+Validation data links and the real-data plan are in [`validation/pdac_data_sources.md`](validation/pdac_data_sources.md). The committed PDAC time series in `results/pdac_rogue_closure/` is synthetic and exists for reproducibility; raw public datasets should be fetched from GDC, cBioPortal, GEO, DepMap, PDMR, PDX Finder, GlyGen, and GlyConnect rather than stored directly in the repository.
+
 
 ## 🦞 AutoResearchClaw Integration
 
