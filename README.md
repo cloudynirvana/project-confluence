@@ -1,3 +1,38 @@
+# Project Confluence
+
+**A Phi-vector framework for modeling shared metabolic dynamics across cancer types**
+
+## Abstract
+
+Cancer cells across tissue types converge on shared metabolic reprogramming
+patterns (the Warburg effect and its extensions), but most models validate
+against synthetic or single-cancer-type data, limiting claims of generality.
+Project Confluence models this convergence directly using an ODE-based
+state-space system anchored in a five-component Phi-vector - Phi_temporal,
+Phi_informational, Phi_functional, Phi_spatial, and Phi_coupling - representing
+distinct facets of metabolic-regulatory state.
+
+Six enzymes central to glycolytic and oxidative metabolism (HK2, PKM2, LDHA,
+IDH1/2, PDK1, G6PD) are mapped to specific channels in the ODE system as
+grounded, biologically-interpretable state variables rather than abstract
+parameters.
+
+**Key result:** Replacing synthetic-data validation with six real CCLE
+metabolomics channels (`CCLE_metabolomics_20190502.csv`; 225 metabolites x
+928 cell lines) raises structurally identifiable parameters from 7/17 to
+15/17, evaluated across three cancer types chosen for maximal biological
+diversity - AML (blood), osteosarcoma (bone), and NSCLC (lung) - to support
+generalizability claims beyond a single tissue context.
+
+An adaptive controller built on this framework extends structurally to
+theranostic applications (radioligand diagnostic-therapeutic pairing).
+
+## Citation
+
+See `CITATION.cff`. DOI badge added below once Zenodo publishes.
+
+---
+
 # 🧬 Project Confluence
 
 > ⚠️ Status: Phase 1 computational validation only. No real patient data used.
