@@ -6,6 +6,7 @@ authors:
   - family-names: Ogbonna
     given-names: Kelechi
 repository-code: "https://github.com/cloudynirvana/project-confluence"
+doi: "10.5281/zenodo.21446803"
 license: MIT
 date-released: "2026-06-06"
 abstract: "A computational framework for complexity-aware adaptive oncology, dynamical complexity profiling, and simulation-stage adaptive therapy validation."
