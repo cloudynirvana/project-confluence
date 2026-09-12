@@ -1,0 +1,24 @@
+{
+  "n_scenarios": 30,
+  "total_days": 60.0,
+  "strategies": {
+    "MTD": {
+      "resistant_takeover_rate": 0.6667,
+      "mean_final_resistant_fraction": 0.8848,
+      "mean_final_burden": 0.2529,
+      "mean_days_under_control": 57.95
+    },
+    "Expert": {
+      "resistant_takeover_rate": 0.1667,
+      "mean_final_resistant_fraction": 0.4703,
+      "mean_final_burden": 0.5371,
+      "mean_days_under_control": 53.77
+    },
+    "NeuralBrain": {
+      "resistant_takeover_rate": 0.1667,
+      "mean_final_resistant_fraction": 0.4175,
+      "mean_final_burden": 0.5504,
+      "mean_days_under_control": 52.88
+    }
+  }
+}
