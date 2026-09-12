@@ -33,6 +33,94 @@ See `CITATION.cff`. DOI badge added below once Zenodo publishes.
 
 ---
 
+# Confluence v2 — fly mushroom body × cancer microenvironment
+
+> **Computational research / simulation only.** This is not a medical device, not a treatment planner, and it does not claim a clinical cure. See [DISCLAIMER.md](DISCLAIMER.md).
+
+Confluence v2 asks a concrete control-theoretic question: *can a Drosophila melanogaster mushroom-body-style associative circuit, driven by noisy cancer observations and a dopamine-like reward, generate adaptive multi-drug infusion policies on a mechanistic tumor microenvironment?*
+
+The closed loop is:
+
+```
+Y (noisy, partial) → sensory W_in → AL/LH projection → sparse Kenyon cells
+    → MBON rates → motor decode U = clip(W_out · rates, 0)
+    → PK  dC_k/dt = −(ln 2 / t½) C_k + U_k(t)
+    → 11-D ODE  X = (T_s, T_r, I_act, I_exh, S_fib, L, O, G, C_tgfb, C_ifng, H)
+    → Y′
+```
+
+Plasticity on KC→MBON synapses:
+
+```
+dW_ij/dt = η · DA(t) · KC_j · MBON_i − λ W_ij
+DA(t)    = −Δburden − α · Σ C_k − β · Δresistance
+```
+
+Host health `H ∈ [0, 1]`; `H ≤ 0.2` is terminal toxicity. Phenotypic switching `ε_switch(C_drugs, L)` is attenuated by HDAC occupancy. Immune kill is stroma-shielded. Exhaustion `γ_exh` rises with TGF-β, lactate, and unblocked PD-1.
+
+This sits beside the original 16-D Φ / BAC stack in `models/` — v2 does not replace v1; it adds a real-time connectome controller and an interactive session.
+
+## Run the interactive session
+
+```bash
+pip install -e .
+# or, at minimum:
+pip install numpy scipy pydantic fastapi "uvicorn[standard]"
+
+python -m confluence
+# equivalent:
+uvicorn confluence.telemetry.websocket_server:app --host 127.0.0.1 --port 8765
+```
+
+Open **http://127.0.0.1:8765**. The browser UI streams:
+
+- latent and observed cancer state (burden, resistance / ctDNA-like, lactate, TGF-β, immune competence, host H)
+- connectome activity (KC sparsity heatmap, MBON rates, dopamine / plasticity norm)
+- current infusion `U(t)` and PK concentrations `C(t)`
+- archetype selector (Glioblastoma, PDAC/pancreatic, Melanoma persister)
+- play / pause / step, controller A–E, optional **manual drug override**
+
+Interactive Kenyon-cell count defaults to **256** for real-time FPS (documented). Pass `n_kc=2048` in `MushroomBodyNetwork` / controllers for a more FlyWire-like expansion.
+
+```bash
+# package tests
+python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py -q
+
+# short controller bake-off (3 archetypes × A–E)
+python -m confluence --benchmark --trials 2 --horizon 40
+```
+
+Getting-started notebook: [`notebooks/confluence_v2_getting_started.ipynb`](notebooks/confluence_v2_getting_started.ipynb).
+
+## FlyWire stub vs real data
+
+The default graph is a **biologically structured stub**: ~7 PN axons per KC, cholinergic PN→KC, GABAergic APL feedback, dopaminergic DAN→KC/MBON, FlyWire_FAFB_v783 field names on `ConnectomeSubcircuit`. It is **not** a literal Dorkenwald / FlyWire dump.
+
+To ingest real FAFB later:
+
+1. Export `CAVE_TOKEN` (or `FLYWIRE_TOKEN`).
+2. Install `caveclient` / `fafbseg`.
+3. Implement the reserved path in `confluence/connectome/fafb_loader.py` (`_try_caveclient`) and compile with `CircuitExtractor`.
+
+Without credentials the client stays on the stub and the interactive session still runs.
+
+## Controllers (benchmark module)
+
+| ID | Policy | Notes |
+|----|--------|-------|
+| A | Standard-of-care MTD | Continuous archetype-specific mix |
+| B | Gatenby adaptive | Treat to 50% burden drop, halt, resume on recovery |
+| C | PPO | Thin trainable stub + optional `CONFLUENCE_PPO_CKPT`; full training is heavy |
+| D | Static MB reservoir | Frozen connectome + ridge readout |
+| E | Plastic mushroom body | Live DA plasticity (default interactive controller) |
+
+Metrics: simulated PFS, resistance emergence time, cumulative toxicity, pharmacological burden. These are **in-silico scores**, not clinical endpoints.
+
+Pharmacology lives in `confluence/pharmacology/drug_catalog.json` (≥6 entries: pembrolizumab, galunisertib, AZD3965, vorinostat, trametinib, osimertinib, plus a clearly marked supportive-care placeholder). Half-lives use published DOIs where possible; IC50/MTD values are **simulation-scaled**. Controller commands `U∈[0,1]` are clearance-matched so `C_ss = U · MTD` (long-half-life mAbs do not wind up unboundedly).
+
+---
+
+
 # 🧬 Project Confluence
 
 > ⚠️ Status: Phase 1 computational validation only. No real patient data used.
@@ -204,8 +292,13 @@ graph TD
 git clone https://github.com/cloudynirvana/project-confluence.git
 cd project-confluence
 
-# Install dependencies
+# Install (v2 interactive extras are in pyproject.toml / requirements.txt)
+pip install -e .
 pip install -r requirements.txt
+
+# Interactive closed-loop session (primary v2 demo)
+python -m confluence
+```
 
 # Run complexity profiling
 python -c "
@@ -278,7 +371,18 @@ AutoResearchClaw runs 23 stages autonomously — literature review, hypothesis d
 
 ```
 project-confluence/
-├── models/                          # Core computational modules
+├── confluence/                      # v2 installable package
+│   ├── contracts.py                 # Pydantic: LatentCancerState, Observation, drugs, MB circuit
+│   ├── loop.py                      # Closed loop Y → controller → PK → ODE
+│   ├── connectome/                  # FlyWire stub + FAFB loader hook + circuit_extractor
+│   ├── neural_engine/               # Rate MB network + DA plasticity
+│   ├── cancer_env/                  # 11-D ODE, observation layer, 3 archetypes
+│   ├── pharmacology/                # drug_catalog.json, PK/PD, toxicity
+│   ├── controllers/                 # A MTD · B Gatenby · C PPO stub · D reservoir · E plastic MB
+│   ├── benchmarks/                  # PFS / resistance / toxicity runner
+│   └── telemetry/                   # FastAPI + WebSocket UI
+├── notebooks/                       # Getting-started notebook
+├── models/                          # Core computational modules (v1 Φ / BAC stack)
 │   ├── adaptive_controller.py       # Closed-loop adaptive therapy controller
 │   ├── clonal_dynamics.py           # Lotka-Volterra clonal competition engine
 │   ├── resistance_model.py          # Multi-mechanism resistance tracker

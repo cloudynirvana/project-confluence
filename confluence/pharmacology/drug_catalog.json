@@ -1,0 +1,195 @@
+{
+  "version": "2.0",
+  "unit_note": "half_life_hours are clinical-scale values used directly in PK. ic50/mtd/organ_toxicity are simulation-scaled so C(t) stays O(1) in the interactive ODE. clinical_ic50_note records published units.",
+  "drugs": [
+    {
+      "id": "anti_pd1",
+      "name": "Pembrolizumab",
+      "drug_class": "immune_checkpoint",
+      "mechanism": "PD-1 blockade; reduces T-cell exhaustion drive",
+      "half_life_hours": 624.0,
+      "ic50": 0.25,
+      "hill": 1.2,
+      "mtd": 1.0,
+      "organ_toxicity": {
+        "liver": 0.15,
+        "kidney": 0.0,
+        "heart": 0.05,
+        "marrow": 0.0,
+        "immune": 0.45,
+        "gut": 0.10,
+        "nerve": 0.05
+      },
+      "control_channel": "anti_pd1",
+      "clinical_half_life_hours": 624.0,
+      "clinical_ic50_note": "Clinical t1/2 ~26 days (pembrolizumab label / popPK). Binding affinity is nM-scale; here IC50 is simulation-scaled occupancy.",
+      "provenance": {
+        "doi": "10.1056/NEJMoa1200694",
+        "note": "Hamid et al., NEJM 2013 (KEYNOTE-001). PK half-life corroborated by 10.1007/s40262-016-0427-y (Ahamadi et al. 2017 popPK).",
+        "placeholder": false
+      }
+    },
+    {
+      "id": "tgfb_inhibitor",
+      "name": "Galunisertib (LY2157299)",
+      "drug_class": "tgfb_pathway",
+      "mechanism": "TGF-βRI kinase inhibition; lowers stromal drive and exhaustion",
+      "half_life_hours": 8.0,
+      "ic50": 0.40,
+      "hill": 1.4,
+      "mtd": 1.0,
+      "organ_toxicity": {
+        "liver": 0.10,
+        "kidney": 0.05,
+        "heart": 0.20,
+        "marrow": 0.05,
+        "immune": 0.05,
+        "gut": 0.10,
+        "nerve": 0.0
+      },
+      "control_channel": "tgfb_inhibitor",
+      "clinical_half_life_hours": 8.0,
+      "clinical_ic50_note": "Published t1/2 ~8 h; cardiac monitoring was a Phase I constraint.",
+      "provenance": {
+        "doi": "10.1007/s00280-014-2616-4",
+        "note": "Rodón et al., Cancer Chemother Pharmacol 2015. First-in-human TGF-βRI inhibitor PK/PD.",
+        "placeholder": false
+      }
+    },
+    {
+      "id": "mct1",
+      "name": "AZD3965",
+      "drug_class": "metabolic",
+      "mechanism": "MCT1 inhibition; slows lactate export/clearance remodeling",
+      "half_life_hours": 2.5,
+      "ic50": 0.35,
+      "hill": 1.6,
+      "mtd": 1.0,
+      "organ_toxicity": {
+        "liver": 0.15,
+        "kidney": 0.05,
+        "heart": 0.05,
+        "marrow": 0.10,
+        "immune": 0.0,
+        "gut": 0.20,
+        "nerve": 0.05
+      },
+      "control_channel": "mct1",
+      "clinical_half_life_hours": 2.5,
+      "clinical_ic50_note": "Half-life approximated from first-in-human PK (hours-scale). IC50 in vitro is nM; sim-scaled here.",
+      "provenance": {
+        "doi": "10.1158/1078-0432.CCR-22-2263",
+        "note": "Halford et al., Clin Cancer Res 2023. First-in-human MCT1 inhibitor AZD3965.",
+        "placeholder": false
+      }
+    },
+    {
+      "id": "hdac",
+      "name": "Vorinostat (SAHA)",
+      "drug_class": "epigenetic",
+      "mechanism": "HDAC inhibition; attenuates sensitive→resistant phenotypic switch",
+      "half_life_hours": 2.0,
+      "ic50": 0.45,
+      "hill": 1.3,
+      "mtd": 1.0,
+      "organ_toxicity": {
+        "liver": 0.10,
+        "kidney": 0.0,
+        "heart": 0.05,
+        "marrow": 0.35,
+        "immune": 0.05,
+        "gut": 0.15,
+        "nerve": 0.05
+      },
+      "control_channel": "hdac",
+      "clinical_half_life_hours": 2.0,
+      "clinical_ic50_note": "Clinical t1/2 ~2 h; myelosuppression is dose-limiting.",
+      "provenance": {
+        "doi": "10.1158/1078-0432.CCR-06-2082",
+        "note": "Mann et al., Clin Cancer Res 2007. Vorinostat PK and HDAC inhibition in advanced cancer.",
+        "placeholder": false
+      }
+    },
+    {
+      "id": "targeted_kinase",
+      "name": "Trametinib",
+      "drug_class": "targeted_kinase",
+      "mechanism": "MEK1/2 inhibition; archetype-mapped cytotoxic pressure on sensitive clones",
+      "half_life_hours": 96.0,
+      "ic50": 0.30,
+      "hill": 1.5,
+      "mtd": 1.0,
+      "organ_toxicity": {
+        "liver": 0.10,
+        "kidney": 0.0,
+        "heart": 0.15,
+        "marrow": 0.10,
+        "immune": 0.0,
+        "gut": 0.15,
+        "nerve": 0.05
+      },
+      "control_channel": "targeted_kinase",
+      "clinical_half_life_hours": 96.0,
+      "clinical_ic50_note": "Clinical t1/2 ~4 days. Default kinase channel; melanoma maps most naturally. GBM/PDAC use the same channel as a stand-in for EGFR/MEK-adjacent pressure.",
+      "provenance": {
+        "doi": "10.1200/JCO.2012.43.5966",
+        "note": "Infante et al., JCO 2012. Trametinib first-in-human / recommended Phase II dose.",
+        "placeholder": false
+      }
+    },
+    {
+      "id": "osimertinib",
+      "name": "Osimertinib",
+      "drug_class": "targeted_kinase",
+      "mechanism": "EGFR T790M-selective TKI; GBM-adjacent kinase catalog entry (not in default 5-D U)",
+      "half_life_hours": 48.0,
+      "ic50": 0.28,
+      "hill": 1.4,
+      "mtd": 1.0,
+      "organ_toxicity": {
+        "liver": 0.10,
+        "kidney": 0.05,
+        "heart": 0.20,
+        "marrow": 0.05,
+        "immune": 0.0,
+        "gut": 0.10,
+        "nerve": 0.05
+      },
+      "control_channel": null,
+      "clinical_half_life_hours": 48.0,
+      "clinical_ic50_note": "Clinical t1/2 ~48 h (AURA). Catalog-only; default controller uses trametinib as the shared kinase channel.",
+      "provenance": {
+        "doi": "10.1056/NEJMoa1411580",
+        "note": "Jänne et al., NEJM 2015 (AURA). Included so the catalog has an EGFR-axis kinase with a real DOI.",
+        "placeholder": false
+      }
+    },
+    {
+      "id": "supportive_placeholder",
+      "name": "Supportive care (placeholder)",
+      "drug_class": "supportive",
+      "mechanism": "Non-cytotoxic placeholder for future host-protection channels",
+      "half_life_hours": 12.0,
+      "ic50": 1.0,
+      "hill": 1.0,
+      "mtd": 1.0,
+      "organ_toxicity": {
+        "liver": 0.0,
+        "kidney": 0.0,
+        "heart": 0.0,
+        "marrow": 0.0,
+        "immune": 0.0,
+        "gut": 0.0,
+        "nerve": 0.0
+      },
+      "control_channel": null,
+      "clinical_half_life_hours": null,
+      "clinical_ic50_note": "PLACEHOLDER — not a real oncology agent. Reserved for future host-protection / G-CSF-like channels.",
+      "provenance": {
+        "doi": "10.5281/zenodo.21446803",
+        "note": "PLACEHOLDER: no clinical DOI. Zenodo software DOI of this repository is listed only as an attribution handle.",
+        "placeholder": true
+      }
+    }
+  ]
+}

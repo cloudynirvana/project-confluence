@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Confluence v2 — live closed loop</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="mast">
+    <div>
+      <p class="kicker">Computational research · not a clinical system</p>
+      <h1>Confluence <span>v2</span></h1>
+      <p class="sub">Drosophila mushroom body steers therapy over a mechanistic cancer microenvironment.</p>
+    </div>
+    <div class="clock">
+      <div class="clock-label">t (days)</div>
+      <div id="t-days">0.00</div>
+      <div id="status-pill" class="pill idle">idle</div>
+    </div>
+  </header>
+
+  <main class="grid">
+    <aside class="panel controls">
+      <h2>Session</h2>
+      <label>Archetype
+        <select id="archetype">
+          <option value="glioblastoma">Glioblastoma</option>
+          <option value="pancreatic_pdac">PDAC / pancreatic</option>
+          <option value="melanoma_persister">Melanoma (persister)</option>
+        </select>
+      </label>
+      <label>Controller
+        <select id="controller">
+          <option value="E" selected>E · Plastic mushroom body</option>
+          <option value="D">D · Static reservoir</option>
+          <option value="C">C · PPO stub</option>
+          <option value="B">B · Gatenby adaptive</option>
+          <option value="A">A · MTD / SOC</option>
+        </select>
+      </label>
+      <div class="btn-row">
+        <button id="btn-play" type="button">Play</button>
+        <button id="btn-pause" type="button">Pause</button>
+        <button id="btn-step" type="button">Step</button>
+        <button id="btn-reset" type="button" class="ghost">Reset</button>
+      </div>
+      <label>Step size (days)
+        <input id="dt" type="range" min="0.05" max="1.0" step="0.05" value="0.25" />
+        <span id="dt-val">0.25</span>
+      </label>
+
+      <h2>Infusion</h2>
+      <label class="toggle">
+        <input id="override" type="checkbox" />
+        Manual override (vs automatic controller)
+      </label>
+      <div id="sliders"></div>
+      <p class="src" id="source">source: —</p>
+    </aside>
+
+    <section class="panel">
+      <h2>Latent &amp; observed cancer state</h2>
+      <canvas id="chart-cancer" height="220"></canvas>
+      <div class="legend" id="legend-cancer"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Connectome activity</h2>
+      <div class="metrics">
+        <div><span>KC sparsity</span><strong id="kc-sp">—</strong></div>
+        <div><span>DA / plasticity</span><strong id="da">—</strong></div>
+        <div><span>‖W<sub>KC→MBON</sub>‖</span><strong id="wnorm">—</strong></div>
+        <div><span>graph</span><strong id="graph-src">stub</strong></div>
+      </div>
+      <canvas id="kc-heat" width="640" height="72"></canvas>
+      <canvas id="chart-mbon" height="140"></canvas>
+    </section>
+
+    <section class="panel">
+      <h2>U(t) infusion &amp; PK concentrations</h2>
+      <canvas id="chart-drugs" height="220"></canvas>
+      <div class="bars" id="drug-bars"></div>
+    </section>
+  </main>
+
+  <footer>
+    Closed loop: Y → MB controller → U(t) → PK/PD → 11-D ODE → Y′. Host health H ≤ 0.2 is terminal toxicity.
+    Simulation only — no claim of clinical benefit or cure.
+    <span id="warn" class="warn hidden">HOST TOXICITY WARNING</span>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
