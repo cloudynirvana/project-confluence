@@ -1,0 +1,17 @@
+{
+  "name": "Project Confluence",
+  "install": "python3 -m pip install -r requirements.txt -r api_service/requirements.txt && python3 -c \"from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')\"",
+  "terminals": [
+    {
+      "name": "api",
+      "command": "cd api_service && python3 -m uvicorn app:app --host 127.0.0.1 --port 8000",
+      "description": "Project Confluence FastAPI service (AutoResearch jobs + Nigeria NSTG 2022 clinical-guidelines RAG). Serves http://127.0.0.1:8000 (see /docs)."
+    }
+  ],
+  "ports": [
+    {
+      "name": "api",
+      "port": 8000
+    }
+  ]
+}
