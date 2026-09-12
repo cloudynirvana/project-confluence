@@ -37,6 +37,14 @@
           <option value="C">C · PPO stub</option>
           <option value="B">B · Gatenby adaptive</option>
           <option value="A">A · MTD / SOC</option>
+          <option value="F">F · Full-brain secretory</option>
+        </select>
+      </label>
+      <label>Brain mode
+        <select id="brain-mode">
+          <option value="demo" selected>Small-net demo (256 KC)</option>
+          <option value="train">Full-brain train (2,048 rate-based)</option>
+          <option value="full">Full-brain 166,700 (may hitch UI)</option>
         </select>
       </label>
       <label>Loop
@@ -56,6 +64,23 @@
         <input id="dt" type="range" min="0.05" max="1.0" step="0.05" value="0.25" />
         <span id="dt-val">0.25</span>
       </label>
+
+      <h2>Training</h2>
+      <p class="src" id="brain-meta">brain: demo · 256 neurons</p>
+      <div class="btn-row">
+        <button id="btn-train" type="button">Train episode</button>
+        <button id="btn-train-short" type="button" class="ghost">Short (20 d)</button>
+      </div>
+      <div class="metrics train-metrics">
+        <div><span>episodes</span><strong id="tr-ep">0</strong></div>
+        <div><span>reward</span><strong id="tr-rew">—</strong></div>
+        <div><span>DA</span><strong id="tr-da">—</strong></div>
+        <div><span>burden</span><strong id="tr-bur">—</strong></div>
+        <div><span>toxicity</span><strong id="tr-tox">—</strong></div>
+        <div><span>best R</span><strong id="tr-best">—</strong></div>
+      </div>
+      <p class="src" id="tr-proteins">proteins: —</p>
+      <p class="src">Simulated expression/dosing of biologics — not fly-neuron translation.</p>
 
       <h2>Infusion</h2>
       <label class="toggle">
@@ -88,6 +113,9 @@
       <h2>U(t) infusion &amp; PK concentrations</h2>
       <canvas id="chart-drugs" height="220"></canvas>
       <div class="bars" id="drug-bars"></div>
+      <h3 class="subhead">Protein / biologic channels</h3>
+      <p class="src" id="protein-active">active: —</p>
+      <div class="bars" id="protein-bars"></div>
     </section>
 
     <section class="panel" id="panel-embodiment">
@@ -105,7 +133,7 @@
   </main>
 
   <footer>
-    Closed loop: Y → MB controller → U(t) → PK/PD → 11-D ODE → Y′ and/or flybody actuators.
+    Closed loop: Y → net → small-molecule + protein effectors → PK/PD → 11-D ODE → Y′ and/or flybody actuators.
     Host health H ≤ 0.2 is terminal toxicity. flybody: DeepMind/Janelia, Apache 2.0.
     Simulation only — no claim of clinical benefit or cure.
     <span id="warn" class="warn hidden">HOST TOXICITY WARNING</span>

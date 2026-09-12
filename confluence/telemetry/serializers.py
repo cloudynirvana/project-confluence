@@ -4,7 +4,12 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
+from confluence.contracts import CONTROL_DRUG_IDS, PROTEIN_CHANNEL_IDS
 from confluence.loop import SimFrame
+
+
+def _subset(mapping: Dict[str, float], keys) -> Dict[str, float]:
+    return {k: float(mapping.get(k, 0.0)) for k in keys}
 
 
 def frame_to_dict(frame: SimFrame) -> Dict[str, Any]:
@@ -43,6 +48,20 @@ def frame_to_dict(frame: SimFrame) -> Dict[str, Any]:
             "occupancy": frame.occupancies,
             "source": frame.action.source,
             "notes": frame.action.notes,
+            "small_molecule": {
+                "U": _subset(frame.action.infusion, CONTROL_DRUG_IDS),
+                "C": _subset(frame.concentrations, CONTROL_DRUG_IDS),
+            },
+            "protein": {
+                "U": _subset(frame.action.infusion, PROTEIN_CHANNEL_IDS),
+                "C": _subset(frame.concentrations, PROTEIN_CHANNEL_IDS),
+                "active": [
+                    pid
+                    for pid in PROTEIN_CHANNEL_IDS
+                    if float(frame.action.infusion.get(pid, 0.0)) > 0.05
+                    or float(frame.occupancies.get(pid, 0.0)) > 0.05
+                ],
+            },
         },
         "connectome": frame.connectome
         or {

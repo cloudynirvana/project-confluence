@@ -1,6 +1,7 @@
-"""Competing therapy controllers A–E."""
+"""Competing therapy controllers A–F."""
 
 from confluence.controllers.base import BaseController, ControllerContext
+from confluence.controllers.full_brain import FullBrainController
 from confluence.controllers.gatenby import GatenbyAdaptiveController
 from confluence.controllers.mtd import MTDController
 from confluence.controllers.plastic_mb import PlasticMushroomBodyController
@@ -13,11 +14,13 @@ CONTROLLER_REGISTRY = {
     "C": PPOController,
     "D": StaticReservoirController,
     "E": PlasticMushroomBodyController,
+    "F": FullBrainController,
     "mtd": MTDController,
     "gatenby": GatenbyAdaptiveController,
     "ppo": PPOController,
     "reservoir": StaticReservoirController,
     "plastic_mb": PlasticMushroomBodyController,
+    "full_brain": FullBrainController,
 }
 
 
@@ -36,6 +39,7 @@ __all__ = [
     "CONTROLLER_REGISTRY",
     "BaseController",
     "ControllerContext",
+    "FullBrainController",
     "GatenbyAdaptiveController",
     "MTDController",
     "PPOController",

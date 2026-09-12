@@ -9,6 +9,8 @@ Project Confluence is a **computational research tool** designed for scientific 
 - **NOT** a diagnostic, prognostic, or therapeutic tool
 - **NOT** approved by the FDA, EMA, or any regulatory body
 
+Connectome controllers (including the optional 166,700-unit sparse net and “protein” effector channels) are **in-silico control signals**. They do not synthesize therapeutics, express genes, or constitute a biologic manufacturing or dosing system.
+
 ## No Medical Advice
 
 Nothing in this repository constitutes medical advice. The computational models, drug optimization outputs, and complexity profiles are **theoretical constructs** for research purposes only.

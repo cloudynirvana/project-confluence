@@ -11,7 +11,7 @@ from confluence.cancer_env.archetypes import get_archetype
 from confluence.cancer_env.ode_system import CancerODE
 from confluence.cancer_env.observation_layer import ObservationLayer
 from confluence.contracts import (
-    CONTROL_DRUG_IDS,
+    ALL_EFFECTOR_IDS,
     InterventionAction,
     LatentCancerState,
     ObservationRecord,
@@ -46,13 +46,15 @@ class ClosedLoopSimulator:
 
     def __post_init__(self) -> None:
         self.params = get_archetype(self.archetype)
-        self.pk = PKPDModel()
+        # Always allocate protein + small-molecule PK states. Controllers A–E
+        # still emit 5-D U; missing keys pad to 0 so existing policies are unchanged.
+        self.pk = PKPDModel(drug_ids=ALL_EFFECTOR_IDS)
         self.ode = CancerODE(self.params, self.pk)
         self.observer = ObservationLayer(seed=self.seed)
         if self.controller is None:
             self.controller = PlasticMushroomBodyController()
         self.manual_override = False
-        self.manual_u = {d: 0.0 for d in CONTROL_DRUG_IDS}
+        self.manual_u = {d: 0.0 for d in ALL_EFFECTOR_IDS}
         self.embodiment = FlybodyBridge(task="walk_imitation", prefer_real=True, seed=self.seed)
         self.embodiment_alpha = 0.25
         self.reset()
@@ -81,7 +83,7 @@ class ClosedLoopSimulator:
     def _idle_action(self) -> InterventionAction:
         return InterventionAction(
             t=self.t,
-            infusion={d: 0.0 for d in CONTROL_DRUG_IDS},
+            infusion={d: 0.0 for d in self.pk.drug_ids},
             source="init",
         )
 

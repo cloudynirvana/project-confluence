@@ -17,11 +17,19 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from confluence.cancer_env.archetypes import ARCHETYPES, DISPLAY_NAMES
+from confluence.contracts import (
+    DEMO_BRAIN_NEURONS,
+    FULL_BRAIN_NEURONS,
+    INTERACTIVE_BRAIN_NEURONS,
+    PROTEIN_CHANNEL_IDS,
+)
 from confluence.controllers import make_controller
+from confluence.controllers.full_brain import FullBrainController
 from confluence.embodiment.flybody_bridge import flybody_status
 from confluence.loop import ClosedLoopSimulator
 from confluence.pharmacology.toxicity_constraints import load_drug_catalog
 from confluence.telemetry.serializers import frame_to_dict
+from confluence.training.loop import run_live_episode
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
@@ -53,7 +61,13 @@ async def archetypes():
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "service": "confluence-v2", "embodiment": flybody_status()}
+    return {
+        "status": "ok",
+        "service": "confluence-v2",
+        "embodiment": flybody_status(),
+        "full_brain_neurons": FULL_BRAIN_NEURONS,
+        "protein_channels": list(PROTEIN_CHANNEL_IDS),
+    }
 
 
 @app.get("/api/embodiment")
@@ -62,17 +76,34 @@ async def embodiment_info():
 
 
 class LiveSession:
+    BRAIN_MODES = {
+        "demo": {"controller": "E", "n_neurons": DEMO_BRAIN_NEURONS, "n_kc": DEMO_BRAIN_NEURONS},
+        "train": {"controller": "F", "n_neurons": INTERACTIVE_BRAIN_NEURONS},
+        "full": {"controller": "F", "n_neurons": FULL_BRAIN_NEURONS},
+    }
+
     def __init__(self):
         self.controller_id = "E"
+        self.brain_mode = "demo"
+        self.n_neurons = DEMO_BRAIN_NEURONS
         self.mode = "both"  # cancer | embodiment | both
         self.sim = ClosedLoopSimulator(
             archetype="glioblastoma",
-            controller=make_controller("E", n_kc=256, seed=7),
+            controller=make_controller("E", n_kc=DEMO_BRAIN_NEURONS, seed=7),
             dt=0.25,
             seed=7,
         )
         self.running = False
         self.hz = 12.0
+        self.training = {
+            "episodes": 0,
+            "last_reward": 0.0,
+            "last_da": 0.0,
+            "last_burden": 0.0,
+            "last_toxicity": 0.0,
+            "protein_active": [],
+            "best_reward": None,
+        }
 
     def _flags(self):
         return {
@@ -80,14 +111,57 @@ class LiveSession:
             "run_embodiment": self.mode in {"embodiment", "both"},
         }
 
+    def _controller_kwargs(self, controller: str, seed: int) -> dict:
+        if controller in {"D", "E"}:
+            n_kc = DEMO_BRAIN_NEURONS if self.brain_mode == "demo" else min(self.n_neurons, 2048)
+            return {"n_kc": n_kc, "seed": seed}
+        if controller in {"F", "full_brain"}:
+            return {"n_neurons": self.n_neurons, "seed": seed}
+        return {}
+
     def reset(self, archetype: Optional[str] = None, controller: Optional[str] = None, seed: int = 7):
         if controller:
             self.controller_id = controller
-            kwargs = {}
-            if controller in {"D", "E"}:
-                kwargs = {"n_kc": 256, "seed": seed}
-            self.sim.set_controller(make_controller(controller, **kwargs))
+            self.sim.set_controller(make_controller(controller, **self._controller_kwargs(controller, seed)))
         return self.sim.reset(archetype=archetype, seed=seed)
+
+    def set_brain_mode(self, mode: str, seed: int = 7):
+        if mode not in self.BRAIN_MODES:
+            raise ValueError(f"unknown brain mode '{mode}'")
+        spec = self.BRAIN_MODES[mode]
+        self.brain_mode = mode
+        self.n_neurons = int(spec["n_neurons"])
+        self.controller_id = spec["controller"]
+        self.sim.set_controller(
+            make_controller(self.controller_id, **self._controller_kwargs(self.controller_id, seed))
+        )
+        return self.sim.reset(seed=seed)
+
+    def train_episode(self, days: float = 80.0) -> dict:
+        if not isinstance(self.sim.controller, FullBrainController):
+            self.set_brain_mode("train" if self.n_neurons < FULL_BRAIN_NEURONS else "full")
+        metrics = run_live_episode(self.sim, days=days)
+        self.training["episodes"] += 1
+        self.training["last_reward"] = metrics["reward"]
+        self.training["last_da"] = metrics["mean_da"]
+        self.training["last_burden"] = metrics["mean_burden"]
+        self.training["last_toxicity"] = metrics["mean_toxicity"]
+        self.training["protein_active"] = list(metrics["protein_active"])
+        best = self.training["best_reward"]
+        if best is None or metrics["reward"] > best:
+            self.training["best_reward"] = metrics["reward"]
+        return {**metrics, **self.training, "n_neurons": self.n_neurons, "brain_mode": self.brain_mode}
+
+    def session_meta(self) -> dict:
+        return {
+            "controller": self.controller_id,
+            "mode": self.mode,
+            "brain_mode": self.brain_mode,
+            "n_neurons": self.n_neurons,
+            "protein_channels": list(PROTEIN_CHANNEL_IDS),
+            "training": dict(self.training),
+            "embodiment": flybody_status(),
+        }
 
 
 @app.websocket("/ws/sim")
@@ -98,9 +172,7 @@ async def sim_socket(ws: WebSocket):
     await ws.send_json({
         "type": "hello",
         "frame": frame_to_dict(frame),
-        "controller": session.controller_id,
-        "mode": session.mode,
-        "embodiment": flybody_status(),
+        **session.session_meta(),
     })
     try:
         while True:
@@ -120,7 +192,7 @@ async def sim_socket(ws: WebSocket):
                 elif cmd == "step":
                     frame = session.sim.step(**session._flags())
                     payload = frame_to_dict(frame)
-                    payload["mode"] = session.mode
+                    payload.update(session.session_meta())
                     await ws.send_json(payload)
                 elif cmd == "reset":
                     frame = session.reset(
@@ -152,13 +224,27 @@ async def sim_socket(ws: WebSocket):
                         "mode": session.mode,
                         "embodiment": flybody_status(),
                     })
+                elif cmd == "set_brain_mode":
+                    session.running = False
+                    frame = session.set_brain_mode(str(msg.get("mode", "demo")))
+                    payload = frame_to_dict(frame)
+                    payload.update({"type": "brain_mode", **session.session_meta()})
+                    await ws.send_json(payload)
+                elif cmd == "train_episode":
+                    session.running = False
+                    days = float(msg.get("days", 80.0))
+                    metrics = await asyncio.to_thread(session.train_episode, days)
+                    frame = session.sim.history[-1]
+                    payload = frame_to_dict(frame)
+                    payload.update({"type": "train_result", **session.session_meta(), "metrics": metrics})
+                    await ws.send_json(payload)
                 elif cmd == "ping":
                     await ws.send_json({"type": "pong"})
 
             if session.running:
                 frame = session.sim.step(**session._flags())
                 payload = frame_to_dict(frame)
-                payload["mode"] = session.mode
+                payload.update(session.session_meta())
                 await ws.send_json(payload)
                 if frame.terminal:
                     session.running = False

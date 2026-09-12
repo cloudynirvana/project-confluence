@@ -4,6 +4,7 @@
     python -m confluence --port 8765
     python -m confluence --benchmark --trials 2
     python -m confluence.embodiment --task template
+    python -m confluence.train_full_brain --neurons 2048 --episodes 3
 """
 
 from __future__ import annotations

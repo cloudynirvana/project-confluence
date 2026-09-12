@@ -81,11 +81,11 @@ Open **http://127.0.0.1:8765**. The browser UI streams:
 - play / pause / step, controller A–E, optional **manual drug override**
 - loop mode: Cancer ODE / Flybody embodiment / both, with fly pose + action RMS telemetry
 
-Interactive Kenyon-cell count defaults to **256** for real-time FPS (documented). Pass `n_kc=2048` in `MushroomBodyNetwork` / controllers for a more FlyWire-like expansion.
+Interactive Kenyon-cell count defaults to **256** for real-time FPS (documented). Pass `n_kc=2048` in `MushroomBodyNetwork` / controllers for a more FlyWire-like expansion. Controller **F** is a separate sparse rate-based net that can be constructed at `n_neurons=166700` (see below); the UI default stays on the small demo.
 
 ```bash
 # package tests
-python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py tests/test_flybody_bridge.py -q
+python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py tests/test_flybody_bridge.py tests/test_protein_channels.py tests/test_full_brain_scale.py tests/test_training_smoke.py -q
 
 # short controller bake-off (3 archetypes × A–E)
 python -m confluence --benchmark --trials 2 --horizon 40
@@ -142,6 +142,61 @@ Citation (please keep if you use the body model):
 
 Clocks are independent: cancer time is days; flybody walking control is ~20 ms. Play/pause/step are shared. This remains computational research — not a claim about real fly nervous systems or clinical therapy.
 
+## Full-brain training (N = 166,700) and therapeutic proteins
+
+> **Research simulation only.** The 166,700 units are a **sparse, rate-based controller**, not a multicompartment LIF reconstruction of a fly brain, and **not ribosomes**. Nothing in this loop translates polypeptides or synthesizes drugs. “Proteins that manage therapy” means **simulated PK/PD channels** for antibody-like and cytokine effectors whose infusion / expression *rates* are read out from a dedicated secretory population (or MBON mix). There is no claim of a clinical cure, cellular translation inside Drosophila neurons, or a real FlyWire synapse dump at this scale.
+
+### Scale and memory
+
+The user-named size `FULL_BRAIN_NEURONS = 166700` is a FlyWire-class whole-brain order of magnitude (published adult FlyWire reconstructions are ~10⁵ neurons; this repo does **not** load a CAVEclient materialization unless you add credentials later). Topology here is a **structured sparse stub**: each hidden cell has fan-in 7 from a small PN layer, k-WTA sparsity ~5%, and a compact secretory readout. A dense 166700² float32 matrix would be ~111 GB and is never allocated.
+
+| Mode | `n_neurons` | Typical use | Rough cost |
+|------|-------------|-------------|------------|
+| Small-net demo (controller E) | 256 KC | Interactive UI, ~12 Hz | few MB |
+| Full-brain train (controller F) | 2,048 | UI train mode / smoke | ~few MB, CPU |
+| Full-brain 166,700 (controller F) | 166,700 | Headless `train_full_brain` | ~25–40 MB RAM, ~2–10 ms/step on CPU; GPU not required |
+
+Interactive FPS stays on the 256-KC mushroom body. Switching the UI to **Full-brain 166,700** will construct the sparse net in-process and may hitch the browser loop; prefer the CLI for long runs.
+
+### Effector layer (small molecules + biologics)
+
+Controllers A–E still emit the original 5-D `U` (`anti_pd1`, `tgfb_inhibitor`, `mct1`, `hdac`, `targeted_kinase`). The closed-loop PK state is 9-D: those five plus four **protein/biologic** channels that default to 0 unless controller F (or a manual override) drives them:
+
+| Channel | Simulated class | Notes |
+|---------|-----------------|-------|
+| `protein_anti_pd1` | checkpoint antibody-like (anti-PD-1) | Complementary occupancy with the 5-D pembrolizumab-class slot |
+| `protein_tgfb_trap` | TGF-β neutralizing trap | Slower clearance than galunisertib |
+| `protein_ifng` | IFN-γ cytokine | Adds to `C_ifng` production |
+| `protein_il2` | IL-2 / fusion-adjacent cytokine | Boosts immune recruitment; higher `tox_weight` |
+
+Half-lives and organ weights are **simulation-scaled** class references (catalog DOIs), not a dosing protocol. Host-health toxicity uses a per-channel `tox_weight` so biologics do not share small-molecule marrow/cardiac profiles.
+
+Closed loop:
+
+```
+Y (cancer ± proprio) → 166k-scale sparse net → U_small + U_protein
+    → first-order PK (slower mAb/trap clearance) → 11-D ODE → Y′
+```
+
+### Training
+
+Inner loop: existing dopaminergic three-factor rule on the **secretory readout** only (`η · DA · secretory · U − λW`). Outer loop: optional (1+1)-ES weight proposals (`--outer da|es|both`). Checkpoints write `results/full_brain/ckpt.npz` (gitignored `*.npz`).
+
+```bash
+# downscaled smoke (CI / laptop)
+python -m confluence.train_full_brain --neurons 512 --episodes 2 --days 20
+
+# interactive-scale train
+python -m confluence.train_full_brain --neurons 2048 --episodes 8 --days 80
+
+# user-named full size (CPU, sparse rate-based; minutes scale with episodes × days)
+python -m confluence.train_full_brain --neurons 166700 --episodes 10 --days 80
+```
+
+The UI **Small-net demo / Full-brain train** switch plus **Train episode** runs the same loop on the live session (reward, DA, burden, toxicity, active protein channels).
+
+Provenance: Apache-2.0 flybody remains optional; FlyWire field names stay on the stub schema. Real FAFB ingestion is still the reserved `CAVE_TOKEN` path in `confluence/connectome/fafb_loader.py`. Until that lands, N = 166700 is a **configurable sparse stub**, not Dorkenwald / FlyWire connectivity.
+
 ## Controllers (benchmark module)
 
 | ID | Policy | Notes |
@@ -151,10 +206,11 @@ Clocks are independent: cancer time is days; flybody walking control is ~20 ms. 
 | C | PPO | Thin trainable stub + optional `CONFLUENCE_PPO_CKPT`; full training is heavy |
 | D | Static MB reservoir | Frozen connectome + ridge readout |
 | E | Plastic mushroom body | Live DA plasticity (default interactive controller) |
+| F | Full-brain secretory | Sparse rate-based net → 5 small-molecule + 4 protein channels; default 2048, configurable 166700 |
 
 Metrics: simulated PFS, resistance emergence time, cumulative toxicity, pharmacological burden. These are **in-silico scores**, not clinical endpoints.
 
-Pharmacology lives in `confluence/pharmacology/drug_catalog.json` (≥6 entries: pembrolizumab, galunisertib, AZD3965, vorinostat, trametinib, osimertinib, plus a clearly marked supportive-care placeholder). Half-lives use published DOIs where possible; IC50/MTD values are **simulation-scaled**. Controller commands `U∈[0,1]` are clearance-matched so `C_ss = U · MTD` (long-half-life mAbs do not wind up unboundedly).
+Pharmacology lives in `confluence/pharmacology/drug_catalog.json` (≥10 entries: the original small-molecule / mAb catalog plus four simulated protein/biologic effectors). Half-lives use published DOIs where possible; IC50/MTD/`tox_weight` values are **simulation-scaled**. Controller commands `U∈[0,1]` are clearance-matched so `C_ss = U · MTD` (long-half-life mAbs do not wind up unboundedly).
 
 ---
 

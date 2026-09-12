@@ -81,7 +81,7 @@ class ArchetypeParams:
 
 
 class CancerODE:
-    """11-D microenvironment + 5-D PK, integrated together."""
+    """11-D microenvironment + catalog PK (5-D default, 9-D with proteins)."""
 
     def __init__(
         self,
@@ -135,11 +135,17 @@ class CancerODE:
         C_ifng = max(C_ifng, 0.0)
         H = float(np.clip(H, 0.0, 1.0))
 
-        e_pd1 = float(occ.get("anti_pd1", 0.0))
-        e_tgfbi = float(occ.get("tgfb_inhibitor", 0.0))
+        e_pd1_sm = float(occ.get("anti_pd1", 0.0))
+        e_pd1_ab = float(occ.get("protein_anti_pd1", 0.0))
+        e_pd1 = 1.0 - (1.0 - e_pd1_sm) * (1.0 - e_pd1_ab)
+        e_tgfb_sm = float(occ.get("tgfb_inhibitor", 0.0))
+        e_tgfb_trap = float(occ.get("protein_tgfb_trap", 0.0))
+        e_tgfbi = 1.0 - (1.0 - e_tgfb_sm) * (1.0 - e_tgfb_trap)
         e_mct1 = float(occ.get("mct1", 0.0))
         e_hdac = float(occ.get("hdac", 0.0))
         e_kin = float(occ.get("targeted_kinase", 0.0))
+        e_ifng_p = float(occ.get("protein_ifng", 0.0))
+        e_il2 = float(occ.get("protein_il2", 0.0))
 
         burden = T_s + T_r
         nutrient = _sat(G, 0.35) * (0.35 + 0.65 * _sat(O, 0.25))
@@ -181,7 +187,11 @@ class CancerODE:
             * (1.0 - 0.80 * e_pd1)
         )
         room = max(0.0, 1.15 - I_act - I_exh)
-        dI_act = p.rho_immune * _sat(C_ifng, 0.3) * room - gamma_exh * I_act - p.delta_act * I_act
+        dI_act = (
+            p.rho_immune * _sat(C_ifng, 0.3) * room * (1.0 + 1.2 * e_il2)
+            - gamma_exh * I_act
+            - p.delta_act * I_act
+        )
         dI_exh = gamma_exh * I_act - p.delta_exh * I_exh
 
         # Stroma driven by TGF-β (reduced when TGF-β is inhibited)
@@ -197,7 +207,7 @@ class CancerODE:
         dG = p.supply_glc - p.consume_glc * burden * G - 0.06 * G
 
         dTgf = p.p_tgfb * (0.4 * burden + 0.8 * S_fib) - p.cl_tgfb * (1.0 + 2.0 * e_tgfbi) * C_tgfb
-        dIfn = p.p_ifng * I_act - p.cl_ifng * C_ifng
+        dIfn = p.p_ifng * I_act + 0.10 * e_ifng_p - p.cl_ifng * C_ifng
 
         tox = max(0.0, tox_load)
         dH = p.r_host * (1.0 - H) - p.kappa_burden * burden * H - p.kappa_tox * tox * H

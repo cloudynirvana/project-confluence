@@ -29,6 +29,25 @@ CONTROL_DRUG_IDS = (
     "targeted_kinase",
 )
 
+# Simulated therapeutic protein / biologic infusion channels.
+# These are PK/PD effectors (expression-or-infusion rates), not a claim
+# that fly neurons translate polypeptides.
+PROTEIN_CHANNEL_IDS = (
+    "protein_anti_pd1",
+    "protein_tgfb_trap",
+    "protein_ifng",
+    "protein_il2",
+)
+
+ALL_EFFECTOR_IDS = CONTROL_DRUG_IDS + PROTEIN_CHANNEL_IDS
+
+# FlyWire-scale class size named by the user. Published adult FlyWire
+# reconstructions are the same order (~1e5 neurons); this repo uses a
+# sparse structured stub at exactly this N unless a real dump is loaded.
+FULL_BRAIN_NEURONS = 166700
+INTERACTIVE_BRAIN_NEURONS = 2048
+DEMO_BRAIN_NEURONS = 256
+
 
 class LatentCancerState(BaseModel):
     """Latent microenvironment state X ∈ R^11."""
@@ -134,6 +153,15 @@ class DrugSpecification(BaseModel):
     )
     clinical_half_life_hours: Optional[float] = None
     clinical_ic50_note: Optional[str] = None
+    modality: str = Field(
+        "small_molecule",
+        description="small_molecule or protein_biologic (simulated infusion/expression)",
+    )
+    tox_weight: float = Field(
+        1.0,
+        ge=0.0,
+        description="Multiplier on C/MTD in host-health toxicity load",
+    )
     provenance: DrugProvenance
 
 

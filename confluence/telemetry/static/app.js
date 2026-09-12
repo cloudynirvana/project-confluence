@@ -5,6 +5,13 @@ const DRUGS = [
   ["hdac", "HDAC"],
   ["targeted_kinase", "kinase"],
 ];
+const PROTEINS = [
+  ["protein_anti_pd1", "αPD-1 Ab"],
+  ["protein_tgfb_trap", "TGF-β trap"],
+  ["protein_ifng", "IFN-γ"],
+  ["protein_il2", "IL-2"],
+];
+const EFFECTORS = DRUGS.concat(PROTEINS);
 
 const MAX_POINTS = 180;
 const wsProto = location.protocol === "https:" ? "wss" : "ws";
@@ -13,9 +20,10 @@ const ws = new WebSocket(`${wsProto}://${location.host}/ws/sim`);
 const $ = (id) => document.getElementById(id);
 const sliderBox = $("sliders");
 const bars = $("drug-bars");
+const proteinBars = $("protein-bars");
 const manual = {};
 
-DRUGS.forEach(([id, label]) => {
+function addSliderAndBar(id, label, barParent, protein) {
   manual[id] = 0;
   const wrap = document.createElement("label");
   wrap.className = "slider";
@@ -28,10 +36,13 @@ DRUGS.forEach(([id, label]) => {
     sendOverride();
   });
   const row = document.createElement("div");
-  row.className = "bar";
+  row.className = protein ? "bar protein" : "bar";
   row.innerHTML = `<span>${label}</span><div class="track"><div class="fill" id="fill-${id}"></div></div><span id="c-${id}">0.00</span>`;
-  bars.appendChild(row);
-});
+  barParent.appendChild(row);
+}
+
+DRUGS.forEach(([id, label]) => addSliderAndBar(id, label, bars, false));
+PROTEINS.forEach(([id, label]) => addSliderAndBar(id, label, proteinBars, true));
 
 function send(cmd, extra = {}) {
   if (ws.readyState === 1) ws.send(JSON.stringify({ cmd, ...extra }));
@@ -58,9 +69,9 @@ const traces = {
     makeTrace("MBON mean", "#d4a054"),
     makeTrace("DA", "#e06b5c"),
   ],
-  drugs: DRUGS.map(([id], i) => {
-    const colors = ["#e06b5c", "#d4a054", "#3ecfc0", "#7aa2d4", "#c084fc"];
-    return makeTrace(`C ${id}`, colors[i]);
+  drugs: EFFECTORS.map(([id], i) => {
+    const colors = ["#e06b5c", "#d4a054", "#3ecfc0", "#7aa2d4", "#c084fc", "#f0b7a4", "#8fbc8f", "#e8e0d4", "#7aa2d4"];
+    return makeTrace(`C ${id}`, colors[i % colors.length]);
   }),
   emb: [
     makeTrace("action RMS", "#d4a054"),
@@ -205,9 +216,26 @@ function drawFly(emb) {
   ctx.restore();
 }
 
+function applyTraining(meta) {
+  if (!meta) return;
+  const tr = meta.training || meta.metrics || {};
+  if (meta.n_neurons != null && $("brain-meta")) {
+    $("brain-meta").textContent = `brain: ${meta.brain_mode || "—"} · ${meta.n_neurons} neurons`;
+  }
+  if ($("tr-ep")) $("tr-ep").textContent = String(tr.episodes ?? 0);
+  if ($("tr-rew")) $("tr-rew").textContent = tr.last_reward != null ? Number(tr.last_reward).toFixed(3) : "—";
+  if ($("tr-da")) $("tr-da").textContent = tr.last_da != null ? Number(tr.last_da).toFixed(3) : "—";
+  if ($("tr-bur")) $("tr-bur").textContent = tr.last_burden != null ? Number(tr.last_burden).toFixed(3) : "—";
+  if ($("tr-tox")) $("tr-tox").textContent = tr.last_toxicity != null ? Number(tr.last_toxicity).toFixed(3) : "—";
+  if ($("tr-best")) $("tr-best").textContent = tr.best_reward != null ? Number(tr.best_reward).toFixed(3) : "—";
+  const active = tr.protein_active || (meta.metrics && meta.metrics.protein_active) || [];
+  if ($("tr-proteins")) $("tr-proteins").textContent = `proteins: ${active.length ? active.join(", ") : "—"}`;
+}
+
 function applyFrame(frame) {
   if (!frame) return;
-  if (frame.type && frame.type !== "frame") {
+  if (frame.training || frame.brain_mode) applyTraining(frame);
+  if (frame.type && frame.type !== "frame" && frame.type !== "brain_mode" && frame.type !== "train_result") {
     if (frame.type === "halted") {
       $("status-pill").textContent = "terminal";
       $("status-pill").className = "pill halt";
@@ -231,7 +259,7 @@ function applyFrame(frame) {
   const mbonMean = mbon.length ? mbon.reduce((a, b) => a + b, 0) / mbon.length : 0;
   traces.mbon[0].ys.push(mbonMean);
   traces.mbon[1].ys.push(C.da || 0);
-  traces.drugs.forEach((tr, i) => tr.ys.push(frame.drugs.C[DRUGS[i][0]] || 0));
+  traces.drugs.forEach((tr, i) => tr.ys.push((frame.drugs.C || {})[EFFECTORS[i][0]] || 0));
   const E = frame.embodiment || {};
   traces.emb[0].ys.push(E.action_rms || 0);
   traces.emb[1].ys.push(E.reward || 0);
@@ -246,19 +274,26 @@ function applyFrame(frame) {
   $("wnorm").textContent = (C.plasticity_norm ?? 0).toFixed(2);
   $("graph-src").textContent = C.source || "none";
   paintHeat(C.kc_rates || []);
-  DRUGS.forEach(([id]) => {
-    const u = frame.drugs.U[id] || 0;
-    const c = frame.drugs.C[id] || 0;
-    $(`fill-${id}`).style.width = `${Math.min(100, 100 * c)}%`;
-    $(`c-${id}`).textContent = c.toFixed(2);
+  EFFECTORS.forEach(([id]) => {
+    const u = (frame.drugs.U || {})[id] || 0;
+    const c = (frame.drugs.C || {})[id] || 0;
+    const fill = $(`fill-${id}`);
+    if (fill) fill.style.width = `${Math.min(100, 100 * c)}%`;
+    const cEl = $(`c-${id}`);
+    if (cEl) cEl.textContent = c.toFixed(2);
     if (!$("override").checked) {
       const sl = document.querySelector(`input[data-drug="${id}"]`);
       if (sl) {
         sl.value = u;
-        $(`sv-${id}`).textContent = Number(u).toFixed(2);
+        const sv = $(`sv-${id}`);
+        if (sv) sv.textContent = Number(u).toFixed(2);
       }
     }
   });
+  const proteinActive = (frame.drugs.protein && frame.drugs.protein.active) || [];
+  if ($("protein-active")) {
+    $("protein-active").textContent = `active: ${proteinActive.length ? proteinActive.join(", ") : "none"}`;
+  }
   $("source").textContent = `source: ${frame.drugs.source} ${frame.drugs.notes || ""}`;
   if ($("emb-backend")) {
     $("emb-backend").textContent = `backend: ${E.backend || "—"} · ${E.task || ""} · dim ${E.action_dim || 0}  ${E.notes || ""}`;
@@ -293,11 +328,25 @@ ws.addEventListener("message", (ev) => {
       $("mode").value = msg.mode;
       setModeClass(msg.mode);
     }
+    if (msg.controller && $("controller")) $("controller").value = msg.controller;
+    if (msg.brain_mode && $("brain-mode")) $("brain-mode").value = msg.brain_mode;
+    applyTraining(msg);
     applyFrame(msg.frame);
     return;
   }
   if (msg.type === "mode") {
     setModeClass(msg.mode);
+    return;
+  }
+  if (msg.type === "brain_mode" || msg.type === "train_result") {
+    if (msg.controller && $("controller")) $("controller").value = msg.controller;
+    if (msg.brain_mode && $("brain-mode")) $("brain-mode").value = msg.brain_mode;
+    applyTraining(msg);
+    if (msg.type === "train_result") {
+      $("status-pill").textContent = "trained";
+      $("status-pill").className = "pill run";
+    }
+    applyFrame(msg);
     return;
   }
   applyFrame(msg);
@@ -327,6 +376,26 @@ $("archetype").onchange = () => {
 $("controller").onchange = () => {
   send("set_controller", { controller: $("controller").value });
 };
+if ($("brain-mode")) {
+  $("brain-mode").onchange = () => {
+    send("set_brain_mode", { mode: $("brain-mode").value });
+    clearTraces();
+  };
+}
+if ($("btn-train")) {
+  $("btn-train").onclick = () => {
+    $("status-pill").textContent = "training";
+    $("status-pill").className = "pill run";
+    send("train_episode", { days: 80 });
+  };
+}
+if ($("btn-train-short")) {
+  $("btn-train-short").onclick = () => {
+    $("status-pill").textContent = "training";
+    $("status-pill").className = "pill run";
+    send("train_episode", { days: 20 });
+  };
+}
 $("mode").onchange = () => {
   send("set_mode", { mode: $("mode").value });
   setModeClass($("mode").value);

@@ -64,6 +64,12 @@ button:hover { filter: brightness(1.08); }
 .slider span { display: flex; justify-content: space-between; }
 .src { color: var(--muted); font-size: 12px; }
 .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; font-family: ui-sans-serif, system-ui, sans-serif; }
+.train-metrics { grid-template-columns: 1fr 1fr 1fr; }
+.subhead {
+  margin: 12px 0 6px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--sky); font-family: ui-sans-serif, system-ui, sans-serif;
+}
+.bar.protein .fill { background: var(--amber); }
 .metrics div { background: #0c151d; padding: 6px 8px; border-radius: 4px; }
 .metrics span { display: block; color: var(--muted); font-size: 11px; }
 .metrics strong { font-size: 16px; }

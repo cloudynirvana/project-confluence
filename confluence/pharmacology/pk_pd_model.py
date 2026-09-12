@@ -62,6 +62,15 @@ class PKPDModel:
     def zeros(self) -> np.ndarray:
         return np.zeros(self.n_drugs, dtype=float)
 
+    def _pad_u(self, u: np.ndarray) -> np.ndarray:
+        """Accept short controller vectors (A–E are 5-D) when PK has proteins."""
+        vec = np.asarray(u, dtype=float).reshape(-1)
+        if vec.size < self.n_drugs:
+            vec = np.pad(vec, (0, self.n_drugs - vec.size))
+        elif vec.size > self.n_drugs:
+            vec = vec[: self.n_drugs]
+        return vec
+
     def rhs(self, c: np.ndarray, u: np.ndarray) -> np.ndarray:
         """Clearance-matched infusion: U∈[0,1] targets C_ss = U · MTD.
 
@@ -71,7 +80,7 @@ class PKPDModel:
         t½ drugs (HDAC, MCT1) still equilibrate in hours.
         """
         c = np.asarray(c, dtype=float)
-        u = np.clip(np.asarray(u, dtype=float), 0.0, 1.0)
+        u = np.clip(self._pad_u(u), 0.0, 1.0)
         return -self.k_el * np.maximum(c, 0.0) + self.k_el * self.mtd * u
 
     def occupancies(self, c: np.ndarray) -> Dict[str, float]:
@@ -88,10 +97,11 @@ class PKPDModel:
         if isinstance(u, Mapping):
             vec = np.array([float(u.get(d, 0.0)) for d in self.drug_ids], dtype=float)
         else:
-            vec = np.asarray(u, dtype=float)
+            vec = self._pad_u(u)
         return np.clip(vec, 0.0, 1.0)
 
     def toxicity_load(self, c: np.ndarray) -> float:
         """Weighted concentration / MTD load used by host-health dynamics."""
         c = np.maximum(np.asarray(c, dtype=float), 0.0)
-        return float(np.sum(c / np.maximum(self.mtd, 1e-8)))
+        weights = np.array([float(spec.tox_weight) for spec in self.specs], dtype=float)
+        return float(np.sum(weights * c / np.maximum(self.mtd, 1e-8)))

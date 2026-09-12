@@ -53,7 +53,7 @@ def test_pk_decay_and_catalog_size():
     from confluence.pharmacology.toxicity_constraints import load_drug_catalog
 
     catalog = load_drug_catalog()
-    assert len(catalog) >= 6
+    assert len(catalog) >= 10
     c = np.ones(5)
     c1 = c + pk.rhs(c, np.zeros(5)) * 0.1
     assert np.all(c1 < c)

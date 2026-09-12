@@ -41,3 +41,6 @@ confluence = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+markers = [
+    "slow: optional long / 166700-neuron jobs (CONFLUENCE_FULL_BRAIN=1)",
+]
