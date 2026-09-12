@@ -238,6 +238,53 @@ python -B -m pytest tests/test_adaptive_controller.py tests/test_ode_system.py t
 python -B scripts/detect_curvature_bottlenecks.py
 ```
 
+## Neural Therapy Brain (Learned Adaptive Dosing)
+
+> *"The optimal therapy is an algorithm, not a prescription."* — extended from a fixed policy to a **learned** one.
+
+The Neural Therapy Brain (`models/neural_brain.py`) is a compact recurrent
+controller (a small GRU "brain") whose **neurons are trained on therapy
+datasets** to keep the complex cancer environment under therapeutic control —
+suppressing the resistant clone and holding tumour burden away from resistant
+takeover — **despite ambivalent externalities** (biological uncertainty,
+measurement noise, and inter-patient variability).
+
+Where `AdaptiveController` encodes a fixed policy π(state) → dose, the brain
+*learns* that policy by behavioral cloning of the robust adaptive expert across
+many randomized biological scenarios, then generalizes across the uncertainty
+set. At deployment the brain is wrapped by the **same non-overridable safety
+layer** (`NeuralBrainController`) as the hand-crafted controller — absolute dose
+cap, forced drug holidays, cumulative-toxicity budget, and the NSTG 2022 layer —
+so a learned policy can never breach the hard clinical bounds.
+
+```bash
+# Train the brain and print a robustness report (synthetic scenarios)
+python scripts/train_neural_brain.py --scenarios 80 --epochs 120
+
+# Interactive closed-loop simulation vs MTD and the expert, with a plot
+python scripts/run_neural_brain_sim.py --cancer TNBC --plot --robustness
+```
+
+**Robustness (30 randomized scenarios, 60 days):**
+
+| Strategy | Resistant takeover | Mean final resistant fraction |
+|----------|--------------------|-------------------------------|
+| MTD (standard care) | 66.7% | 88.5% |
+| Adaptive expert | 16.7% | 47.0% |
+| **Neural Brain** | **16.7%** | **41.8%** |
+
+The learned brain matches the expert on evolutionary containment (near-6×
+lower takeover than MTD) with the lowest mean resistant fraction, reproducing
+the adaptive-therapy trade-off: it preserves the sensitive clone's competitive
+suppression of resistance at the cost of short-horizon tumour shrinkage.
+
+> ⚠️ **Data & validation:** the brain is trained on **synthetic** simulator
+> trajectories by default. Real longitudinal clinical datasets can be supplied
+> via `TherapyDataset.from_real_cohort` (validation-gated), but real-data
+> training is **pending independent expert review and authentic clinical
+> validation**. Research artifact only — not a medical device. See
+> [DISCLAIMER.md](DISCLAIMER.md).
+
 ## PDAC Rogue Closure Model
 
 Project Confluence now includes a disease-specific executable scaffold for pancreatic ductal adenocarcinoma (PDAC):
