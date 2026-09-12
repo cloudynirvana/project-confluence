@@ -1,0 +1,25 @@
+# ═══════════════════════════════════════════════════════════════
+# Project Confluence — OPTIONAL Nigeria Guidelines RAG stack
+# ═══════════════════════════════════════════════════════════════
+#
+# These dependencies enable HIGH-ACCURACY semantic retrieval over the
+# Nigeria Standard Treatment Guidelines (NSTG 2022) in
+# `agents/nigeria_guideline_retriever.py` and the FastAPI `/guideline_*`
+# endpoints in `api_service/app.py`.
+#
+# They are OPTIONAL: without them the retriever automatically falls back to
+# a scikit-learn TF-IDF index (already in requirements.txt), so all
+# functionality keeps working at lower retrieval accuracy.
+#
+# Heads-up: `sentence-transformers` pulls in transformers + torch (on Linux
+# this is the large CUDA build unless you use the CPU wheel index).
+#
+# Install with:
+#     pip install -r requirements-rag.txt
+#
+# License note: the NSTG 2022 dataset is CC-BY-4.0 (Federal Ministry of
+# Health, Nigeria), curated by Chisom Rutherford.
+
+sentence-transformers>=2.2.0    # Embedding model for semantic retrieval
+faiss-cpu>=1.7.0                # Vector similarity search index
+datasets>=2.14.0                # HuggingFace dataset loader
