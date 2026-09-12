@@ -138,8 +138,11 @@ function paintHeat(rates) {
   const n = rates.length || 1;
   const cw = w / n;
   rates.forEach((v, i) => {
-    const g = Math.round(40 + 200 * Math.min(1, v));
-    ctx.fillStyle = `rgb(${Math.round(g * 0.7)}, ${Math.round(g * 0.42)}, 18)`;
+    const t = Math.min(1, Math.max(0, v) * 1.4);
+    const r = Math.round(28 + 210 * t);
+    const g = Math.round(18 + 130 * t);
+    const b = Math.round(12 + 28 * t);
+    ctx.fillStyle = `rgb(${r},${g},${b})`;
     ctx.fillRect(i * cw, 0, cw + 0.5, h);
   });
 }

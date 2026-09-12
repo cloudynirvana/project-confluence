@@ -62,8 +62,16 @@ class MushroomBodyNetwork:
         self.w_pn_kc = compiled.w_pn_kc.copy()
         self.w_kc_mbon = compiled.w_kc_mbon.copy()
         # Motor decode from MBON rates. GABAergic MBONs flip sign.
-        self.w_out = rng.normal(0.0, 0.25, size=(self.config.n_out, n_mbon))
+        # Structured prior onto excitatory MBONs so an untrained network
+        # still produces a visible infusion; plasticity then reshapes it.
+        self.w_out = rng.normal(0.0, 0.10, size=(self.config.n_out, n_mbon))
         self.w_out *= compiled.signs_mbon[None, :]
+        excitatory = [i for i, s in enumerate(compiled.signs_mbon) if s > 0]
+        if not excitatory:
+            excitatory = list(range(n_mbon))
+        for i in range(self.config.n_out):
+            self.w_out[i, excitatory[i % len(excitatory)]] += 0.85
+            self.w_out[i, excitatory[(i + 2) % len(excitatory)]] += 0.35
         self.apl = compiled.w_apl_kc.copy()
 
         self.mbon_rate = np.zeros(n_mbon, dtype=float)
@@ -147,7 +155,8 @@ class MushroomBodyNetwork:
         if kc.size > 64:
             buckets = 64
             stride = kc.size // buckets
-            kc_ds = kc[: stride * buckets].reshape(buckets, stride).mean(axis=1)
+            # Max-pool so sparse k-WTA winners stay visible in the UI heatmap.
+            kc_ds = kc[: stride * buckets].reshape(buckets, stride).max(axis=1)
         else:
             kc_ds = kc
         return {
