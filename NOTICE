@@ -14,3 +14,9 @@ Scientific status:
 This is Phase 1 computational validation. It is not clinical guidance, not a
 medical device, and not validated on real patient outcomes unless explicitly
 stated in a future release.
+
+Optional third-party software:
+The optional embodiment extra wraps flybody (TuragaLab / Google DeepMind /
+HHMI Janelia), Apache License 2.0. See https://github.com/TuragaLab/flybody
+and Vaxenburg et al., Nature 643:1312–1320 (2025), doi:10.1038/s41586-025-09029-4.
+Confluence does not vendor flybody source; it is an optional dependency.

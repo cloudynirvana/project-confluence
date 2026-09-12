@@ -18,6 +18,7 @@ from confluence.contracts import (
 )
 from confluence.controllers.base import BaseController, ControllerContext
 from confluence.controllers.plastic_mb import PlasticMushroomBodyController
+from confluence.embodiment.flybody_bridge import FlybodyBridge
 from confluence.pharmacology.pk_pd_model import PKPDModel
 
 
@@ -30,6 +31,7 @@ class SimFrame:
     concentrations: Dict[str, float]
     occupancies: Dict[str, float]
     connectome: Optional[Dict] = None
+    embodiment: Optional[Dict] = None
     terminal: bool = False
 
 
@@ -39,6 +41,7 @@ class ClosedLoopSimulator:
     controller: Optional[BaseController] = None
     dt: float = 0.25
     seed: int = 0
+    embodiment_enabled: bool = True
     history: List[SimFrame] = field(default_factory=list)
 
     def __post_init__(self) -> None:
@@ -50,6 +53,8 @@ class ClosedLoopSimulator:
             self.controller = PlasticMushroomBodyController()
         self.manual_override = False
         self.manual_u = {d: 0.0 for d in CONTROL_DRUG_IDS}
+        self.embodiment = FlybodyBridge(task="walk_imitation", prefer_real=True, seed=self.seed)
+        self.embodiment_alpha = 0.25
         self.reset()
 
     def reset(self, archetype: Optional[str] = None, seed: Optional[int] = None) -> SimFrame:
@@ -65,6 +70,8 @@ class ClosedLoopSimulator:
         self.history.clear()
         if hasattr(self.controller, "reset"):
             self.controller.reset()
+        if self.embodiment_enabled:
+            self.embodiment.reset()
         return self._frame(self._observe(), self._idle_action())
 
     def _observe(self) -> ObservationRecord:
@@ -84,6 +91,9 @@ class ClosedLoopSimulator:
         tel = None
         if hasattr(self.controller, "connectome_telemetry"):
             tel = self.controller.connectome_telemetry()
+        emb = None
+        if self.embodiment_enabled and self.embodiment.last is not None:
+            emb = self.embodiment.last.as_dict()
         frame = SimFrame(
             t=self.t,
             latent=latent,
@@ -92,6 +102,7 @@ class ClosedLoopSimulator:
             concentrations=conc,
             occupancies=self.pk.occupancies(self.c),
             connectome=tel,
+            embodiment=emb,
             terminal=latent.terminal_toxicity,
         )
         self.history.append(frame)
@@ -107,8 +118,23 @@ class ClosedLoopSimulator:
         if hasattr(controller, "reset"):
             controller.reset()
 
-    def step(self) -> SimFrame:
-        obs = self._observe()
+    def _maybe_mix(self, obs: ObservationRecord) -> ObservationRecord:
+        if not self.embodiment_enabled or self.embodiment.last is None:
+            return obs
+        mixed = self.embodiment.mix_observation(obs.as_vector(), alpha=self.embodiment_alpha)
+        return obs.model_copy(
+            update={
+                "tumor_burden": float(max(0.0, mixed[0])),
+                "resistance_frequency": float(np.clip(mixed[1], 0.0, 1.0)),
+                "lactate": float(max(0.0, mixed[2])),
+                "tgfb": float(max(0.0, mixed[3])),
+                "immune_competence_ratio": float(max(0.0, mixed[4])),
+            }
+        )
+
+    def step(self, run_cancer: bool = True, run_embodiment: bool = True) -> SimFrame:
+        obs_true = self._observe()
+        obs_ctrl = self._maybe_mix(obs_true) if run_embodiment else obs_true
         if self.manual_override:
             action = InterventionAction(
                 t=self.t,
@@ -123,8 +149,15 @@ class ClosedLoopSimulator:
                 dt=self.dt,
                 step_index=len(self.history),
             )
-            action = self.controller.decide(obs, ctx)
+            action = self.controller.decide(obs_ctrl, ctx)
         u = self.pk.clip_infusion(action.infusion)
-        self.x, self.c = self.ode.step(self.x, self.c, u, self.dt)
-        self.t += self.dt
-        return self._frame(obs, action)
+        if run_embodiment and self.embodiment_enabled:
+            mbon = []
+            if hasattr(self.controller, "connectome_telemetry"):
+                tel = self.controller.connectome_telemetry() or {}
+                mbon = tel.get("mbon_rates") or []
+            self.embodiment.step(u, mbon)
+        if run_cancer:
+            self.x, self.c = self.ode.step(self.x, self.c, u, self.dt)
+            self.t += self.dt
+        return self._frame(obs_true, action)

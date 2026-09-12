@@ -18,6 +18,7 @@ from fastapi.staticfiles import StaticFiles
 
 from confluence.cancer_env.archetypes import ARCHETYPES, DISPLAY_NAMES
 from confluence.controllers import make_controller
+from confluence.embodiment.flybody_bridge import flybody_status
 from confluence.loop import ClosedLoopSimulator
 from confluence.pharmacology.toxicity_constraints import load_drug_catalog
 from confluence.telemetry.serializers import frame_to_dict
@@ -52,12 +53,18 @@ async def archetypes():
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "service": "confluence-v2"}
+    return {"status": "ok", "service": "confluence-v2", "embodiment": flybody_status()}
+
+
+@app.get("/api/embodiment")
+async def embodiment_info():
+    return flybody_status()
 
 
 class LiveSession:
     def __init__(self):
         self.controller_id = "E"
+        self.mode = "both"  # cancer | embodiment | both
         self.sim = ClosedLoopSimulator(
             archetype="glioblastoma",
             controller=make_controller("E", n_kc=256, seed=7),
@@ -66,6 +73,12 @@ class LiveSession:
         )
         self.running = False
         self.hz = 12.0
+
+    def _flags(self):
+        return {
+            "run_cancer": self.mode in {"cancer", "both"},
+            "run_embodiment": self.mode in {"embodiment", "both"},
+        }
 
     def reset(self, archetype: Optional[str] = None, controller: Optional[str] = None, seed: int = 7):
         if controller:
@@ -82,7 +95,13 @@ async def sim_socket(ws: WebSocket):
     await ws.accept()
     session = LiveSession()
     frame = session.sim.history[-1] if session.sim.history else session.sim.reset()
-    await ws.send_json({"type": "hello", "frame": frame_to_dict(frame), "controller": session.controller_id})
+    await ws.send_json({
+        "type": "hello",
+        "frame": frame_to_dict(frame),
+        "controller": session.controller_id,
+        "mode": session.mode,
+        "embodiment": flybody_status(),
+    })
     try:
         while True:
             try:
@@ -99,8 +118,10 @@ async def sim_socket(ws: WebSocket):
                 elif cmd == "pause":
                     session.running = False
                 elif cmd == "step":
-                    frame = session.sim.step()
-                    await ws.send_json(frame_to_dict(frame))
+                    frame = session.sim.step(**session._flags())
+                    payload = frame_to_dict(frame)
+                    payload["mode"] = session.mode
+                    await ws.send_json(payload)
                 elif cmd == "reset":
                     frame = session.reset(
                         archetype=msg.get("archetype"),
@@ -122,12 +143,23 @@ async def sim_socket(ws: WebSocket):
                 elif cmd == "set_speed":
                     session.sim.dt = float(msg.get("dt", 0.25))
                     session.hz = float(msg.get("hz", session.hz))
+                elif cmd == "set_mode":
+                    mode = str(msg.get("mode", "both"))
+                    if mode in {"cancer", "embodiment", "both"}:
+                        session.mode = mode
+                    await ws.send_json({
+                        "type": "mode",
+                        "mode": session.mode,
+                        "embodiment": flybody_status(),
+                    })
                 elif cmd == "ping":
                     await ws.send_json({"type": "pong"})
 
             if session.running:
-                frame = session.sim.step()
-                await ws.send_json(frame_to_dict(frame))
+                frame = session.sim.step(**session._flags())
+                payload = frame_to_dict(frame)
+                payload["mode"] = session.mode
+                await ws.send_json(payload)
                 if frame.terminal:
                     session.running = False
                     await ws.send_json({"type": "halted", "reason": "terminal_toxicity"})

@@ -79,12 +79,13 @@ Open **http://127.0.0.1:8765**. The browser UI streams:
 - current infusion `U(t)` and PK concentrations `C(t)`
 - archetype selector (Glioblastoma, PDAC/pancreatic, Melanoma persister)
 - play / pause / step, controller A–E, optional **manual drug override**
+- loop mode: Cancer ODE / Flybody embodiment / both, with fly pose + action RMS telemetry
 
 Interactive Kenyon-cell count defaults to **256** for real-time FPS (documented). Pass `n_kc=2048` in `MushroomBodyNetwork` / controllers for a more FlyWire-like expansion.
 
 ```bash
 # package tests
-python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py -q
+python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py tests/test_flybody_bridge.py -q
 
 # short controller bake-off (3 archetypes × A–E)
 python -m confluence --benchmark --trials 2 --horizon 40
@@ -103,6 +104,43 @@ To ingest real FAFB later:
 3. Implement the reserved path in `confluence/connectome/fafb_loader.py` (`_try_caveclient`) and compile with `CircuitExtractor`.
 
 Without credentials the client stays on the stub and the interactive session still runs.
+
+## Flybody embodiment (optional)
+
+Confluence can also close the loop through a **body**, using the DeepMind / HHMI Janelia [`flybody`](https://github.com/TuragaLab/flybody) MuJoCo Drosophila (Apache 2.0). MBON / `U` outputs map through a documented affine readout into the walking action space (59-D for `walk_imitation`); proprioception is pooled and mixed into sensory `Y` (`Y_mix = (1−α)Y + α Y_proprio`).
+
+This extra is **optional**. The core cancer closed-loop and controllers A–E install and run without MuJoCo.
+
+```bash
+# Python 3.10 is the cleanest flybody target. Upstream pins numpy==1.26.4 —
+# use a separate venv if you do not want to downgrade Confluence's numpy 2.x.
+pip install -e ".[flybody]"
+# pinned to TuragaLab/flybody@d015e9bfe441bd90ae431bac24c55cb74bdbce26
+export MUJOCO_GL=osmesa   # or egl, for headless
+python -m confluence.embodiment --task template --steps 20
+python -m confluence          # UI loop selector: Cancer ODE / Flybody / Both
+```
+
+If flybody is missing, the UI still shows an embodiment panel driven by a **kinematic CPG stub** (not MuJoCo). The smoke test `tests/test_flybody_bridge.py` skips the real-env case when the extra is absent.
+
+Citation (please keep if you use the body model):
+
+```bibtex
+@article{flybody,
+  title = {Whole-body physics simulation of fruit fly locomotion},
+  author = {Roman Vaxenburg and Igor Siwanowicz and Josh Merel and Alice A Robie and
+            Carmen Morrow and Guido Novati and Zinovia Stefanidi and Gert-Jan Both and
+            Gwyneth M Card and Michael B Reiser and Matthew M Botvinick and
+            Kristin M Branson and Yuval Tassa and Srinivas C Turaga},
+  journal = {Nature},
+  volume = {643},
+  pages = {1312--1320},
+  year = {2025},
+  doi = {https://doi.org/10.1038/s41586-025-09029-4}
+}
+```
+
+Clocks are independent: cancer time is days; flybody walking control is ~20 ms. Play/pause/step are shared. This remains computational research — not a claim about real fly nervous systems or clinical therapy.
 
 ## Controllers (benchmark module)
 
@@ -380,7 +418,8 @@ project-confluence/
 │   ├── pharmacology/                # drug_catalog.json, PK/PD, toxicity
 │   ├── controllers/                 # A MTD · B Gatenby · C PPO stub · D reservoir · E plastic MB
 │   ├── benchmarks/                  # PFS / resistance / toxicity runner
-│   └── telemetry/                   # FastAPI + WebSocket UI
+│   ├── telemetry/                   # FastAPI + WebSocket UI
+│   └── embodiment/                  # Optional flybody (MuJoCo) bridge + kinematic stub
 ├── notebooks/                       # Getting-started notebook
 ├── models/                          # Core computational modules (v1 Φ / BAC stack)
 │   ├── adaptive_controller.py       # Closed-loop adaptive therapy controller

@@ -39,6 +39,13 @@
           <option value="A">A · MTD / SOC</option>
         </select>
       </label>
+      <label>Loop
+        <select id="mode">
+          <option value="both" selected>Both (cancer + flybody)</option>
+          <option value="cancer">Cancer ODE</option>
+          <option value="embodiment">Flybody embodiment</option>
+        </select>
+      </label>
       <div class="btn-row">
         <button id="btn-play" type="button">Play</button>
         <button id="btn-pause" type="button">Pause</button>
@@ -59,7 +66,7 @@
       <p class="src" id="source">source: —</p>
     </aside>
 
-    <section class="panel">
+    <section class="panel" id="panel-cancer">
       <h2>Latent &amp; observed cancer state</h2>
       <canvas id="chart-cancer" height="220"></canvas>
       <div class="legend" id="legend-cancer"></div>
@@ -77,15 +84,29 @@
       <canvas id="chart-mbon" height="140"></canvas>
     </section>
 
-    <section class="panel">
+    <section class="panel" id="panel-drugs">
       <h2>U(t) infusion &amp; PK concentrations</h2>
       <canvas id="chart-drugs" height="220"></canvas>
       <div class="bars" id="drug-bars"></div>
     </section>
+
+    <section class="panel" id="panel-embodiment">
+      <h2>Flybody embodiment</h2>
+      <p class="src" id="emb-backend">backend: —</p>
+      <div class="metrics">
+        <div><span>t_fly (s)</span><strong id="emb-t">—</strong></div>
+        <div><span>action RMS</span><strong id="emb-rms">—</strong></div>
+        <div><span>reward</span><strong id="emb-rew">—</strong></div>
+        <div><span>heading</span><strong id="emb-hdg">—</strong></div>
+      </div>
+      <canvas id="fly-pose" width="640" height="160"></canvas>
+      <canvas id="chart-emb" height="110"></canvas>
+    </section>
   </main>
 
   <footer>
-    Closed loop: Y → MB controller → U(t) → PK/PD → 11-D ODE → Y′. Host health H ≤ 0.2 is terminal toxicity.
+    Closed loop: Y → MB controller → U(t) → PK/PD → 11-D ODE → Y′ and/or flybody actuators.
+    Host health H ≤ 0.2 is terminal toxicity. flybody: DeepMind/Janelia, Apache 2.0.
     Simulation only — no claim of clinical benefit or cure.
     <span id="warn" class="warn hidden">HOST TOXICITY WARNING</span>
   </footer>

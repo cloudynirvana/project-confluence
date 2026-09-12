@@ -62,6 +62,10 @@ const traces = {
     const colors = ["#e06b5c", "#d4a054", "#3ecfc0", "#7aa2d4", "#c084fc"];
     return makeTrace(`C ${id}`, colors[i]);
   }),
+  emb: [
+    makeTrace("action RMS", "#d4a054"),
+    makeTrace("reward", "#3ecfc0"),
+  ],
 };
 const ts = [];
 
@@ -151,6 +155,54 @@ function redraw() {
   drawChart("chart-cancer", traces.cancer, 1.2);
   drawChart("chart-mbon", traces.mbon, 0.4);
   drawChart("chart-drugs", traces.drugs, 0.4);
+  if ($("chart-emb")) drawChart("chart-emb", traces.emb, 0.3);
+}
+
+function drawFly(emb) {
+  const canvas = $("fly-pose");
+  if (!canvas) return;
+  const parent = canvas.parentElement;
+  const w = Math.max(200, parent.clientWidth - 8);
+  const h = 160;
+  if (canvas.width !== w) canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#0c151d";
+  ctx.fillRect(0, 0, w, h);
+  const cx = w * 0.5;
+  const cy = h * 0.5;
+  const heading = emb ? emb.heading || 0 : 0;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(-heading);
+  ctx.strokeStyle = "#d4a054";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-28, 0);
+  ctx.lineTo(32, 0);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.ellipse(8, 0, 18, 8, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  const joints = (emb && emb.joints) || [];
+  const contacts = (emb && emb.contacts) || [];
+  for (let i = 0; i < 6; i++) {
+    const side = i < 3 ? -1 : 1;
+    const slot = i % 3;
+    const baseX = -6 + slot * 12;
+    const coxa = joints[i * 3] || 0;
+    const femur = joints[i * 3 + 1] || 0;
+    const reach = 22 + 16 * femur;
+    const ang = side * (0.7 + 0.55 * coxa);
+    const x2 = baseX + Math.cos(ang) * reach;
+    const y2 = Math.sin(ang) * reach;
+    ctx.strokeStyle = (contacts[i] || 0) > 0.5 ? "#3ecfc0" : "#8d8476";
+    ctx.beginPath();
+    ctx.moveTo(baseX, side * 4);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  }
+  ctx.restore();
 }
 
 function applyFrame(frame) {
@@ -180,6 +232,9 @@ function applyFrame(frame) {
   traces.mbon[0].ys.push(mbonMean);
   traces.mbon[1].ys.push(C.da || 0);
   traces.drugs.forEach((tr, i) => tr.ys.push(frame.drugs.C[DRUGS[i][0]] || 0));
+  const E = frame.embodiment || {};
+  traces.emb[0].ys.push(E.action_rms || 0);
+  traces.emb[1].ys.push(E.reward || 0);
   ts.push(t);
   if (ts.length > MAX_POINTS) {
     ts.shift();
@@ -205,6 +260,14 @@ function applyFrame(frame) {
     }
   });
   $("source").textContent = `source: ${frame.drugs.source} ${frame.drugs.notes || ""}`;
+  if ($("emb-backend")) {
+    $("emb-backend").textContent = `backend: ${E.backend || "—"} · ${E.task || ""} · dim ${E.action_dim || 0}  ${E.notes || ""}`;
+    $("emb-t").textContent = (E.t_fly ?? 0).toFixed(3);
+    $("emb-rms").textContent = (E.action_rms ?? 0).toFixed(3);
+    $("emb-rew").textContent = (E.reward ?? 0).toFixed(3);
+    $("emb-hdg").textContent = (E.heading ?? 0).toFixed(2);
+    drawFly(E);
+  }
   $("warn").classList.toggle("hidden", !Y.host_toxicity_warning);
   if (frame.terminal) {
     $("status-pill").textContent = "terminal";
@@ -218,10 +281,26 @@ function clearTraces() {
   redraw();
 }
 
+function setModeClass(mode) {
+  document.body.classList.remove("mode-cancer", "mode-embodiment", "mode-both");
+  document.body.classList.add(`mode-${mode || "both"}`);
+}
+
 ws.addEventListener("message", (ev) => {
   const msg = JSON.parse(ev.data);
-  if (msg.type === "hello") applyFrame(msg.frame);
-  else applyFrame(msg);
+  if (msg.type === "hello") {
+    if (msg.mode) {
+      $("mode").value = msg.mode;
+      setModeClass(msg.mode);
+    }
+    applyFrame(msg.frame);
+    return;
+  }
+  if (msg.type === "mode") {
+    setModeClass(msg.mode);
+    return;
+  }
+  applyFrame(msg);
 });
 
 $("btn-play").onclick = () => {
@@ -247,6 +326,10 @@ $("archetype").onchange = () => {
 };
 $("controller").onchange = () => {
   send("set_controller", { controller: $("controller").value });
+};
+$("mode").onchange = () => {
+  send("set_mode", { mode: $("mode").value });
+  setModeClass($("mode").value);
 };
 $("override").onchange = sendOverride;
 $("dt").oninput = () => {

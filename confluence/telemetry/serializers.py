@@ -54,4 +54,5 @@ def frame_to_dict(frame: SimFrame) -> Dict[str, Any]:
             "plasticity_norm": 0.0,
             "source": "none",
         },
+        "embodiment": frame.embodiment,
     }
