@@ -1,0 +1,46 @@
+# Fly.io — long-lived FastAPI + WebSocket sim (not Vercel serverless).
+# Research URL only. Repeat the disclaimer; no clinical claims.
+#
+#   fly launch --no-deploy
+#   fly deploy
+#
+# app name is a placeholder — `fly launch` will rewrite it.
+
+app = "confluence-sim"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8765"
+  CONFLUENCE_CORS_ORIGINS = "*"
+  MUJOCO_GL = "osmesa"
+
+[http_service]
+  internal_port = 8765
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [http_service.concurrency]
+    type = "connections"
+    hard_limit = 50
+    soft_limit = 25
+
+  [http_service.http_options]
+    idle_timeout = 300
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "20s"
+    method = "GET"
+    path = "/health"
+
+[[vm]]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1

@@ -108,6 +108,28 @@ python -m confluence --benchmark --trials 2 --horizon 40
 
 Getting-started notebook: [`notebooks/confluence_v2_getting_started.ipynb`](notebooks/confluence_v2_getting_started.ipynb).
 
+## Deploy evidence to Vercel
+
+The **evidence site** is a static HTML export in [`evidence/`](evidence/). It shows Blender / MuJoCo stills, the cinematic reel, a short honesty blurb, and a prominent disclaimer. It does **not** run the interactive simulator.
+
+1. In Vercel, import [cloudynirvana/project-confluence](https://github.com/cloudynirvana/project-confluence).
+2. Set **Root Directory** to `evidence`.
+3. Framework Preset: **Other**. Leave the build command empty (`evidence/vercel.json` already sets `framework: null` and `outputDirectory: "."`).
+4. Deploy. No secrets or environment variables are required.
+
+Local preview: `cd evidence && python -m http.server 4173`.
+
+The live session is Python FastAPI + WebSockets (`uvicorn confluence.telemetry.websocket_server:app`). Do **not** attach that ASGI app to Vercel as a serverless function — it will not keep a WebSocket loop. Host it with Docker on Railway or Fly.io instead: [`docs/HOSTING.md`](docs/HOSTING.md).
+
+```bash
+# lightweight image: numpy / scipy / fastapi — flybody/MuJoCo not required to boot
+docker build -t confluence-sim .
+docker run --rm -p 8765:8765 confluence-sim
+# GET /health  →  {"status":"ok", ...}
+```
+
+Free / hobby tiers may sleep. A public URL is still **research only** — link [DISCLAIMER.md](DISCLAIMER.md) and [docs/AWAITING_CLINICAL_VALIDATION.md](docs/AWAITING_CLINICAL_VALIDATION.md); no cure / FDA / Phase II claims.
+
 ## FlyWire stub vs real data
 
 The default graph is a **biologically structured stub**: ~7 PN axons per KC, cholinergic PN→KC, GABAergic APL feedback, dopaminergic DAN→KC/MBON, FlyWire_FAFB_v783 field names on `ConnectomeSubcircuit`. It is **not** a literal Dorkenwald / FlyWire dump.
@@ -627,7 +649,10 @@ project-confluence/
 │   ├── universal_sustainment_theorem.md   # Control Lyapunov proof for indefinite sustainment
 │   └── consciousness_complexity_bridge.md  # IIT × BAC Φ-Unification — identity preservation theory
 ├── tests/                           # Test suite (11 test files)
-├── docs/                            # User documentation
+├── docs/                            # User documentation (HOSTING.md, AWAITING_CLINICAL_VALIDATION.md)
+├── evidence/                        # Static Vercel evidence site (not the WebSocket sim)
+├── Dockerfile                       # Railway / Fly interactive UI (no flybody required)
+├── fly.toml / railway.toml / Procfile
 └── notebooks/                       # Validation pipelines
 ```
 
@@ -886,7 +911,7 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ## Disclaimer
 
-This is a **research framework** for computational exploration. It is **not** a medical device, clinical decision support system, or diagnostic tool. See [DISCLAIMER.md](DISCLAIMER.md).
+This is a **research framework** for computational exploration. It is **not** a medical device, clinical decision support system, or diagnostic tool. See [DISCLAIMER.md](DISCLAIMER.md) and [docs/AWAITING_CLINICAL_VALIDATION.md](docs/AWAITING_CLINICAL_VALIDATION.md). Hosting notes: [docs/HOSTING.md](docs/HOSTING.md).
 
 ---
 

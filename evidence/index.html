@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Project Confluence — simulation / research evidence</title>
+  <meta name="description" content="Computational research evidence for Project Confluence: connectome controller, cancer ODE, and flybody visualization. Not a medical device." />
+  <meta name="robots" content="index,follow" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="stamp">Simulation / research — not a medical device, not a clinical result</div>
+  <nav class="nav" aria-label="Primary">
+    <a class="wordmark" href="./">Confluence</a>
+    <div class="nav-links">
+      <a href="#what">What it is</a>
+      <a href="#disclaimer">Disclaimer</a>
+      <a href="#run">Run locally</a>
+      <a href="disclaimer.html">Full disclaimer</a>
+      <a href="awaiting-clinical-validation.html">Awaiting validation</a>
+      <a href="https://github.com/cloudynirvana/project-confluence">GitHub</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <img class="hero-still" src="public/still_hero.png" alt="TuragaLab/flybody MuJoCo still of the Drosophila mesh with a slim research HUD" />
+    <video autoplay muted loop playsinline poster="public/still_hero.png">
+      <source src="public/cinematic.mp4" type="video/mp4" />
+    </video>
+    <div class="vignette"></div>
+    <div class="hero-copy">
+      <p class="kicker">Blender HUD · MuJoCo fruitfly.xml · in-silico closed loop</p>
+      <h1>Project Confluence</h1>
+      <p class="lede">
+        A research simulator: a mushroom-body-style connectome controller steers
+        unitless infusion <code>U(t)</code> over a mechanistic cancer ODE, with an
+        optional flybody embodiment. Scores on this page are simulated.
+      </p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="honesty" id="honesty">
+      <h2>Honesty first</h2>
+      <p>
+        This site is a <strong>static evidence reel</strong> — stills and short films
+        from the local research loop. It is not a clinic, not a trial dashboard, and
+        it does not run the interactive session. The live UI is a long-lived
+        Python FastAPI + WebSocket process (Railway / Fly / your laptop), not a
+        Vercel serverless function.
+      </p>
+      <p class="muted">
+        Burn-in on the science path: <strong>SIMULATION / RESEARCH</strong>.
+        See <a href="https://github.com/cloudynirvana/project-confluence/blob/main/DISCLAIMER.md">DISCLAIMER.md</a>
+        and
+        <a href="https://github.com/cloudynirvana/project-confluence/blob/main/docs/AWAITING_CLINICAL_VALIDATION.md">docs/AWAITING_CLINICAL_VALIDATION.md</a>.
+      </p>
+    </section>
+
+    <section class="disclaimer" id="disclaimer">
+      <h2>Disclaimer (read this)</h2>
+      <p>
+        Project Confluence is a <strong>computational research tool</strong>.
+        It is not a medical device, not a diagnostic or therapeutic product, and
+        not approved by the FDA, EMA, or any regulator. Nothing here is medical
+        advice or a claim of clinical benefit.
+      </p>
+      <ul>
+        <li>No cure, disease-eradication, or treatment-path claims.</li>
+        <li>No FDA / EMA readiness and no Phase I / II / III result.</li>
+        <li>Tumor burden, resistance, fusion AF, and “protein channels” are <em>ODE research scores</em>, not patient outcomes.</li>
+        <li>Fly neurons in this repo do not synthesize biologics.</li>
+      </ul>
+      <p>
+        <a href="disclaimer.html">Full on-site disclaimer</a>
+        ·
+        <a href="https://github.com/cloudynirvana/project-confluence/blob/main/DISCLAIMER.md">DISCLAIMER.md on GitHub</a>
+        ·
+        <a href="awaiting-clinical-validation.html">Awaiting external clinical validation</a>
+      </p>
+    </section>
+
+    <section id="what">
+      <h2>What the simulator is</h2>
+      <p class="muted">Three coupled pieces. Visualization is data-driven, not generative biology.</p>
+      <div class="grid">
+        <article class="card">
+          <h3>Connectome controller</h3>
+          <p>
+            Noisy observations enter a mushroom-body-style circuit (PN → sparse Kenyon
+            cells → MBON). Controllers A–F decode a unitless infusion vector
+            <code>U</code>. The default graph is a structured stub, not a literal FlyWire dump.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Cancer ODE</h3>
+          <p>
+            A mechanistic tumor-microenvironment integrator (LSODA) with host-health
+            <code>H</code>, resistance, stroma, and a fusion-clone coordinate. PK/PD
+            maps <code>U</code> into simulated concentrations. Research dynamics only.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Flybody (optional)</h3>
+          <p>
+            TuragaLab/flybody <code>fruitfly.xml</code> (MuJoCo, Apache 2.0) for the
+            hero mesh. The web UI boots <strong>without</strong> MuJoCo; missing mesh
+            shows an install CTA instead of a fake fly.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="stills">
+      <h2>Blender / MuJoCo stills</h2>
+      <p class="muted">Copied from <code>docs/demo/</code> and <code>docs/demo/blender/renders/</code>. Stamped simulation / research.</p>
+      <div class="filmstrip">
+        <figure>
+          <img src="public/still_mesh.png" alt="Clean walker/hero MuJoCo fruitfly.xml still" />
+          <figcaption>MuJoCo fruitfly.xml — walker/hero, no HUD</figcaption>
+        </figure>
+        <figure>
+          <img src="public/still_track.png" alt="walker/track1 three-quarter MuJoCo still" />
+          <figcaption>MuJoCo — walker/track1</figcaption>
+        </figure>
+        <figure>
+          <img src="public/blender/blender_still.png" alt="Blender 4.x HUD still stamped SIMULATION / RESEARCH" />
+          <figcaption>Blender 4.x HUD still — SIMULATION / RESEARCH</figcaption>
+        </figure>
+        <figure>
+          <img src="public/blender/anim_0008.png" alt="Later frame of the Blender HUD animation" />
+          <figcaption>Blender HUD animation frame 0008</figcaption>
+        </figure>
+        <figure>
+          <video muted loop controls playsinline poster="public/blender/still_mid.png">
+            <source src="public/blender/mujoco_preview.mp4" type="video/mp4" />
+          </video>
+          <figcaption>MuJoCo preview clip from the Blender sidecar path</figcaption>
+        </figure>
+        <figure>
+          <video muted loop controls playsinline poster="public/still_immune_hero.png">
+            <source src="public/immune_chimeric.mp4" type="video/mp4" />
+          </video>
+          <figcaption>Immune / chimeric-protein demo — research visualization</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="cta" id="run">
+      <h2>Run the interactive session locally</h2>
+      <p>
+        The live closed loop is FastAPI + WebSockets. Install the package and start
+        the ASGI app on your machine:
+      </p>
+      <pre>pip install -e .
+python -m confluence
+# equivalent:
+uvicorn confluence.telemetry.websocket_server:app --host 127.0.0.1 --port 8765</pre>
+      <p>Then open <code>http://127.0.0.1:8765</code>. Minimum extras: numpy, scipy, pydantic, fastapi, uvicorn[standard]. Flybody / MuJoCo is optional.</p>
+      <div class="buttons">
+        <a class="btn primary" href="https://github.com/cloudynirvana/project-confluence">GitHub repository</a>
+        <a class="btn" href="https://github.com/cloudynirvana/project-confluence/blob/main/docs/HOSTING.md">Host the sim (Railway / Fly)</a>
+        <a class="btn" href="https://github.com/cloudynirvana/project-confluence/blob/main/docs/AWAITING_CLINICAL_VALIDATION.md">Awaiting clinical validation</a>
+        <a class="btn" href="https://github.com/cloudynirvana/project-confluence/blob/main/DISCLAIMER.md">DISCLAIMER.md</a>
+      </div>
+    </section>
+
+    <aside class="note">
+      <strong>Hosting split.</strong> This evidence app is static and belongs on Vercel
+      (root directory <code>evidence</code>). Do not point Vercel at the FastAPI
+      WebSocket server — serverless functions cannot keep that loop. A public
+      interactive URL, if you attach one later, must repeat the research disclaimer
+      and must not claim clinical validation. Free tiers may sleep.
+    </aside>
+  </main>
+
+  <footer class="site">
+    Project Confluence · computational research · MIT
+    · <a href="https://github.com/cloudynirvana/project-confluence">github.com/cloudynirvana/project-confluence</a>
+    · flybody citation: Vaxenburg et al., Nature 2025
+  </footer>
+</body>
+</html>
