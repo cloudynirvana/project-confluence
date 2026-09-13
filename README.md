@@ -108,23 +108,27 @@ python -m confluence --benchmark --trials 2 --horizon 40
 
 Getting-started notebook: [`notebooks/confluence_v2_getting_started.ipynb`](notebooks/confluence_v2_getting_started.ipynb).
 
-## Deploy evidence to Vercel
+## Deploy the clinical briefing to Vercel
 
-The **evidence site** is a static HTML export in [`evidence/`](evidence/). It shows Blender / MuJoCo stills, the cinematic reel, a short honesty blurb, and a prominent disclaimer. It does **not** run the interactive simulator.
+The **public face** is a static HTML briefing in [`clinical/`](clinical/). It is written for a 60-second read by a haematologist, surgeon, or pathologist (University of Uyo / teaching-hospital mentors). It does **not** run the interactive simulator and does not claim clinical validation.
+
+The cinematic flybody / connectome HUD remains in [`evidence/`](evidence/) as an optional second static site (“lab reel”), linked from the clinical page.
 
 **One-click import (clone into your Vercel team):**
-[Deploy evidence on Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcloudynirvana%2Fproject-confluence&root-directory=evidence&project-name=confluence-evidence)
+[Deploy clinical briefing on Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcloudynirvana%2Fproject-confluence&root-directory=clinical&project-name=confluence-clinical)
 
 Or from the dashboard (this repo, no secrets):
 
 1. Open [vercel.com/new](https://vercel.com/new) and import `cloudynirvana/project-confluence`.
-2. Click **Edit** next to Root Directory and set it to `evidence`.
-3. Framework Preset: **Other**. Leave Build Command empty. Output Directory must be `.` (not `public` — films live in `evidence/assets/`; `evidence/vercel.json` already sets `framework: null` and `outputDirectory: "."`).
+2. Click **Edit** next to Root Directory and set it to `clinical`.
+3. Framework Preset: **Other**. Leave Build Command empty. Output Directory must be `.` (not `public`). `clinical/vercel.json` already sets `framework: null` and `outputDirectory: "."`.
 4. Deploy. No environment variables.
 
-After deploy, Vercel prints a `*.vercel.app` URL you can put in a professor email. Keep the research disclaimer; do not describe that URL as clinical validation.
+**One-line production change if an existing project still points at `evidence`:** set Root Directory to `clinical` and redeploy.
 
-Local preview: `cd evidence && python -m http.server 4173`.
+After deploy, Vercel prints a `*.vercel.app` URL you can put in a professor email. Keep the research disclaimer; do not describe that URL as clinical validation. To keep the cinematic reel live, add a **second** Vercel project with Root Directory `evidence`.
+
+Local preview: `cd clinical && python -m http.server 4173`. Lab reel preview: `cd evidence && python -m http.server 4174`.
 
 The live session is Python FastAPI + WebSockets (`uvicorn confluence.telemetry.websocket_server:app`). Do **not** attach that ASGI app to Vercel as a serverless function — it will not keep a WebSocket loop. Host it with Docker on Railway or Fly.io instead: [`docs/HOSTING.md`](docs/HOSTING.md).
 
@@ -657,7 +661,8 @@ project-confluence/
 │   └── consciousness_complexity_bridge.md  # IIT × BAC Φ-Unification — identity preservation theory
 ├── tests/                           # Test suite (11 test files)
 ├── docs/                            # User documentation (HOSTING.md, AWAITING_CLINICAL_VALIDATION.md)
-├── evidence/                        # Static Vercel evidence site (not the WebSocket sim)
+├── clinical/                        # Clinician-facing static briefing (default Vercel public face)
+├── evidence/                        # Optional cinematic lab reel (second Vercel project)
 ├── Dockerfile                       # Railway / Fly interactive UI (no flybody required)
 ├── fly.toml / railway.toml / Procfile
 └── notebooks/                       # Validation pipelines
@@ -720,7 +725,7 @@ We are seeking **longitudinal pathology and omics datasets** to validate Conflue
 |-------|-------------|--------|
 | **Phase 1** | Computational validation (1000-trial Monte Carlo) | ✅ Complete |
 | **Phase 1b** | Adaptive therapy Monte Carlo (200 uncertain scenarios) | ✅ Complete |
-| **Phase 2** | Retrospective validation (TCGA complexity vs. survival) | 🔄 In Progress |
+| **Phase 2** | Synthetic cohort stress-test (`scripts/tcga_retrospective.py`; TCGA-shaped IDs, **not** GDC/TCGA clinical data) | 🔄 Script exists — **not** clinical TCGA validation |
 | **Phase 2b** | Cross-disease complexity validation (3-arm protocol) | 📢 Call for Data posted |
 | **Phase 3** | Prospective wet-lab (collaborator-dependent) | ⏳ Planned |
 
@@ -763,7 +768,7 @@ Therapeutic simulation (Nephroblastoma):
 | IGF2R monotherapy (IGF2_signaling: 0.75 -> 0.30) | 0.2932 | 0.2302 | 21.5% | 3/5 dimensions shift toward healthy |
 | IGF2R + WT1 mRNA (WT1_activity: 0.20 -> 0.55) | 0.2932 | 0.2186 | 25.5% | 4.0% synergy gain vs mono |
 
-TCGA retrospective (Track A, synthetic cohort):
+Synthetic cohort stress-test (Track A; **not** GDC/TCGA clinical validation — `scripts/tcga_retrospective.py` still builds synthetic patients):
 
 | Disease | Phi-dist | Survival (d) | Spearman rho | HR |
 |---------|----------|--------------|--------------|----|
@@ -789,7 +794,7 @@ python scripts/disease_poc.py > poc_results.txt 2>&1
 python scripts/tcga_retrospective.py > tcga_output.txt 2>&1
 ```
 
-TCGA retrospective results are saved to `results/tcga_val/retrospective_metrics.json`.
+Synthetic stress-test metrics are written to `results/tcga_val/retrospective_metrics.json`. Those numbers are **not** a TCGA/GDC clinical validation.
 
 Track B ingestion (longitudinal cohort):
 

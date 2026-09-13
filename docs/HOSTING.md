@@ -6,37 +6,43 @@ evidence. Link [DISCLAIMER.md](../DISCLAIMER.md) and
 [AWAITING_CLINICAL_VALIDATION.md](AWAITING_CLINICAL_VALIDATION.md) from any
 page you put in front of reviewers.
 
-There are **two deployables**. Do not collapse them onto Vercel serverless.
+There are **three deployables**. Do not collapse the interactive sim onto Vercel serverless.
 
 | Deployable | Where | What it is |
 |------------|--------|------------|
-| Evidence site | **Vercel** (static) | Stills, films, honesty copy. Root directory `evidence`. |
+| Clinical briefing | **Vercel** (static) | 60-second mentor page. **Root Directory `clinical`** (production public face). |
+| Lab reel (optional) | **Vercel** (static, second project) | Flybody / cinematic HUD. Root Directory `evidence`. |
 | Interactive sim | **Railway or Fly.io** (container / dyno) | Long-lived FastAPI + WebSockets. |
 
 The interactive session is `uvicorn confluence.telemetry.websocket_server:app`.
 It needs a process that stays up and speaks HTTP **and** WebSockets. That is
 not a Vercel serverless function.
 
-## 1. Evidence site on Vercel
+## 1. Clinical briefing on Vercel (public face)
 
-**One-click:** [Deploy evidence on Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcloudynirvana%2Fproject-confluence&root-directory=evidence&project-name=confluence-evidence)
+**One-line production change:** if an existing project still uses Root Directory `evidence`, set it to `clinical` and redeploy.
+
+**One-click:** [Deploy clinical briefing on Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcloudynirvana%2Fproject-confluence&root-directory=clinical&project-name=confluence-clinical)
 
 Dashboard (import this GitHub repo — no secrets):
 
 1. Open [vercel.com/new](https://vercel.com/new) and import `cloudynirvana/project-confluence`.
-2. Set **Root Directory** to `evidence`.
+2. Set **Root Directory** to `clinical`.
 3. Framework Preset: **Other**. Leave the build command empty.
-   Output Directory: `.` — not `public`. Stills live in `evidence/assets/`.
-   `evidence/vercel.json` sets `framework: null` and `outputDirectory: "."`.
+   Output Directory: `.` — not `public`.
+   `clinical/vercel.json` sets `framework: null` and `outputDirectory: "."`.
 4. Deploy. No environment variables.
 
-There is no in-repo Vercel preview URL until the owner connects the GitHub app and deploys. The first production URL will look like `https://confluence-evidence.vercel.app`.
+There is no in-repo Vercel preview URL until the owner connects the GitHub app and deploys. The first production URL will look like `https://confluence-clinical.vercel.app`.
+
+Optional cinematic **lab reel** (flybody / HUD): deploy a **second** project with Root Directory `evidence`. One-click: [Deploy lab reel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcloudynirvana%2Fproject-confluence&root-directory=evidence&project-name=confluence-evidence). `evidence/vercel.json` already sets `framework: null` and `outputDirectory: "."`.
 
 Local preview:
 
 ```bash
-cd evidence
-python -m http.server 4173
+cd clinical && python -m http.server 4173
+# from repo root, optional lab reel:
+cd evidence && python -m http.server 4174
 ```
 
 If you later add a “Try the live sim” button, point it at the Railway/Fly
@@ -109,7 +115,7 @@ None are secrets. Do not put tokens in the repo.
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `PORT` | `8765` | Listen port (Railway/Fly set this). |
-| `CONFLUENCE_CORS_ORIGINS` | `*` | Comma-separated browser origins allowed to call HTTP APIs (`/health`, `/api/*`). Use your Vercel origin if the evidence site fetches the sim. |
+| `CONFLUENCE_CORS_ORIGINS` | `*` | Comma-separated browser origins allowed to call HTTP APIs (`/health`, `/api/*`). Use your Vercel origin if the clinical briefing or lab reel fetches the sim. |
 | `CONFLUENCE_SKIP_WARMUP` | unset | Set `1` to skip building a session on process start (faster boot; first WebSocket constructs the loop). |
 | `MUJOCO_GL` | `osmesa` | Only relevant for the optional `mesh` image. |
 | `CONFLUENCE_PPO_CKPT` | unset | Optional torch checkpoint for controller C. Not needed for the demo. |
@@ -122,8 +128,8 @@ secret store, never in git).
 
 - The **interactive UI is served by the same FastAPI process** (`GET /` +
   `GET /static/*` + `WS /ws/sim`). Same-origin sockets do not need CORS.
-- Browser **HTTP** calls from another origin (for example the Vercel evidence
-  site hitting `/health`) honor `CONFLUENCE_CORS_ORIGINS`.
+- Browser **HTTP** calls from another origin (for example the Vercel clinical
+  briefing hitting `/health`) honor `CONFLUENCE_CORS_ORIGINS`.
 - **WebSocket** handshakes are not fully covered by Starlette CORS middleware.
   Keep the live canvas on the Railway/Fly origin, or terminate TLS on a proxy
   that forwards `Upgrade: websocket` to the container.
@@ -146,7 +152,8 @@ Any hosted sim page already says “research · not clinical” in the HUD. Stil
 - Do not title the deployment “FDA-ready,” “Phase II,” or “treatment planner.”
 - Link [DISCLAIMER.md](../DISCLAIMER.md) and
   [AWAITING_CLINICAL_VALIDATION.md](AWAITING_CLINICAL_VALIDATION.md) from the
-  evidence site (already linked) and from the repo README.
+  clinical briefing (already linked), the optional evidence lab reel, and the
+  repo README.
 - Simulated burden / resistance / protein channels remain ODE research scores.
 
 ## Local equivalent (no container)

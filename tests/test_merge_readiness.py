@@ -54,6 +54,24 @@ def test_readme_install_and_no_cure_claim() -> None:
         assert phrase not in lowered
 
 
+def test_readme_phase2_is_synthetic_not_clinical_tcga() -> None:
+    text = (REPO / "README.md").read_text(encoding="utf-8")
+    phase2_rows = [
+        line
+        for line in text.splitlines()
+        if "**Phase 2**" in line and "Phase 2b" not in line
+    ]
+    assert phase2_rows, "expected a Phase 2 row in the validation roadmap"
+    row = phase2_rows[0]
+    lowered = row.lower()
+    assert "synthetic" in lowered
+    assert "not" in lowered and "clinical tcga" in lowered
+    assert "✅" not in row
+    assert "complete" not in lowered
+    body = text.lower()
+    assert "not** a tcga/gdc clinical validation" in body or "not a tcga/gdc clinical validation" in body
+
+
 def test_ci_skips_slow_and_flybody() -> None:
     yml = (REPO / ".github" / "workflows" / "pytest.yml").read_text(encoding="utf-8")
     assert "not slow" in yml

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Project Confluence — simulation / research evidence</title>
-  <meta name="description" content="Computational research evidence for Project Confluence: connectome controller, cancer ODE, and flybody visualization. Not a medical device." />
+  <title>Project Confluence — simulation / research lab reel</title>
+  <meta name="description" content="Optional cinematic lab reel for Project Confluence: connectome controller, cancer ODE, and flybody visualization. Not the clinical briefing. Not a medical device." />
   <meta name="robots" content="index,follow" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -29,7 +29,7 @@
     </video>
     <div class="vignette"></div>
     <div class="hero-copy">
-      <p class="kicker">Blender HUD · MuJoCo fruitfly.xml · in-silico closed loop</p>
+      <p class="kicker">Optional lab reel · Blender HUD · MuJoCo fruitfly.xml · not the clinical briefing</p>
       <h1>Project Confluence</h1>
       <p class="lede">
         A research simulator: a mushroom-body-style connectome controller steers
@@ -43,8 +43,10 @@
     <section class="honesty" id="honesty">
       <h2>Honesty first</h2>
       <p>
-        This site is a <strong>static evidence reel</strong> — stills and short films
-        from the local research loop. It is not a clinic, not a trial dashboard, and
+        This site is an optional <strong>cinematic lab reel</strong> — stills and short films
+        from the local research loop. The mentor-facing briefing is
+        <a href="https://github.com/cloudynirvana/project-confluence/tree/main/clinical">clinical/</a>
+        (Vercel Root Directory <code>clinical</code>). This page is not a clinic, not a trial dashboard, and
         it does not run the interactive session. The live UI is a long-lived
         Python FastAPI + WebSocket process (Railway / Fly / your laptop), not a Vercel serverless function.
       </p>
@@ -166,8 +168,10 @@ uvicorn confluence.telemetry.websocket_server:app --host 127.0.0.1 --port 8765</
     </section>
 
     <aside class="note">
-      <strong>Hosting split.</strong> This evidence app is static and belongs on Vercel
-      (root directory <code>evidence</code>). Do not point Vercel at the FastAPI
+      <strong>Hosting split.</strong> Production public face is
+      <code>clinical/</code> (Vercel Root Directory <code>clinical</code>).
+      This lab reel is an optional second static project (root directory
+      <code>evidence</code>). Do not point Vercel at the FastAPI
       WebSocket server — serverless functions cannot keep that loop. A public
       interactive URL, if you attach one later, must repeat the research disclaimer
       and must not claim clinical validation. Free tiers may sleep.

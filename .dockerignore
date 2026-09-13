@@ -9,7 +9,8 @@ __pycache__
 .mypy_cache
 .ruff_cache
 
-# Evidence site and docs are not needed to serve the interactive UI
+# Static sites and docs are not needed to serve the interactive UI
+clinical
 evidence
 docs
 notebooks
