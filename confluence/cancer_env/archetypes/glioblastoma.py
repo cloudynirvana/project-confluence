@@ -8,6 +8,7 @@ class GlioblastomaArchetype(ArchetypeParams):
         super().__init__(
             name="glioblastoma",
             display_name="Glioblastoma",
+            disease_class="malignant",
             r_s=0.22,
             r_r=0.14,
             k_carry=4.2,

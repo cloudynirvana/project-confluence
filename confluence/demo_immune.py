@@ -5,7 +5,7 @@
 
 Shows controller F (sparse secretory net) driving IFN-γ / IL-2 / chimeric
 T-cell engager / checkpoint + fusion TKIs while I_act rises. Research
-visualization only — not a clinical immune-therapy demo and not a cure.
+visualization only — not a clinical immune-therapy demo.
 
 Refuses stub / CPG footage.
 """
@@ -82,7 +82,7 @@ def render_immune_clip(
         )
     metrics = {
         "research_only": True,
-        "not_a_cure": True,
+        "research_scores_only": True,
         "mesh": "TuragaLab/flybody fruitfly.xml",
         "controller": "F",
         "archetype": "melanoma_persister",
@@ -121,7 +121,7 @@ def main(argv=None) -> int:
     if args.allow_stub:
         raise SystemExit("--allow-stub is rejected: this demo must be fruitfly.xml")
 
-    print("Fly-brain immune + chimeric-protein demo — research visualization, not a cure.")
+    print("Fly-brain immune + chimeric-protein demo — research visualization, not a clinical outcome.")
     frames, last, _sim, metrics = render_immune_clip(
         seconds=args.seconds, fps=args.fps, width=args.width, height=args.height
     )

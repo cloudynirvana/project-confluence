@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from confluence.contracts import ALL_EFFECTOR_IDS, InterventionAction, ObservationRecord
+from confluence.contracts import ALL_EFFECTOR_IDS, OBS_VECTOR_NAMES, InterventionAction, ObservationRecord
 from confluence.controllers.base import BaseController, ControllerContext
 from confluence.controllers.immune_prior import apply_immune_secretory_prior
 from confluence.neural_engine.network import MushroomBodyNetwork, NetworkConfig
@@ -17,7 +17,13 @@ class PlasticMushroomBodyController(BaseController):
         kwargs.setdefault("drug_ids", ALL_EFFECTOR_IDS)
         super().__init__(**kwargs)
         self.network = MushroomBodyNetwork(
-            NetworkConfig(n_kc=n_kc, seed=seed, plastic=True, n_obs=7, n_out=len(self.drug_ids)),
+            NetworkConfig(
+                n_kc=n_kc,
+                seed=seed,
+                plastic=True,
+                n_obs=len(OBS_VECTOR_NAMES),
+                n_out=len(self.drug_ids),
+            ),
             drug_ids=self.drug_ids,
         )
 

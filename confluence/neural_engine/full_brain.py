@@ -25,6 +25,7 @@ from confluence.contracts import (
     DEMO_BRAIN_NEURONS,
     FULL_BRAIN_NEURONS,
     INTERACTIVE_BRAIN_NEURONS,
+    OBS_VECTOR_NAMES,
     ObservationRecord,
     PROTEIN_CHANNEL_IDS,
 )
@@ -79,7 +80,7 @@ def population_sizes(n_neurons: int) -> Dict[str, int]:
 @dataclass
 class FullBrainConfig:
     n_neurons: int = INTERACTIVE_BRAIN_NEURONS
-    n_obs: int = 7
+    n_obs: int = len(OBS_VECTOR_NAMES)
     n_out: int = len(ALL_EFFECTOR_IDS)
     sparsity: float = 0.05
     fan_in: int = 7
@@ -111,7 +112,11 @@ class FullBrainNetwork:
 
         self.w_in = rng.normal(0.0, 0.8, size=(self.n_pn, self.config.n_obs)).astype(np.float32)
         if self.config.n_obs >= 7:
-            self.w_in[:, -2:] += rng.normal(0.35, 0.15, size=(self.n_pn, 2)).astype(np.float32)
+            self.w_in[:, 5:7] += rng.normal(0.35, 0.15, size=(self.n_pn, 2)).astype(np.float32)
+        if self.config.n_obs >= 11:
+            self.w_in[:, 7:] += rng.normal(
+                0.28, 0.12, size=(self.n_pn, self.config.n_obs - 7)
+            ).astype(np.float32)
         self.pn_bias = rng.normal(0.0, 0.1, size=self.n_pn).astype(np.float32)
         self.hidden_idx = rng.integers(
             0, self.n_pn, size=(self.n_hidden, self.config.fan_in), dtype=np.int32

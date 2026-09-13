@@ -337,6 +337,64 @@
       }
     },
     {
+      "id": "protein_surveillance_igg",
+      "name": "Surveillance IgG-like antibody",
+      "drug_class": "immune_surveillance",
+      "mechanism": "Simulated early-warning / surveillance monoclonal (IgG PK class). Raises I_surv and antibody readiness. Not a screening assay and not ribosomal synthesis in fly neurons.",
+      "half_life_hours": 480.0,
+      "ic50": 0.28,
+      "hill": 1.3,
+      "mtd": 1.0,
+      "organ_toxicity": {
+        "liver": 0.08,
+        "kidney": 0.02,
+        "heart": 0.04,
+        "marrow": 0.04,
+        "immune": 0.28,
+        "gut": 0.06,
+        "nerve": 0.04
+      },
+      "control_channel": "protein_surveillance_igg",
+      "clinical_half_life_hours": 480.0,
+      "clinical_ic50_note": "IgG-class t1/2 is days-to-weeks (rituximab-class). IC50 is simulation-scaled occupancy.",
+      "modality": "protein_biologic",
+      "tox_weight": 0.60,
+      "provenance": {
+        "doi": "10.1200/JCO.1998.16.8.2825",
+        "note": "McLaughlin et al., JCO 1998 (rituximab). Class reference for a long-t½ IgG surveillance / readiness channel. RESEARCH SIMULATION only.",
+        "placeholder": false
+      }
+    },
+    {
+      "id": "protein_fusion_mab",
+      "name": "Fusion-directed monoclonal / bispecific",
+      "drug_class": "fusion_biologic",
+      "mechanism": "Simulated fusion-adjacent monoclonal (amivantamab-class). Extra kill on T_f complementary to TKIs. Not a prescribed EGFR-MET regimen.",
+      "half_life_hours": 264.0,
+      "ic50": 0.26,
+      "hill": 1.4,
+      "mtd": 1.0,
+      "organ_toxicity": {
+        "liver": 0.10,
+        "kidney": 0.04,
+        "heart": 0.06,
+        "marrow": 0.06,
+        "immune": 0.22,
+        "gut": 0.10,
+        "nerve": 0.06
+      },
+      "control_channel": "protein_fusion_mab",
+      "clinical_half_life_hours": 264.0,
+      "clinical_ic50_note": "Amivantamab-class t1/2 is days-scale. IC50 is simulation-scaled. RESEARCH SIMULATION of a fusion-directed biologic.",
+      "modality": "protein_biologic",
+      "tox_weight": 0.72,
+      "provenance": {
+        "doi": "10.1200/JCO.20.03453",
+        "note": "Park et al., JCO 2021 (amivantamab). Class reference for a fusion-adjacent monoclonal / bispecific channel. RESEARCH SIMULATION only.",
+        "placeholder": false
+      }
+    },
+    {
       "id": "tki_imatinib_like",
       "name": "Imatinib-like fusion TKI",
       "drug_class": "fusion_tki",

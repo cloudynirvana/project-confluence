@@ -130,7 +130,7 @@ def main(argv=None) -> int:
         raise SystemExit("--allow-stub is rejected: share clips must be fruitfly.xml")
 
     print("Rendering flybody fruitfly.xml clip — research visualization, not a clinical demo.")
-    print("Simulated therapy metrics are not a cancer cure.")
+    print("Simulated therapy metrics are research scores, not a clinical outcome.")
     frames, last, sim = render_clip(
         seconds=args.seconds,
         fps=args.fps,

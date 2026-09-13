@@ -20,6 +20,19 @@ LATENT_NAMES = (
     "C_ifng",
     "H",
     "T_f",
+    "I_surv",
+    "A_ready",
+    "awake",
+)
+
+# Disease-class taxonomy. These are state-signature modes (latent + Y),
+# not clinical stage labels and not a diagnostic claim.
+DISEASE_CLASS_IDS = (
+    "benign",
+    "malignant",
+    "occult",
+    "dormant",
+    "terminal",
 )
 
 CONTROL_DRUG_IDS = (
@@ -39,6 +52,8 @@ PROTEIN_CHANNEL_IDS = (
     "protein_ifng",
     "protein_il2",
     "protein_chimeric_engager",
+    "protein_surveillance_igg",
+    "protein_fusion_mab",
 )
 
 # Fusion-directed TKI class channels. Kill terms prefer the T_f clone.
@@ -50,8 +65,8 @@ FUSION_CHANNEL_IDS = (
 
 ALL_EFFECTOR_IDS = CONTROL_DRUG_IDS + PROTEIN_CHANNEL_IDS + FUSION_CHANNEL_IDS
 
-# Y(t) sensory vector. First five channels stay the original cancer readout;
-# last two are chimeric-junction / fusion-AF proxies (research simulation).
+# Y(t) sensory vector. Indices 0–6 stay the original cancer + fusion readout;
+# 7–10 are class / readiness signs (research simulation, not a clinical panel).
 OBS_VECTOR_NAMES = (
     "tumor_burden",
     "resistance_frequency",
@@ -60,6 +75,10 @@ OBS_VECTOR_NAMES = (
     "immune_competence_ratio",
     "fusion_allele_fraction",
     "junction_neoantigen",
+    "occult_allele_fraction",
+    "dormancy_exit",
+    "immune_surveillance",
+    "antibody_readiness",
 )
 
 # FlyWire-scale class size named by the user. Published adult FlyWire
@@ -71,7 +90,11 @@ DEMO_BRAIN_NEURONS = 256
 
 
 class LatentCancerState(BaseModel):
-    """Latent microenvironment state X ∈ R^12 (11-D TME + fusion clone)."""
+    """Latent microenvironment state X ∈ R^15 (12-D TME/fusion + readiness).
+
+    Indices 0–11 are unchanged (``H`` at 10, ``T_f`` at 11). Indices 12–14
+    are immune surveillance, antibody readiness, and the dormancy gate.
+    """
 
     model_config = ConfigDict(extra="forbid")
 
@@ -90,6 +113,9 @@ class LatentCancerState(BaseModel):
         0.0,
         description="Fusion-oncoprotein clone (chimeric-driver–positive)",
     )
+    I_surv: float = Field(0.0, description="Immune surveillance / effector priming")
+    A_ready: float = Field(0.0, description="Antibody / biologic production readiness")
+    awake: float = Field(1.0, description="Dormancy gate in [0, 1]; 1 = fully awake")
     t: float = Field(0.0, description="Simulation time (days)")
     fusion_id: str = Field(
         "fusion_oncoprotein",
@@ -98,6 +124,10 @@ class LatentCancerState(BaseModel):
     fusion_display: str = Field(
         "",
         description="Human-readable fusion class (e.g. FGFR3–TACC3-like)",
+    )
+    disease_class: str = Field(
+        "malignant",
+        description="Taxonomy class: benign | malignant | occult | dormant | terminal",
     )
 
     def as_vector(self) -> List[float]:
@@ -159,7 +189,24 @@ class ObservationRecord(BaseModel):
         0.0,
         description="Noisy chimeric-junction neoantigen / fusion-transcript proxy",
     )
+    occult_allele_fraction: float = Field(
+        0.0,
+        description="Weakly visible fusion-AF leak used as an occult / hidden sign",
+    )
+    dormancy_exit: float = Field(
+        0.0,
+        description="Dormancy-exit marker (noisy awake / Δawake proxy)",
+    )
+    immune_surveillance: float = Field(
+        0.0,
+        description="Observed immune-surveillance / priming sign",
+    )
+    antibody_readiness: float = Field(
+        0.0,
+        description="Observed antibody / biologic production-readiness sign",
+    )
     fusion_id: str = Field("fusion_oncoprotein", description="Archetype fusion class id")
+    disease_class: str = Field("malignant", description="Taxonomy class on the source archetype")
     host_toxicity_warning: bool = False
     host_health: Optional[float] = Field(
         None, description="Optional privileged readout (not used by default controller)"

@@ -1,12 +1,16 @@
-"""Coupled nonlinear ODE for the 12-D cancer microenvironment.
+"""Coupled nonlinear ODE for the 15-D cancer microenvironment.
 
 Latent state X:
-    T_s, T_r, I_act, I_exh, S_fib, L, O, G, C_tgfb, C_ifng, H, T_f
+    T_s, T_r, I_act, I_exh, S_fib, L, O, G, C_tgfb, C_ifng, H, T_f,
+    I_surv, A_ready, awake
 
-The first 11 coordinates are the original TME. ``T_f`` is a fusion-
-oncoprotein clone (chimeric-driver–positive). Fusion proteins in biology
-arise from chimeric mRNAs at a gene-junction; here ``T_f`` is a
-research state, not a sequenced patient fusion.
+The first 12 coordinates are the original TME + fusion clone (``H`` at
+index 10, ``T_f`` at 11). ``I_surv`` / ``A_ready`` are immune-surveillance
+and antibody-readiness states. ``awake`` gates dormant growth.
+
+``T_f`` is a fusion-oncoprotein clone (chimeric-driver–positive). Fusion
+proteins in biology arise from chimeric mRNAs at a gene-junction; here
+``T_f`` is a research state, not a sequenced patient fusion.
 
 Design:
     * logistic tumor growth with Lotka–Volterra competition (3 clones)
@@ -36,7 +40,8 @@ from confluence.pharmacology.pk_pd_model import PKPDModel, hill_occupancy
 
 STATE_NAMES = LATENT_NAMES
 STATE_INDEX = {name: i for i, name in enumerate(STATE_NAMES)}
-DIM = 12
+DIM = 15
+CORE_DIM = 12  # TME + T_f; H at 10, T_f at 11
 
 
 def _sat(x: float, k: float) -> float:
@@ -97,23 +102,37 @@ class ArchetypeParams:
     tki_alk_weight: float = 0.55
     eps_fusion: float = 0.004
     k_junction_shed: float = 0.85
+    # Disease-class knobs (taxonomy). Defaults = malignant / visible.
+    disease_class: str = "malignant"
+    invasion_factor: float = 1.0
+    immune_evasion: float = 1.0
+    clinical_visibility_k: float = 0.12
+    occult_af_leak: float = 0.08
+    growth_awake_gate: bool = False
+    awaken_hazard: float = 0.0
+    awaken_jump: float = 0.45
+    rho_surv: float = 0.12
+    rho_ready: float = 0.10
     x0: Tuple[float, ...] = (
         0.85, 0.15, 0.35, 0.12, 0.25, 0.40, 0.70, 1.10, 0.35, 0.30, 0.92, 0.12,
+        0.10, 0.06, 1.0,
     )
     notes: str = ""
 
 
 class CancerODE:
-    """12-D microenvironment + catalog PK (5-D default; proteins + fusion TKIs)."""
+    """15-D microenvironment + catalog PK (5-D default; proteins + fusion TKIs)."""
 
     def __init__(
         self,
         params: ArchetypeParams,
         pk: Optional[PKPDModel] = None,
+        seed: int = 0,
     ):
         self.params = params
         self.pk = pk or PKPDModel()
         self.dim = DIM + self.pk.n_drugs
+        self.rng = np.random.default_rng(int(seed))
 
     def pack(self, x: np.ndarray, c: np.ndarray) -> np.ndarray:
         return np.concatenate([np.asarray(x, dtype=float), np.asarray(c, dtype=float)])
@@ -123,14 +142,19 @@ class CancerODE:
 
     def initial_state(self) -> Tuple[np.ndarray, np.ndarray]:
         x = np.array(self.params.x0, dtype=float)
+        if x.size < CORE_DIM:
+            x = np.pad(x, (0, CORE_DIM - x.size))
         if x.size < DIM:
-            x = np.pad(x, (0, DIM - x.size))
+            extra = np.array([0.10, 0.06, 1.0], dtype=float)
+            x = np.concatenate([x[:CORE_DIM], extra[: DIM - CORE_DIM]])
         return x[:DIM], self.pk.zeros()
 
     def clip_state(self, x: np.ndarray) -> np.ndarray:
         y = np.asarray(x, dtype=float).copy()
         if y.size < DIM:
             y = np.pad(y, (0, DIM - y.size))
+            if y.size >= 15 and y[14] == 0.0 and not self.params.growth_awake_gate:
+                y[14] = 1.0
         y[0] = max(y[0], 0.0)  # T_s
         y[1] = max(y[1], 0.0)  # T_r
         y[2] = np.clip(y[2], 0.0, 1.2)  # I_act
@@ -143,6 +167,12 @@ class CancerODE:
         y[9] = max(y[9], 0.0)  # C_ifng
         y[10] = np.clip(y[10], 0.0, 1.0)  # H
         y[11] = max(y[11], 0.0)  # T_f
+        if y.size > 12:
+            y[12] = np.clip(y[12], 0.0, 1.2)  # I_surv
+        if y.size > 13:
+            y[13] = np.clip(y[13], 0.0, 1.2)  # A_ready
+        if y.size > 14:
+            y[14] = np.clip(y[14], 0.0, 1.0)  # awake
         return y
 
     def occupancies(self, c: np.ndarray) -> Dict[str, float]:
@@ -153,12 +183,20 @@ class CancerODE:
         xv = [float(v) for v in x]
         if len(xv) < DIM:
             xv = xv + [0.0] * (DIM - len(xv))
-        T_s, T_r, I_act, I_exh, S_fib, L, O, G, C_tgfb, C_ifng, H, T_f = xv[:DIM]
+            if len(x) < 15 and not p.growth_awake_gate:
+                xv[14] = 1.0
+        T_s, T_r, I_act, I_exh, S_fib, L, O, G, C_tgfb, C_ifng, H, T_f = xv[:CORE_DIM]
+        I_surv = xv[12] if len(xv) > 12 else 0.0
+        A_ready = xv[13] if len(xv) > 13 else 0.0
+        awake = xv[14] if len(xv) > 14 else 1.0
         T_s = max(T_s, 0.0)
         T_r = max(T_r, 0.0)
         T_f = max(T_f, 0.0)
         I_act = max(I_act, 0.0)
         I_exh = max(I_exh, 0.0)
+        I_surv = float(np.clip(I_surv, 0.0, 1.2))
+        A_ready = float(np.clip(A_ready, 0.0, 1.2))
+        awake = float(np.clip(awake, 0.0, 1.0))
         S_fib = float(np.clip(S_fib, 0.0, 1.0))
         L = max(L, 0.0)
         O = max(O, 0.0)
@@ -179,6 +217,8 @@ class CancerODE:
         e_ifng_p = float(occ.get("protein_ifng", 0.0))
         e_il2 = float(occ.get("protein_il2", 0.0))
         e_engager = float(occ.get("protein_chimeric_engager", 0.0))
+        e_surv_igg = float(occ.get("protein_surveillance_igg", 0.0))
+        e_fusion_mab = float(occ.get("protein_fusion_mab", 0.0))
         e_ima = float(occ.get("tki_imatinib_like", 0.0))
         e_alk = float(occ.get("tki_alk", 0.0))
         e_fusion = float(
@@ -194,7 +234,19 @@ class CancerODE:
         stroma_shield = 1.0 - 0.85 * S_fib
         ifng_boost = 1.0 + 0.6 * _sat(C_ifng, 0.4)
         engager_boost = 1.0 + 0.90 * e_engager
-        immune_kill = p.kappa_immune * I_act * stroma_shield * ifng_boost * engager_boost
+        surv_boost = 1.0 + 0.35 * e_surv_igg + 0.20 * I_surv
+        evasion = float(np.clip(p.immune_evasion, 0.15, 1.8))
+        immune_kill = (
+            p.kappa_immune
+            * I_act
+            * stroma_shield
+            * ifng_boost
+            * engager_boost
+            * surv_boost
+            / evasion
+        )
+        gate = awake if p.growth_awake_gate else 1.0
+        invade = float(np.clip(p.invasion_factor, 0.05, 1.8))
 
         # Phenotypic switch: lactate + cytotoxic pressure, attenuated by HDAC.
         drug_pressure = 0.35 * e_kin + 0.15 * e_pd1
@@ -207,7 +259,7 @@ class CancerODE:
         eps_switch = float(np.clip(eps_switch, 0.0, 0.25))
 
         dT_s = (
-            p.r_s * T_s * (1.0 - crowding_s) * nutrient
+            p.r_s * T_s * (1.0 - crowding_s) * nutrient * gate * invade
             - immune_kill * T_s
             - p.kappa_kinase * e_kin * T_s
             - 0.12 * p.kappa_fusion * e_fusion * T_s
@@ -215,23 +267,24 @@ class CancerODE:
             - p.eps_fusion * T_s
         )
         dT_r = (
-            p.r_r * T_r * (1.0 - crowding_r) * nutrient
+            p.r_r * T_r * (1.0 - crowding_r) * nutrient * gate * invade
             - immune_kill * p.resist_immune_factor * T_r
             - p.kappa_kinase * e_kin * p.resist_kinase_factor * T_r
             - 0.08 * p.kappa_fusion * e_fusion * T_r
             + eps_switch * T_s
         )
         dT_f = (
-            p.r_f * T_f * (1.0 - crowding_f) * nutrient
+            p.r_f * T_f * (1.0 - crowding_f) * nutrient * gate * invade
             - immune_kill * p.fusion_immune_factor * T_f
             - p.kappa_kinase * e_kin * p.fusion_kinase_factor * T_f
             - p.kappa_fusion * e_fusion * T_f
             - 0.20 * p.kappa_immune * I_act * e_engager * T_f
+            - 0.55 * p.kappa_fusion * e_fusion_mab * T_f
             + p.eps_fusion * T_s
         )
 
         # Exhaustion γ_exh(TGF-β, lactate, PD-1 occupancy).
-        # IL-2 occupancy modestly slows new exhaustion (support, not a cure).
+        # IL-2 occupancy modestly slows new exhaustion (support, research term).
         gamma_exh = (
             p.gamma0
             * (1.0 + 1.6 * _sat(C_tgfb, 0.35) * (1.0 - 0.75 * e_tgfbi))
@@ -279,8 +332,33 @@ class CancerODE:
             # Terminal toxicity: freeze recovery, allow residual decay only.
             dH = min(dH, -0.01 * H)
 
+        competence = I_act / (I_act + I_exh + 1e-8)
+        early_drive = (
+            _sat(T_f * p.k_junction_shed, 0.25)
+            + (1.0 - float(np.clip(competence, 0.0, 1.0)))
+            + 0.35 * _sat(T_f, 0.15)
+        )
+        dI_surv = (
+            p.rho_surv * early_drive * max(0.0, 1.15 - I_surv) * (1.0 + 0.70 * e_surv_igg)
+            - 0.055 * I_surv
+        )
+        dA_ready = (
+            p.rho_ready
+            * (0.35 + I_surv)
+            * max(0.0, 1.15 - A_ready)
+            * (1.0 + 0.55 * e_surv_igg + 0.40 * e_fusion_mab + 0.25 * e_pd1_ab)
+            - 0.045 * A_ready
+        )
+        if p.growth_awake_gate:
+            d_awake = -0.015 * (awake - 0.04)
+        else:
+            d_awake = 0.02 * (1.0 - awake)
+
         return np.array(
-            [dT_s, dT_r, dI_act, dI_exh, dS, dL, dO, dG, dTgf, dIfn, dH, dT_f],
+            [
+                dT_s, dT_r, dI_act, dI_exh, dS, dL, dO, dG, dTgf, dIfn, dH, dT_f,
+                dI_surv, dA_ready, d_awake,
+            ],
             dtype=float,
         )
 
@@ -327,7 +405,12 @@ class CancerODE:
             z1 = self._rk4(z0, u, dt)
 
         x1, c1 = self.unpack(z1)
-        return self.clip_state(x1), np.maximum(c1, 0.0)
+        x1 = self.clip_state(x1)
+        if self.params.growth_awake_gate and self.params.awaken_hazard > 0.0:
+            p_jump = 1.0 - np.exp(-float(self.params.awaken_hazard) * float(dt))
+            if self.rng.random() < p_jump:
+                x1[14] = float(np.clip(x1[14] + self.params.awaken_jump, 0.0, 1.0))
+        return x1, np.maximum(c1, 0.0)
 
     def _rk4(self, z: np.ndarray, u: np.ndarray, dt: float) -> np.ndarray:
         k1 = self.rhs(0.0, z, u)
@@ -361,5 +444,6 @@ class CancerODE:
             update={
                 "fusion_id": self.params.fusion_id,
                 "fusion_display": self.params.fusion_display,
+                "disease_class": self.params.disease_class,
             }
         )

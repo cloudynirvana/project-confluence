@@ -8,6 +8,7 @@ class PancreaticPDACArchetype(ArchetypeParams):
         super().__init__(
             name="pancreatic_pdac",
             display_name="PDAC / pancreatic",
+            disease_class="malignant",
             r_s=0.14,
             r_r=0.10,
             k_carry=3.6,

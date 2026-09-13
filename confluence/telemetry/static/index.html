@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Confluence v2</title>
-  <link rel="stylesheet" href="/static/style.css?v=immune2" />
+  <link rel="stylesheet" href="/static/style.css?v=taxonomy1" />
 </head>
 <body class="lab mode-both">
   <canvas id="hero" aria-label="Flybody viewport"></canvas>
@@ -29,6 +29,9 @@
     <div class="stat"><span>proteins</span><strong id="hud-proteins">—</strong></div>
     <div class="stat"><span>fusion AF</span><strong id="hud-fusion">—</strong></div>
     <div class="stat"><span>immune</span><strong id="hud-immune">—</strong></div>
+    <div class="stat"><span>class</span><strong id="hud-class">—</strong></div>
+    <div class="stat"><span>surv</span><strong id="hud-surv">—</strong></div>
+    <div class="stat"><span>Ab ready</span><strong id="hud-ready">—</strong></div>
   </aside>
 
   <div class="hud-bottom">
@@ -61,9 +64,14 @@
       <h2>Session</h2>
       <label>Archetype
         <select id="archetype">
-          <option value="glioblastoma">Glioblastoma</option>
-          <option value="pancreatic_pdac">PDAC / pancreatic</option>
-          <option value="melanoma_persister">Melanoma (persister)</option>
+          <option value="glioblastoma">Glioblastoma (malignant)</option>
+          <option value="pancreatic_pdac">PDAC / pancreatic (malignant)</option>
+          <option value="melanoma_persister">Melanoma (persister, malignant)</option>
+          <option value="benign">Benign (growth-limited)</option>
+          <option value="malignant">Malignant (aggressive)</option>
+          <option value="occult">Occult / hidden</option>
+          <option value="dormant">Dormant (stochastic wake)</option>
+          <option value="terminal">Terminal (host-failure)</option>
         </select>
       </label>
       <label>Controller
@@ -160,10 +168,10 @@
 
   <footer>
     Y → net → protein + drug U → ODE → Y′. Host H ≤ 0.2 terminal. flybody Apache 2.0.
-    Simulation only — no clinical claim.
+    Simulation only — research scores, not a clinical outcome.
     <span id="warn" class="warn hidden">HOST TOXICITY WARNING</span>
   </footer>
 
-  <script src="/static/app.js?v=immune2"></script>
+  <script src="/static/app.js?v=taxonomy1"></script>
 </body>
 </html>

@@ -22,6 +22,7 @@ from fastapi.staticfiles import StaticFiles
 from confluence.cancer_env.archetypes import ARCHETYPES, DISPLAY_NAMES
 from confluence.contracts import (
     DEMO_BRAIN_NEURONS,
+    DISEASE_CLASS_IDS,
     FULL_BRAIN_NEURONS,
     FUSION_CHANNEL_IDS,
     INTERACTIVE_BRAIN_NEURONS,
@@ -72,6 +73,7 @@ async def health():
         "full_brain_neurons": FULL_BRAIN_NEURONS,
         "protein_channels": list(PROTEIN_CHANNEL_IDS),
         "fusion_channels": list(FUSION_CHANNEL_IDS),
+        "disease_classes": list(DISEASE_CLASS_IDS),
     }
 
 

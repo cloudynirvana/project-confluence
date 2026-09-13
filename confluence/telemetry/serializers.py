@@ -38,6 +38,10 @@ def frame_to_dict(frame: SimFrame) -> Dict[str, Any]:
             "junction_neoantigen": latent.junction_neoantigen,
             "fusion_id": latent.fusion_id,
             "fusion_display": latent.fusion_display,
+            "disease_class": latent.disease_class,
+            "I_surv": latent.I_surv,
+            "A_ready": latent.A_ready,
+            "awake": latent.awake,
         },
         "observed": {
             "tumor_burden": obs.tumor_burden,
@@ -47,7 +51,12 @@ def frame_to_dict(frame: SimFrame) -> Dict[str, Any]:
             "immune_competence_ratio": obs.immune_competence_ratio,
             "fusion_allele_fraction": obs.fusion_allele_fraction,
             "junction_neoantigen": obs.junction_neoantigen,
+            "occult_allele_fraction": obs.occult_allele_fraction,
+            "dormancy_exit": obs.dormancy_exit,
+            "immune_surveillance": obs.immune_surveillance,
+            "antibody_readiness": obs.antibody_readiness,
             "fusion_id": obs.fusion_id,
+            "disease_class": obs.disease_class,
             "host_toxicity_warning": obs.host_toxicity_warning,
         },
         "drugs": {

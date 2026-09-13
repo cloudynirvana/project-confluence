@@ -17,14 +17,14 @@ import numpy as np
 
 from confluence.connectome.circuit_extractor import CircuitExtractor, CompiledCircuit
 from confluence.connectome.client_stub import FlyWireClient
-from confluence.contracts import CONTROL_DRUG_IDS, FUSION_CHANNEL_IDS, ObservationRecord
+from confluence.contracts import CONTROL_DRUG_IDS, FUSION_CHANNEL_IDS, OBS_VECTOR_NAMES, ObservationRecord
 from confluence.neural_engine.plasticity import DopaminePlasticity, dopamine_signal
 
 
 @dataclass
 class NetworkConfig:
     n_kc: int = 256
-    n_obs: int = 7
+    n_obs: int = len(OBS_VECTOR_NAMES)
     n_out: int = 7
     sparsity: float = 0.05
     tau_mbon: float = 0.35
@@ -61,7 +61,9 @@ class MushroomBodyNetwork:
         # Junction / fusion-AF columns (last two) get a stronger prior so E
         # can up-weight fusion TKIs when chimeric-junction signal rises.
         if self.config.n_obs >= 7:
-            self.w_in[:, -2:] += rng.normal(0.35, 0.15, size=(n_pn, 2))
+            self.w_in[:, 5:7] += rng.normal(0.35, 0.15, size=(n_pn, 2))
+        if self.config.n_obs >= 11:
+            self.w_in[:, 7:] += rng.normal(0.28, 0.12, size=(n_pn, self.config.n_obs - 7))
         self.pn_bias = rng.normal(0.0, 0.1, size=n_pn)
         self.w_pn_kc = compiled.w_pn_kc.copy()
         self.w_kc_mbon = compiled.w_kc_mbon.copy()

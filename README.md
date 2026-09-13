@@ -35,13 +35,14 @@ See `CITATION.cff`. DOI badge added below once Zenodo publishes.
 
 # Confluence v2 — fly mushroom body × cancer microenvironment
 
-> **Computational research / simulation only.** This is not a medical device, not a treatment planner, and it does not claim a clinical cure. See [DISCLAIMER.md](DISCLAIMER.md).
+> **Computational research / simulation only.** This is not a medical device, not a treatment planner, and it does not claim clinical admissibility or disease eradication. See [DISCLAIMER.md](DISCLAIMER.md).
 
 **Honesty — read this first**
 
-- Confluence is a **research closed-loop**: noisy observations → connectome-style controller → simulated infusion `U(t)` → PK/PD → 12-D cancer ODE (11-D TME + fusion clone `T_f`). In-silico burden / resistance / fusion-AF / DA / “protein channel” scores are **not** a computational cure for cancer and are not a treatment recommendation.
+- Confluence is a **research closed-loop**: noisy observations → connectome-style controller → simulated infusion `U(t)` → PK/PD → 15-D cancer ODE (12-D TME/fusion + surveillance / antibody-readiness / dormancy gate). In-silico burden / resistance / fusion-AF / DA / “protein channel” scores are **research numbers**, not a clinical outcome and not a treatment recommendation.
 - Fusion proteins in biology arise from **chimeric mRNAs** at a gene junction. Our `T_f` clone, fusion allele fraction, and junction-neoantigen traces are **computational proxies**, not a clinical NGS / ctDNA assay and not a claim that we detected or treated a real fusion.
-- Therapeutic chimeric proteins (BiTE-class T-cell engager, IFN-γ, IL-2, anti-PD-1, TGF-β trap) are **simulated infusion / expression rates** from controllers E/F. This is not ribosomal synthesis in Drosophila neurons and not a clinical immune-therapy demo.
+- Therapeutic chimeric proteins (BiTE-class T-cell engager, IFN-γ, IL-2, anti-PD-1, TGF-β trap, surveillance IgG, fusion mAb) are **simulated infusion / expression rates** from controllers E/F. This is not ribosomal synthesis in Drosophila neurons and not a clinical immune-therapy demo.
+- Disease-class labels (`benign`, `malignant`, `occult`, `dormant`, `terminal`) are **state signatures** (distinct X and Y dynamics), not clinical stage or histopathology.
 - The hero viewport and `docs/demo/cinematic.mp4` must show the **TuragaLab/flybody** anatomical MuJoCo mesh (`fruitfly.xml`, Apache 2.0; Vaxenburg et al., *Nature* 2025). A CPG / bead-fly stub is **not** an acceptable product visual. If flybody is missing, the UI shows an install CTA instead of a fake fly.
 - Visual fidelity requires the flybody extra + headless GL (`MUJOCO_GL=osmesa` or `egl`). NeuroMechFly / FlyGym is an acceptable alternate digital twin only if flybody cannot be installed — document which body is on screen.
 
@@ -87,18 +88,18 @@ Open **http://127.0.0.1:8765**. The live session is a **dark-lab hero viewport**
 - loop mode is a film-style **Cancer / Flybody / Both** switch (not a form)
 - hero viewport streams **only** `env.physics.render` JPEGs from `fruitfly.xml`; no mesh → install CTA (CPG stub is hidden)
 - append `?cinema=1` to hide chrome for recording
-- append `?demo=immune` to auto-play the fly-brain immune + chimeric-protein demo (research visualization, not a cure)
+- append `?demo=immune` to auto-play the fly-brain immune + chimeric-protein demo (research visualization, not a clinical outcome)
 
 [![Cinematic still](docs/demo/still_hero.png)](docs/demo/cinematic.mp4)
 [![Immune chimeric still](docs/demo/still_immune_hero.png)](docs/demo/immune_chimeric.mp4)
 
-Share clip (≈12 s, real mesh): [`docs/demo/cinematic.mp4`](docs/demo/cinematic.mp4). Immune + chimeric-protein demo (controller F, I_act / engager HUD): [`docs/demo/immune_chimeric.mp4`](docs/demo/immune_chimeric.mp4) (`python -m confluence.demo_immune`). Both jobs **fail** if fruitfly.xml cannot render. Research scores, not a cure. See [`docs/demo/README.md`](docs/demo/README.md).
+Share clip (≈12 s, real mesh): [`docs/demo/cinematic.mp4`](docs/demo/cinematic.mp4). Immune + chimeric-protein demo (controller F, I_act / engager HUD): [`docs/demo/immune_chimeric.mp4`](docs/demo/immune_chimeric.mp4) (`python -m confluence.demo_immune`). Both jobs **fail** if fruitfly.xml cannot render. Research scores, not a clinical outcome. See [`docs/demo/README.md`](docs/demo/README.md).
 
 Interactive Kenyon-cell count defaults to **256** for real-time FPS (documented). Pass `n_kc=2048` in `MushroomBodyNetwork` / controllers for a more FlyWire-like expansion. Controller **F** is a separate sparse rate-based net that can be constructed at `n_neurons=166700` (see below); the UI default stays on the small demo.
 
 ```bash
 # package tests
-python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py tests/test_flybody_bridge.py tests/test_protein_channels.py tests/test_full_brain_scale.py tests/test_training_smoke.py tests/test_cinematic_render.py tests/test_fusion_biology.py tests/test_immune_chimeric_demo.py -q
+python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py tests/test_flybody_bridge.py tests/test_protein_channels.py tests/test_full_brain_scale.py tests/test_training_smoke.py tests/test_cinematic_render.py tests/test_fusion_biology.py tests/test_immune_chimeric_demo.py tests/test_disease_taxonomy.py tests/test_immune_readiness.py tests/test_validation_suite.py -q
 
 # short controller bake-off (3 archetypes × A–E)
 python -m confluence --benchmark --trials 2 --horizon 40
@@ -159,7 +160,7 @@ Clocks are independent: cancer time is days; flybody walking control is ~20 ms. 
 
 ## Full-brain training (N = 166,700) and therapeutic proteins
 
-> **Research simulation only.** The 166,700 units are a **sparse, rate-based controller**, not a multicompartment LIF reconstruction of a fly brain, and **not ribosomes**. Nothing in this loop translates polypeptides or synthesizes drugs. “Proteins that manage therapy” means **simulated PK/PD channels** for antibody-like and cytokine effectors whose infusion / expression *rates* are read out from a dedicated secretory population (or MBON mix). There is no claim of a clinical cure, cellular translation inside Drosophila neurons, or a real FlyWire synapse dump at this scale.
+> **Research simulation only.** The 166,700 units are a **sparse, rate-based controller**, not a multicompartment LIF reconstruction of a fly brain, and **not ribosomes**. Nothing in this loop translates polypeptides or synthesizes drugs. “Proteins that manage therapy” means **simulated PK/PD channels** for antibody-like and cytokine effectors whose infusion / expression *rates* are read out from a dedicated secretory population (or MBON mix). There is no claim of clinical benefit, cellular translation inside Drosophila neurons, or a real FlyWire synapse dump at this scale.
 
 ### Scale and memory
 
@@ -184,6 +185,8 @@ Controllers A–D still emit the original 5-D `U` (`anti_pd1`, `tgfb_inhibitor`,
 | `protein_ifng` | IFN-γ cytokine | Adds to `C_ifng` production |
 | `protein_il2` | IL-2 / fusion-adjacent cytokine | Boosts immune recruitment; higher `tox_weight` |
 | `protein_chimeric_engager` | BiTE-class chimeric T-cell engager | Multiplies immune kill; extra pressure on `T_f` (Topp et al. class) |
+| `protein_surveillance_igg` | Surveillance IgG-like antibody | Raises `I_surv` / readiness (rituximab-class PK) |
+| `protein_fusion_mab` | Fusion-directed monoclonal / bispecific | Extra kill on `T_f` (amivantamab-class) |
 | `tki_imatinib_like` | BCR–ABL / KIT / PDGFR-class TKI | Preferential kill on `T_f` (Druker et al. class reference) |
 | `tki_alk` | EML4–ALK / ROS1 / NTRK-class TKI | Preferential kill on `T_f` (Kwak et al. class reference) |
 
@@ -197,7 +200,31 @@ Fusion oncoproteins arise from **chimeric mRNAs** at a chromosomal junction (BCR
 - noisy `Y` channels `fusion_allele_fraction` (ctDNA-like) and `junction_neoantigen` (chimeric junction peptide / transcript proxy)
 - per-archetype research labels: GBM `fgfr3_tacc3_like`, PDAC `nrg1_ntrk_like`, melanoma `alk_braf_fusion_like`
 
-This is **not** a clinical fusion assay, not patient genotyping, and **not a cure**. Controllers E/F receive the junction channels in `Y` and can up-weight fusion TKIs when that signal rises; DA includes `−γ Δfusion_AF`.
+This is **not** a clinical fusion assay and not patient genotyping. Controllers E/F receive the junction channels in `Y` and can up-weight fusion TKIs when that signal rises; DA includes `−γ Δfusion_AF`.
+
+## Disease taxonomy + immune readiness
+
+Five **state-signature** classes (not cosmetic labels). Mapping: [`confluence/cancer_env/disease_classes.py`](confluence/cancer_env/disease_classes.py) `CLASS_PARAM_MAP`.
+
+| Class | Distinct latent dynamics | Distinct Y signature |
+|-------|--------------------------|----------------------|
+| `benign` | Low r, low K, high immune kill, low invasion | High-SNR, quiet burden / TGF-β |
+| `malignant` | Aggressive growth + evasion (GBM-like) | High bulk Y, low competence |
+| `occult` | Moderate growth; clinical visibility Hill is large | Bulk Y attenuated; junction / occult AF leak early |
+| `dormant` | Growth × `awake`; stochastic awakening | `dormancy_exit` rises on wake; burden stays low until then |
+| `terminal` | High burden, weak host recovery | High Y burden, H already near failure |
+
+Latent extras (indices 12–14): `I_surv` (surveillance priming), `A_ready` (antibody readiness), `awake` (dormancy gate). `H` stays at index 10; `T_f` stays at 11.
+
+Early-warning score (junction, competence drop, occult AF, dormancy-exit) lifts antibody channels on E/F **before** bulk `Y.tumor_burden` explodes. New biologics: `protein_surveillance_igg` (rituximab-class IgG PK), `protein_fusion_mab` (amivantamab-class). Antibodies still load `H` — they can fail the host.
+
+Computational validation (falsifiable, not clinical):
+
+```bash
+python -m confluence.benchmarks.validation_suite --out results/validation_taxonomy
+```
+
+Notebook: [`notebooks/computational_validation_taxonomy.ipynb`](notebooks/computational_validation_taxonomy.ipynb). Tests: `tests/test_disease_taxonomy.py`, `tests/test_immune_readiness.py`, `tests/test_validation_suite.py`.
 
 Closed loop:
 

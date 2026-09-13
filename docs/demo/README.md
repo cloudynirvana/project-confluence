@@ -2,7 +2,7 @@
 
 Short closed-loop clip for README / sharing. The subject is the **TuragaLab/flybody** anatomical Drosophila (`fruitfly.xml`, `walker/hero` camera). Slim HUD ticks show simulated burden / resistance / DA / protein channels.
 
-This is a **research visualization**. Simulated therapy metrics are **not** a computational cancer cure.
+This is a **research visualization**. Simulated therapy metrics are **research scores**, not a clinical outcome.
 
 The CPG / bead-fly stub is **not** used here. `python -m confluence.demo_cinematic` exits nonzero if MuJoCo cannot render `fruitfly.xml`.
 

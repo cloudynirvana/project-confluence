@@ -11,6 +11,8 @@ const PROTEINS = [
   ["protein_ifng", "IFN-γ"],
   ["protein_il2", "IL-2"],
   ["protein_chimeric_engager", "chimeric engager"],
+  ["protein_surveillance_igg", "surveillance IgG"],
+  ["protein_fusion_mab", "fusion mAb"],
 ];
 const FUSIONS = [
   ["tki_imatinib_like", "imatinib-like"],
@@ -78,6 +80,10 @@ const traces = {
     makeTrace("host H", "#e8e0d4", [2, 3]),
     makeTrace("fusion AF", "#c084fc"),
     makeTrace("junction neoAg", "#f0b7a4", [3, 3]),
+    makeTrace("occult AF", "#a78bfa"),
+    makeTrace("dormancy exit", "#fbbf24"),
+    makeTrace("surveillance", "#34d399"),
+    makeTrace("Ab readiness", "#f472b6"),
   ],
   mbon: [
     makeTrace("MBON mean", "#d4a054"),
@@ -257,6 +263,8 @@ function applyFrame(frame) {
     Y.tumor_burden, L.tumor_burden, Y.resistance_frequency,
     Y.lactate, Y.tgfb, Y.immune_competence_ratio, L.H,
     Y.fusion_allele_fraction, Y.junction_neoantigen,
+    Y.occult_allele_fraction, Y.dormancy_exit,
+    Y.immune_surveillance, Y.antibody_readiness,
   ][i]));
   const C = frame.connectome || {};
   lastConn = C;
@@ -332,6 +340,15 @@ function applyFrame(frame) {
   }
   if ($("hud-immune")) {
     $("hud-immune").textContent = Number(L.I_act ?? 0).toFixed(3);
+  }
+  if ($("hud-class")) {
+    $("hud-class").textContent = L.disease_class || Y.disease_class || "—";
+  }
+  if ($("hud-surv")) {
+    $("hud-surv").textContent = Number(Y.immune_surveillance ?? L.I_surv ?? 0).toFixed(3);
+  }
+  if ($("hud-ready")) {
+    $("hud-ready").textContent = Number(Y.antibody_readiness ?? L.A_ready ?? 0).toFixed(3);
   }
   $("source").textContent = `source: ${frame.drugs.source} ${frame.drugs.notes || ""}`;
   if ($("emb-backend")) {

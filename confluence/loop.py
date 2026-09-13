@@ -49,8 +49,8 @@ class ClosedLoopSimulator:
         # Always allocate protein + small-molecule PK states. Controllers A–E
         # still emit 5-D U; missing keys pad to 0 so existing policies are unchanged.
         self.pk = PKPDModel(drug_ids=ALL_EFFECTOR_IDS)
-        self.ode = CancerODE(self.params, self.pk)
-        self.observer = ObservationLayer(seed=self.seed)
+        self.ode = CancerODE(self.params, self.pk, seed=self.seed)
+        self.observer = ObservationLayer(seed=self.seed, params=self.params)
         if self.controller is None:
             self.controller = PlasticMushroomBodyController()
         self.manual_override = False
@@ -63,10 +63,12 @@ class ClosedLoopSimulator:
         if archetype is not None:
             self.archetype = archetype
             self.params = get_archetype(archetype)
-            self.ode = CancerODE(self.params, self.pk)
+            self.ode = CancerODE(self.params, self.pk, seed=self.seed if seed is None else seed)
         if seed is not None:
             self.seed = seed
-            self.observer = ObservationLayer(seed=seed)
+            self.observer = ObservationLayer(seed=seed, params=self.params)
+        else:
+            self.observer.set_params(self.params)
         self.x, self.c = self.ode.initial_state()
         self.t = 0.0
         self.history.clear()
@@ -134,6 +136,11 @@ class ClosedLoopSimulator:
         if mixed.size >= 7:
             update["fusion_allele_fraction"] = float(np.clip(mixed[5], 0.0, 1.0))
             update["junction_neoantigen"] = float(max(0.0, mixed[6]))
+        if mixed.size >= 11:
+            update["occult_allele_fraction"] = float(np.clip(mixed[7], 0.0, 1.0))
+            update["dormancy_exit"] = float(np.clip(mixed[8], 0.0, 1.5))
+            update["immune_surveillance"] = float(max(0.0, mixed[9]))
+            update["antibody_readiness"] = float(max(0.0, mixed[10]))
         return obs.model_copy(update=update)
 
     def step(self, run_cancer: bool = True, run_embodiment: bool = True) -> SimFrame:

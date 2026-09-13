@@ -8,6 +8,7 @@ class MelanomaPersisterArchetype(ArchetypeParams):
         super().__init__(
             name="melanoma_persister",
             display_name="Melanoma (persister)",
+            disease_class="malignant",
             r_s=0.20,
             r_r=0.13,
             k_carry=3.8,

@@ -5,7 +5,8 @@ A Drosophila melanogaster mushroom-body-style connectome steers a
 multi-drug infusion vector over a mechanistic cancer microenvironment.
 
 This package is a simulation / research instrument. It is not a medical
-device and does not claim clinical efficacy or a path to cure.
+device and does not claim clinical efficacy, disease eradication,
+or a treatment path.
 """
 
 from confluence.contracts import (

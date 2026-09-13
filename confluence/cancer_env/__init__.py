@@ -1,4 +1,4 @@
-"""Mechanistic cancer microenvironment (12-D latent state: 11-D TME + T_f)."""
+"""Mechanistic cancer microenvironment (15-D latent: TME + fusion + readiness)."""
 
 from confluence.cancer_env.ode_system import CancerODE, STATE_INDEX, STATE_NAMES
 from confluence.cancer_env.observation_layer import ObservationLayer
