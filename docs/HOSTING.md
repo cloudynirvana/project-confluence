@@ -19,11 +19,18 @@ not a Vercel serverless function.
 
 ## 1. Evidence site on Vercel
 
-1. Import `cloudynirvana/project-confluence` in the Vercel dashboard.
+**One-click:** [Deploy evidence on Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcloudynirvana%2Fproject-confluence&root-directory=evidence&project-name=confluence-evidence)
+
+Dashboard (import this GitHub repo — no secrets):
+
+1. Open [vercel.com/new](https://vercel.com/new) and import `cloudynirvana/project-confluence`.
 2. Set **Root Directory** to `evidence`.
 3. Framework Preset: **Other**. Leave the build command empty.
+   Output Directory: `.` — not `public`. Stills live in `evidence/assets/`.
    `evidence/vercel.json` sets `framework: null` and `outputDirectory: "."`.
-4. Deploy. No environment variables or secrets are required.
+4. Deploy. No environment variables.
+
+There is no in-repo Vercel preview URL until the owner connects the GitHub app and deploys. The first production URL will look like `https://confluence-evidence.vercel.app`.
 
 Local preview:
 
@@ -37,9 +44,15 @@ origin (HTTPS → `wss`). Do not proxy `/ws/sim` through Vercel serverless.
 
 ## 2. Interactive sim on Railway
 
+**One-click (GitHub → Railway, no secrets):**
+[Deploy on Railway](https://railway.app/new?template=https://github.com/cloudynirvana/project-confluence)
+
+Dashboard:
+
 1. New project → deploy from the GitHub repo.
 2. Railway detects `railway.toml` + `Dockerfile` (numpy / scipy / fastapi —
-   **no MuJoCo / flybody**). Mesh is `Dockerfile.mesh` only.
+   **no MuJoCo / flybody**). Mesh is `Dockerfile.mesh` only. Do not change the
+   Dockerfile path to `Dockerfile.mesh` unless you want the heavier image.
 3. Railway injects `PORT`. The image already runs
    `uvicorn … --host 0.0.0.0 --port ${PORT:-8765}`.
 4. Health check: `GET /health` (configured in `railway.toml`).
@@ -49,11 +62,16 @@ No API keys are required for the demo. Do not commit `.env` files.
 
 ## 3. Interactive sim on Fly.io
 
+**One-click-ish (Fly CLI, no secrets in git):**
+
 ```bash
-# once
-fly launch --no-deploy   # accept/adjust the placeholder app name in fly.toml
+# once, from a clone
+fly launch --no-deploy --copy-config --yes
 fly deploy
 ```
+
+`fly.toml` is already in the repo. `fly launch` will rewrite the placeholder
+`app` name. Do not add API tokens to the repository.
 
 `fly.toml` publishes `internal_port = 8765`, HTTPS, and `GET /health`.
 `auto_stop_machines = "stop"` means a free/hobby machine **will sleep**.

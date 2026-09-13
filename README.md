@@ -112,10 +112,17 @@ Getting-started notebook: [`notebooks/confluence_v2_getting_started.ipynb`](note
 
 The **evidence site** is a static HTML export in [`evidence/`](evidence/). It shows Blender / MuJoCo stills, the cinematic reel, a short honesty blurb, and a prominent disclaimer. It does **not** run the interactive simulator.
 
-1. In Vercel, import [cloudynirvana/project-confluence](https://github.com/cloudynirvana/project-confluence).
-2. Set **Root Directory** to `evidence`.
-3. Framework Preset: **Other**. Leave the build command empty (`evidence/vercel.json` already sets `framework: null` and `outputDirectory: "."`).
-4. Deploy. No secrets or environment variables are required.
+**One-click import (clone into your Vercel team):**
+[Deploy evidence on Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcloudynirvana%2Fproject-confluence&root-directory=evidence&project-name=confluence-evidence)
+
+Or from the dashboard (this repo, no secrets):
+
+1. Open [vercel.com/new](https://vercel.com/new) and import `cloudynirvana/project-confluence`.
+2. Click **Edit** next to Root Directory and set it to `evidence`.
+3. Framework Preset: **Other**. Leave Build Command empty. Output Directory must be `.` (not `public` — films live in `evidence/assets/`; `evidence/vercel.json` already sets `framework: null` and `outputDirectory: "."`).
+4. Deploy. No environment variables.
+
+After deploy, Vercel prints a `*.vercel.app` URL you can put in a professor email. Keep the research disclaimer; do not describe that URL as clinical validation.
 
 Local preview: `cd evidence && python -m http.server 4173`.
 

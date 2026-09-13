@@ -32,10 +32,11 @@ def test_evidence_site_is_static_and_honest() -> None:
     ):
         assert phrase not in lowered
     vercel = (REPO / "evidence" / "vercel.json").read_text(encoding="utf-8")
-    assert "outputDirectory" in vercel
-    assert (REPO / "evidence" / "public" / "still_hero.png").is_file()
-    assert (REPO / "evidence" / "public" / "cinematic.mp4").is_file()
-    assert (REPO / "evidence" / "public" / "blender" / "blender_still.png").is_file()
+    assert '"outputDirectory": "."' in vercel
+    assert not (REPO / "evidence" / "public").exists()
+    assert (REPO / "evidence" / "assets" / "still_hero.png").is_file()
+    assert (REPO / "evidence" / "assets" / "cinematic.mp4").is_file()
+    assert (REPO / "evidence" / "assets" / "blender" / "blender_still.png").is_file()
     assert (REPO / "evidence" / "disclaimer.html").is_file()
     assert (REPO / "evidence" / "awaiting-clinical-validation.html").is_file()
 

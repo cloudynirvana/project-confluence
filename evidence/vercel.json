@@ -1,7 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "",
   "outputDirectory": ".",
   "cleanUrls": true,
   "trailingSlash": false,
@@ -15,7 +14,7 @@
       ]
     },
     {
-      "source": "/public/(.*).mp4",
+      "source": "/assets/(.*).mp4",
       "headers": [
         { "key": "Content-Type", "value": "video/mp4" },
         { "key": "Cache-Control", "value": "public, max-age=86400" }

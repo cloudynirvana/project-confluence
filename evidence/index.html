@@ -23,9 +23,9 @@
   </nav>
 
   <header class="hero">
-    <img class="hero-still" src="public/still_hero.png" alt="TuragaLab/flybody MuJoCo still of the Drosophila mesh with a slim research HUD" />
-    <video autoplay muted loop playsinline poster="public/still_hero.png">
-      <source src="public/cinematic.mp4" type="video/mp4" />
+    <img class="hero-still" src="assets/still_hero.png" alt="TuragaLab/flybody MuJoCo still of the Drosophila mesh with a slim research HUD" />
+    <video autoplay muted loop playsinline poster="assets/still_hero.png">
+      <source src="assets/cinematic.mp4" type="video/mp4" />
     </video>
     <div class="vignette"></div>
     <div class="hero-copy">
@@ -115,30 +115,30 @@
       <p class="muted">Copied from <code>docs/demo/</code> and <code>docs/demo/blender/renders/</code>. Stamped simulation / research.</p>
       <div class="filmstrip">
         <figure>
-          <img src="public/still_mesh.png" alt="Clean walker/hero MuJoCo fruitfly.xml still" />
+          <img src="assets/still_mesh.png" alt="Clean walker/hero MuJoCo fruitfly.xml still" />
           <figcaption>MuJoCo fruitfly.xml — walker/hero, no HUD</figcaption>
         </figure>
         <figure>
-          <img src="public/still_track.png" alt="walker/track1 three-quarter MuJoCo still" />
+          <img src="assets/still_track.png" alt="walker/track1 three-quarter MuJoCo still" />
           <figcaption>MuJoCo — walker/track1</figcaption>
         </figure>
         <figure>
-          <img src="public/blender/blender_still.png" alt="Blender 4.x HUD still stamped SIMULATION / RESEARCH" />
+          <img src="assets/blender/blender_still.png" alt="Blender 4.x HUD still stamped SIMULATION / RESEARCH" />
           <figcaption>Blender 4.x HUD still — SIMULATION / RESEARCH</figcaption>
         </figure>
         <figure>
-          <img src="public/blender/anim_0008.png" alt="Later frame of the Blender HUD animation" />
+          <img src="assets/blender/anim_0008.png" alt="Later frame of the Blender HUD animation" />
           <figcaption>Blender HUD animation frame 0008</figcaption>
         </figure>
         <figure>
-          <video muted loop controls playsinline poster="public/blender/still_mid.png">
-            <source src="public/blender/mujoco_preview.mp4" type="video/mp4" />
+          <video muted loop controls playsinline poster="assets/blender/still_mid.png">
+            <source src="assets/blender/mujoco_preview.mp4" type="video/mp4" />
           </video>
           <figcaption>MuJoCo preview clip from the Blender sidecar path</figcaption>
         </figure>
         <figure>
-          <video muted loop controls playsinline poster="public/still_immune_hero.png">
-            <source src="public/immune_chimeric.mp4" type="video/mp4" />
+          <video muted loop controls playsinline poster="assets/still_immune_hero.png">
+            <source src="assets/immune_chimeric.mp4" type="video/mp4" />
           </video>
           <figcaption>Immune / chimeric-protein demo — research visualization</figcaption>
         </figure>
@@ -157,7 +157,8 @@ python -m confluence
 uvicorn confluence.telemetry.websocket_server:app --host 127.0.0.1 --port 8765</pre>
       <p>Then open <code>http://127.0.0.1:8765</code>. Minimum extras: numpy, scipy, pydantic, fastapi, uvicorn[standard]. Flybody / MuJoCo is optional.</p>
       <div class="buttons">
-        <a class="btn primary" href="https://github.com/cloudynirvana/project-confluence">GitHub repository</a>
+        <a class="btn primary" href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcloudynirvana%2Fproject-confluence&root-directory=evidence&project-name=confluence-evidence">Deploy evidence on Vercel</a>
+        <a class="btn" href="https://github.com/cloudynirvana/project-confluence">GitHub repository</a>
         <a class="btn" href="https://github.com/cloudynirvana/project-confluence/blob/main/docs/HOSTING.md">Host the sim (Railway / Fly)</a>
         <a class="btn" href="https://github.com/cloudynirvana/project-confluence/blob/main/docs/AWAITING_CLINICAL_VALIDATION.md">Awaiting clinical validation</a>
         <a class="btn" href="https://github.com/cloudynirvana/project-confluence/blob/main/DISCLAIMER.md">DISCLAIMER.md</a>
