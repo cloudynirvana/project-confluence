@@ -25,6 +25,7 @@ const manual = {};
 let lastEmb = null;
 let lastConn = {};
 let mujocoImg = null;
+let meshPhase = "loading"; // loading | ready | missing
 
 function addSliderAndBar(id, label, barParent, protein) {
   manual[id] = 0;
@@ -162,59 +163,6 @@ function redraw() {
   drawHero(lastEmb, lastConn);
 }
 
-function wld(heading, xpos, lx, ly, lz) {
-  const c = Math.cos(heading);
-  const s = Math.sin(heading);
-  return [xpos[0] + c * lx - s * ly, xpos[1] + s * lx + c * ly, lz];
-}
-
-function project(pt, cam, w, h) {
-  const vx = pt[0] - cam.eye[0];
-  const vy = pt[1] - cam.eye[1];
-  const vz = pt[2] - cam.eye[2];
-  const rx = vx * cam.r[0] + vy * cam.r[1] + vz * cam.r[2];
-  const ry = vx * cam.u[0] + vy * cam.u[1] + vz * cam.u[2];
-  const rz = -(vx * cam.f[0] + vy * cam.f[1] + vz * cam.f[2]);
-  const z = Math.max(-rz, 0.08);
-  const fl = 0.5 * h / Math.tan((32 * Math.PI) / 360);
-  return [w * 0.5 + (fl * rx) / z, h * 0.55 - (fl * ry) / z, z];
-}
-
-function makeCam(xpos) {
-  const eye = [0.22 + 0.55 * xpos[0], -0.52, 0.24];
-  const target = [0.02 + 0.85 * xpos[0], 0.015 * xpos[1], 0.08];
-  const f = [target[0] - eye[0], target[1] - eye[1], target[2] - eye[2]];
-  const fn = Math.hypot(f[0], f[1], f[2]) || 1;
-  f[0] /= fn; f[1] /= fn; f[2] /= fn;
-  const up = [0, 0, 1];
-  const r = [f[1] * up[2] - f[2] * up[1], f[2] * up[0] - f[0] * up[2], f[0] * up[1] - f[1] * up[0]];
-  const rn = Math.hypot(r[0], r[1], r[2]) || 1;
-  r[0] /= rn; r[1] /= rn; r[2] /= rn;
-  const u = [r[1] * f[2] - r[2] * f[1], r[2] * f[0] - r[0] * f[2], r[0] * f[1] - r[1] * f[0]];
-  return { eye, f, r, u };
-}
-
-function sphere(ctx, x, y, r, fill, rim) {
-  const g = ctx.createRadialGradient(x - r * 0.3, y - r * 0.35, r * 0.1, x, y, r);
-  g.addColorStop(0, fill);
-  g.addColorStop(0.75, fill);
-  g.addColorStop(1, rim || "#000");
-  ctx.fillStyle = g;
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.fill();
-}
-
-function limb(ctx, a, b, width, color) {
-  ctx.strokeStyle = color;
-  ctx.lineWidth = width;
-  ctx.lineCap = "round";
-  ctx.beginPath();
-  ctx.moveTo(a[0], a[1]);
-  ctx.lineTo(b[0], b[1]);
-  ctx.stroke();
-}
-
 function drawHero(emb, conn) {
   const canvas = $("hero");
   if (!canvas) return;
@@ -234,20 +182,27 @@ function drawHero(emb, conn) {
     return;
   }
 
-  // Never draw the CPG / bead fly as the product. Require fruitfly.xml.
+  // Never draw the CPG / bead fly as the product.
   ctx.fillStyle = "#0a0c10";
   ctx.fillRect(0, 0, w, h);
   ctx.fillStyle = "#d4a054";
   ctx.font = "600 13px ui-sans-serif, system-ui, sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("FLYBODY MESH REQUIRED", w / 2, h / 2 - 28);
-  ctx.fillStyle = "#d8d0c4";
-  ctx.font = "15px ui-sans-serif, system-ui, sans-serif";
-  ctx.fillText("Hero viewport streams TuragaLab/flybody fruitfly.xml (MuJoCo).", w / 2, h / 2);
+  if (meshPhase === "missing") {
+    ctx.fillText("FLYBODY MESH REQUIRED", w / 2, h / 2 - 28);
+    ctx.fillStyle = "#d8d0c4";
+    ctx.font = "15px ui-sans-serif, system-ui, sans-serif";
+    ctx.fillText("Hero viewport streams TuragaLab/flybody fruitfly.xml (MuJoCo).", w / 2, h / 2);
+    ctx.fillStyle = "#7a7468";
+    ctx.font = "13px ui-monospace, ui-sans-serif, monospace";
+    ctx.fillText("bash scripts/install_flybody.sh   &&   export MUJOCO_GL=osmesa", w / 2, h / 2 + 28);
+    ctx.fillText("CPG / bead-fly stub is not shown here", w / 2, h / 2 + 50);
+    return;
+  }
+  ctx.fillText("LOADING FRUITFLY.XML", w / 2, h / 2 - 12);
   ctx.fillStyle = "#7a7468";
-  ctx.font = "13px ui-monospace, ui-sans-serif, monospace";
-  ctx.fillText("pip install mujoco dm_control && pip install --no-deps flybody", w / 2, h / 2 + 28);
-  ctx.fillText("export MUJOCO_GL=osmesa   ·   CPG stub is not shown here", w / 2, h / 2 + 50);
+  ctx.font = "13px ui-sans-serif, system-ui, sans-serif";
+  ctx.fillText("TuragaLab/flybody MuJoCo mesh — not a CPG stub", w / 2, h / 2 + 14);
 }
 
 function drawFly(emb) {
@@ -309,6 +264,7 @@ function applyFrame(frame) {
     Object.values(traces).forEach((g) => g.forEach((tr) => tr.ys.shift()));
   }
   if (E.frame_jpeg) {
+    meshPhase = "ready";
     if (!mujocoImg) {
       mujocoImg = new Image();
       mujocoImg.onload = () => drawHero(lastEmb, lastConn);
@@ -316,6 +272,8 @@ function applyFrame(frame) {
     mujocoImg.src = `data:image/jpeg;base64,${E.frame_jpeg}`;
   } else {
     mujocoImg = null;
+    if (E.backend && E.backend !== "flybody") meshPhase = "missing";
+    else if (frame.type === "hello" || frame.type === "frame") meshPhase = "missing";
   }
   redraw();
   $("kc-sp").textContent = (C.kc_sparsity ?? 0).toFixed(3);

@@ -167,10 +167,30 @@ class LiveSession:
         }
 
 
+_warm_session: Optional["LiveSession"] = None
+
+
+def _take_session() -> "LiveSession":
+    global _warm_session
+    session = _warm_session
+    _warm_session = None
+    return session if session is not None else LiveSession()
+
+
+@app.on_event("startup")
+async def _warmup_flybody_session():
+    """Build fruitfly.xml once so the first hello already has a JPEG."""
+    global _warm_session
+    try:
+        _warm_session = await asyncio.to_thread(LiveSession)
+    except Exception:
+        _warm_session = None
+
+
 @app.websocket("/ws/sim")
 async def sim_socket(ws: WebSocket):
     await ws.accept()
-    session = LiveSession()
+    session = _take_session()
     frame = session.sim.history[-1] if session.sim.history else session.sim.reset()
     await ws.send_json({
         "type": "hello",
