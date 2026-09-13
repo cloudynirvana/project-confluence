@@ -90,8 +90,9 @@ Open **http://127.0.0.1:8765**. The live session is a **dark-lab hero viewport**
 - append `?demo=immune` to auto-play the fly-brain immune + chimeric-protein demo (research visualization, not a cure)
 
 [![Cinematic still](docs/demo/still_hero.png)](docs/demo/cinematic.mp4)
+[![Immune chimeric still](docs/demo/still_immune_hero.png)](docs/demo/immune_chimeric.mp4)
 
-Share clip (≈12 s, real mesh): [`docs/demo/cinematic.mp4`](docs/demo/cinematic.mp4). Immune + chimeric-protein demo: [`docs/demo/immune_chimeric.mp4`](docs/demo/immune_chimeric.mp4) (`python -m confluence.demo_immune`). Both jobs **fail** if fruitfly.xml cannot render. See [`docs/demo/README.md`](docs/demo/README.md).
+Share clip (≈12 s, real mesh): [`docs/demo/cinematic.mp4`](docs/demo/cinematic.mp4). Immune + chimeric-protein demo (controller F, I_act / engager HUD): [`docs/demo/immune_chimeric.mp4`](docs/demo/immune_chimeric.mp4) (`python -m confluence.demo_immune`). Both jobs **fail** if fruitfly.xml cannot render. Research scores, not a cure. See [`docs/demo/README.md`](docs/demo/README.md).
 
 Interactive Kenyon-cell count defaults to **256** for real-time FPS (documented). Pass `n_kc=2048` in `MushroomBodyNetwork` / controllers for a more FlyWire-like expansion. Controller **F** is a separate sparse rate-based net that can be constructed at `n_neurons=166700` (see below); the UI default stays on the small demo.
 
