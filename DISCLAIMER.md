@@ -11,7 +11,7 @@ Project Confluence is a **computational research tool** designed for scientific 
 
 Connectome controllers (including the optional 166,700-unit sparse net and “protein” effector channels) are **in-silico control signals**. They do not synthesize therapeutics, express genes, or constitute a biologic manufacturing or dosing system.
 
-**We have not cured cancer computationally.** Simulated tumor-burden, resistance, and therapy-channel metrics in this repository are research scores on an ODE, not a claim of disease eradication, clinical benefit, or a path to a cure.
+**We have not cured cancer computationally.** Simulated tumor-burden, resistance, fusion-allele, junction-neoantigen, and therapy-channel metrics in this repository are research scores on an ODE, not a claim of disease eradication, clinical benefit, or a path to a cure. Fusion-protein terms are inspired by chimeric-mRNA biology (BCR–ABL / EML4–ALK / NTRK-class); they are not a clinical fusion assay.
 
 ## No Medical Advice
 

@@ -44,7 +44,7 @@ def test_untreated_tumor_does_not_explode():
     for _ in range(400):
         x, c = ode.step(x, c, u, dt=0.2)
     assert np.all(np.isfinite(x))
-    assert x[0] + x[1] < 50.0
+    assert x[0] + x[1] + x[11] < 50.0
 
 
 def test_pk_decay_and_catalog_size():

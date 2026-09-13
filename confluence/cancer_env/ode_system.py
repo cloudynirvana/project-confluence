@@ -1,16 +1,22 @@
-"""Coupled nonlinear ODE for the 11-D cancer microenvironment.
+"""Coupled nonlinear ODE for the 12-D cancer microenvironment.
 
 Latent state X:
-    T_s, T_r, I_act, I_exh, S_fib, L, O, G, C_tgfb, C_ifng, H
+    T_s, T_r, I_act, I_exh, S_fib, L, O, G, C_tgfb, C_ifng, H, T_f
+
+The first 11 coordinates are the original TME. ``T_f`` is a fusion-
+oncoprotein clone (chimeric-driver–positive). Fusion proteins in biology
+arise from chimeric mRNAs at a gene-junction; here ``T_f`` is a
+research state, not a sequenced patient fusion.
 
 Design:
-    * logistic tumor growth with Lotka–Volterra competition
+    * logistic tumor growth with Lotka–Volterra competition (3 clones)
     * phenotypic switch ε_switch(C_drugs, L) attenuated by HDAC occupancy
     * immune kill attenuated by stroma
     * exhaustion γ_exh(TGF-β, L, PD1 occupancy)
     * lactate production / MCT1-modulated clearance
     * stroma driven by TGF-β
     * host health H ∈ [0, 1]; H ≤ 0.2 is terminal toxicity
+    * fusion TKIs preferentially kill T_f (imatinib-like / ALK-class)
 
 The RHS is Lipschitz on a compact box (clip + saturating Hill terms) so
 explicit RK4 and scipy LSODA stay finite for ≥1000 interactive steps.
@@ -29,7 +35,7 @@ from confluence.pharmacology.pk_pd_model import PKPDModel, hill_occupancy
 
 STATE_NAMES = LATENT_NAMES
 STATE_INDEX = {name: i for i, name in enumerate(STATE_NAMES)}
-DIM = 11
+DIM = 12
 
 
 def _sat(x: float, k: float) -> float:
@@ -74,14 +80,30 @@ class ArchetypeParams:
     r_host: float = 0.05
     kappa_burden: float = 0.04
     kappa_tox: float = 0.10
+    # Fusion-oncoprotein clone (chimeric driver). Class labels are
+    # research mappings, not clinical genotyping.
+    fusion_id: str = "fusion_oncoprotein"
+    fusion_display: str = "generic chimeric oncoprotein"
+    r_f: float = 0.16
+    alpha_fs: float = 0.70
+    alpha_sf: float = 0.50
+    alpha_fr: float = 0.60
+    alpha_rf: float = 0.55
+    kappa_fusion: float = 0.72
+    fusion_immune_factor: float = 0.50
+    fusion_kinase_factor: float = 0.08
+    tki_imatinib_weight: float = 0.45
+    tki_alk_weight: float = 0.55
+    eps_fusion: float = 0.004
+    k_junction_shed: float = 0.85
     x0: Tuple[float, ...] = (
-        0.85, 0.15, 0.35, 0.12, 0.25, 0.40, 0.70, 1.10, 0.35, 0.30, 0.92,
+        0.85, 0.15, 0.35, 0.12, 0.25, 0.40, 0.70, 1.10, 0.35, 0.30, 0.92, 0.12,
     )
     notes: str = ""
 
 
 class CancerODE:
-    """11-D microenvironment + catalog PK (5-D default, 9-D with proteins)."""
+    """12-D microenvironment + catalog PK (5-D default; proteins + fusion TKIs)."""
 
     def __init__(
         self,
@@ -100,10 +122,14 @@ class CancerODE:
 
     def initial_state(self) -> Tuple[np.ndarray, np.ndarray]:
         x = np.array(self.params.x0, dtype=float)
-        return x, self.pk.zeros()
+        if x.size < DIM:
+            x = np.pad(x, (0, DIM - x.size))
+        return x[:DIM], self.pk.zeros()
 
     def clip_state(self, x: np.ndarray) -> np.ndarray:
         y = np.asarray(x, dtype=float).copy()
+        if y.size < DIM:
+            y = np.pad(y, (0, DIM - y.size))
         y[0] = max(y[0], 0.0)  # T_s
         y[1] = max(y[1], 0.0)  # T_r
         y[2] = np.clip(y[2], 0.0, 1.2)  # I_act
@@ -115,6 +141,7 @@ class CancerODE:
         y[8] = max(y[8], 0.0)  # C_tgfb
         y[9] = max(y[9], 0.0)  # C_ifng
         y[10] = np.clip(y[10], 0.0, 1.0)  # H
+        y[11] = max(y[11], 0.0)  # T_f
         return y
 
     def occupancies(self, c: np.ndarray) -> Dict[str, float]:
@@ -122,9 +149,13 @@ class CancerODE:
 
     def rhs_cancer(self, x: np.ndarray, occ: Mapping[str, float], tox_load: float) -> np.ndarray:
         p = self.params
-        T_s, T_r, I_act, I_exh, S_fib, L, O, G, C_tgfb, C_ifng, H = [float(v) for v in x]
+        xv = [float(v) for v in x]
+        if len(xv) < DIM:
+            xv = xv + [0.0] * (DIM - len(xv))
+        T_s, T_r, I_act, I_exh, S_fib, L, O, G, C_tgfb, C_ifng, H, T_f = xv[:DIM]
         T_s = max(T_s, 0.0)
         T_r = max(T_r, 0.0)
+        T_f = max(T_f, 0.0)
         I_act = max(I_act, 0.0)
         I_exh = max(I_exh, 0.0)
         S_fib = float(np.clip(S_fib, 0.0, 1.0))
@@ -146,11 +177,17 @@ class CancerODE:
         e_kin = float(occ.get("targeted_kinase", 0.0))
         e_ifng_p = float(occ.get("protein_ifng", 0.0))
         e_il2 = float(occ.get("protein_il2", 0.0))
+        e_ima = float(occ.get("tki_imatinib_like", 0.0))
+        e_alk = float(occ.get("tki_alk", 0.0))
+        e_fusion = float(
+            np.clip(p.tki_imatinib_weight * e_ima + p.tki_alk_weight * e_alk, 0.0, 1.5)
+        )
 
-        burden = T_s + T_r
+        burden = T_s + T_r + T_f
         nutrient = _sat(G, 0.35) * (0.35 + 0.65 * _sat(O, 0.25))
-        crowding_s = (T_s + p.alpha_rs * T_r) / max(p.k_carry, 1e-8)
-        crowding_r = (T_r + p.alpha_sr * T_s) / max(p.k_carry, 1e-8)
+        crowding_s = (T_s + p.alpha_rs * T_r + p.alpha_fs * T_f) / max(p.k_carry, 1e-8)
+        crowding_r = (T_r + p.alpha_sr * T_s + p.alpha_fr * T_f) / max(p.k_carry, 1e-8)
+        crowding_f = (T_f + p.alpha_sf * T_s + p.alpha_rf * T_r) / max(p.k_carry, 1e-8)
 
         stroma_shield = 1.0 - 0.85 * S_fib
         ifng_boost = 1.0 + 0.6 * _sat(C_ifng, 0.4)
@@ -170,13 +207,23 @@ class CancerODE:
             p.r_s * T_s * (1.0 - crowding_s) * nutrient
             - immune_kill * T_s
             - p.kappa_kinase * e_kin * T_s
+            - 0.12 * p.kappa_fusion * e_fusion * T_s
             - eps_switch * T_s
+            - p.eps_fusion * T_s
         )
         dT_r = (
             p.r_r * T_r * (1.0 - crowding_r) * nutrient
             - immune_kill * p.resist_immune_factor * T_r
             - p.kappa_kinase * e_kin * p.resist_kinase_factor * T_r
+            - 0.08 * p.kappa_fusion * e_fusion * T_r
             + eps_switch * T_s
+        )
+        dT_f = (
+            p.r_f * T_f * (1.0 - crowding_f) * nutrient
+            - immune_kill * p.fusion_immune_factor * T_f
+            - p.kappa_kinase * e_kin * p.fusion_kinase_factor * T_f
+            - p.kappa_fusion * e_fusion * T_f
+            + p.eps_fusion * T_s
         )
 
         # Exhaustion γ_exh(TGF-β, lactate, PD-1 occupancy)
@@ -216,7 +263,7 @@ class CancerODE:
             dH = min(dH, -0.01 * H)
 
         return np.array(
-            [dT_s, dT_r, dI_act, dI_exh, dS, dL, dO, dG, dTgf, dIfn, dH],
+            [dT_s, dT_r, dI_act, dI_exh, dS, dL, dO, dG, dTgf, dIfn, dH, dT_f],
             dtype=float,
         )
 
@@ -292,4 +339,10 @@ class CancerODE:
         return {"t": sol.t, "x": xs, "c": cs, "success": bool(sol.success)}
 
     def to_latent(self, x: np.ndarray, t: float = 0.0) -> LatentCancerState:
-        return LatentCancerState.from_vector(self.clip_state(x), t=t)
+        state = LatentCancerState.from_vector(self.clip_state(x), t=t)
+        return state.model_copy(
+            update={
+                "fusion_id": self.params.fusion_id,
+                "fusion_display": self.params.fusion_display,
+            }
+        )

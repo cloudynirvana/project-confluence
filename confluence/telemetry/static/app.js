@@ -11,7 +11,11 @@ const PROTEINS = [
   ["protein_ifng", "IFN-γ"],
   ["protein_il2", "IL-2"],
 ];
-const EFFECTORS = DRUGS.concat(PROTEINS);
+const FUSIONS = [
+  ["tki_imatinib_like", "imatinib-like"],
+  ["tki_alk", "ALK TKI"],
+];
+const EFFECTORS = DRUGS.concat(PROTEINS).concat(FUSIONS);
 
 const MAX_POINTS = 180;
 const wsProto = location.protocol === "https:" ? "wss" : "ws";
@@ -21,6 +25,7 @@ const $ = (id) => document.getElementById(id);
 const sliderBox = $("sliders");
 const bars = $("drug-bars");
 const proteinBars = $("protein-bars");
+const fusionBars = $("fusion-bars");
 const manual = {};
 let lastEmb = null;
 let lastConn = {};
@@ -47,6 +52,7 @@ function addSliderAndBar(id, label, barParent, protein) {
 
 DRUGS.forEach(([id, label]) => addSliderAndBar(id, label, bars, false));
 PROTEINS.forEach(([id, label]) => addSliderAndBar(id, label, proteinBars, true));
+if (fusionBars) FUSIONS.forEach(([id, label]) => addSliderAndBar(id, label, fusionBars, false));
 
 function send(cmd, extra = {}) {
   if (ws.readyState === 1) ws.send(JSON.stringify({ cmd, ...extra }));
@@ -68,6 +74,8 @@ const traces = {
     makeTrace("obs TGF-β", "#7aa2d4"),
     makeTrace("immune ratio", "#8fbc8f"),
     makeTrace("host H", "#e8e0d4", [2, 3]),
+    makeTrace("fusion AF", "#c084fc"),
+    makeTrace("junction neoAg", "#f0b7a4", [3, 3]),
   ],
   mbon: [
     makeTrace("MBON mean", "#d4a054"),
@@ -246,6 +254,7 @@ function applyFrame(frame) {
   traces.cancer.forEach((tr, i) => tr.ys.push([
     Y.tumor_burden, L.tumor_burden, Y.resistance_frequency,
     Y.lactate, Y.tgfb, Y.immune_competence_ratio, L.H,
+    Y.fusion_allele_fraction, Y.junction_neoantigen,
   ][i]));
   const C = frame.connectome || {};
   lastConn = C;
@@ -301,6 +310,13 @@ function applyFrame(frame) {
   if ($("protein-active")) {
     $("protein-active").textContent = `active: ${proteinActive.length ? proteinActive.join(", ") : "none"}`;
   }
+  const fusionActive = (frame.drugs.fusion && frame.drugs.fusion.active) || [];
+  if ($("fusion-active")) {
+    $("fusion-active").textContent = `active: ${fusionActive.length ? fusionActive.join(", ") : "none"} · research TKI, not a clinical assay`;
+  }
+  if ($("fusion-class")) {
+    $("fusion-class").textContent = `fusion class: ${L.fusion_display || Y.fusion_id || "—"}`;
+  }
   if ($("hud-burden")) $("hud-burden").textContent = Number(L.tumor_burden).toFixed(2);
   if ($("hud-resist")) $("hud-resist").textContent = Number(L.resistance_frequency).toFixed(2);
   if ($("hud-da")) $("hud-da").textContent = Number(C.da || 0).toFixed(3);
@@ -308,6 +324,9 @@ function applyFrame(frame) {
     $("hud-proteins").textContent = proteinActive.length
       ? proteinActive.map((p) => p.replace("protein_", "")).join(" · ")
       : "—";
+  }
+  if ($("hud-fusion")) {
+    $("hud-fusion").textContent = Number(Y.fusion_allele_fraction ?? L.fusion_allele_fraction ?? 0).toFixed(3);
   }
   $("source").textContent = `source: ${frame.drugs.source} ${frame.drugs.notes || ""}`;
   if ($("emb-backend")) {

@@ -17,15 +17,15 @@ import numpy as np
 
 from confluence.connectome.circuit_extractor import CircuitExtractor, CompiledCircuit
 from confluence.connectome.client_stub import FlyWireClient
-from confluence.contracts import CONTROL_DRUG_IDS, ObservationRecord
+from confluence.contracts import CONTROL_DRUG_IDS, FUSION_CHANNEL_IDS, ObservationRecord
 from confluence.neural_engine.plasticity import DopaminePlasticity, dopamine_signal
 
 
 @dataclass
 class NetworkConfig:
     n_kc: int = 256
-    n_obs: int = 5
-    n_out: int = 5
+    n_obs: int = 7
+    n_out: int = 7
     sparsity: float = 0.05
     tau_mbon: float = 0.35
     seed: int = 7
@@ -37,7 +37,7 @@ class MushroomBodyNetwork:
         self,
         config: Optional[NetworkConfig] = None,
         compiled: Optional[CompiledCircuit] = None,
-        drug_ids: Sequence[str] = CONTROL_DRUG_IDS,
+        drug_ids: Sequence[str] = CONTROL_DRUG_IDS + FUSION_CHANNEL_IDS,
     ):
         self.config = config or NetworkConfig()
         self.drug_ids = tuple(drug_ids)
@@ -58,6 +58,10 @@ class MushroomBodyNetwork:
 
         # Sensory → PN (AL/LH-style). Random but structured: each obs fans out.
         self.w_in = rng.normal(0.0, 0.8, size=(n_pn, self.config.n_obs))
+        # Junction / fusion-AF columns (last two) get a stronger prior so E
+        # can up-weight fusion TKIs when chimeric-junction signal rises.
+        if self.config.n_obs >= 7:
+            self.w_in[:, -2:] += rng.normal(0.35, 0.15, size=(n_pn, 2))
         self.pn_bias = rng.normal(0.0, 0.1, size=n_pn)
         self.w_pn_kc = compiled.w_pn_kc.copy()
         self.w_kc_mbon = compiled.w_kc_mbon.copy()
@@ -72,6 +76,10 @@ class MushroomBodyNetwork:
         for i in range(self.config.n_out):
             self.w_out[i, excitatory[i % len(excitatory)]] += 0.85
             self.w_out[i, excitatory[(i + 2) % len(excitatory)]] += 0.35
+        # Extra prior on fusion-TKI rows (trailing channels).
+        if self.config.n_out >= 7:
+            for i in range(self.config.n_out - 2, self.config.n_out):
+                self.w_out[i, excitatory[i % len(excitatory)]] += 0.40
         self.apl = compiled.w_apl_kc.copy()
 
         self.mbon_rate = np.zeros(n_mbon, dtype=float)
@@ -81,6 +89,7 @@ class MushroomBodyNetwork:
         self.last_sparsity = 0.0
         self.prev_burden: Optional[float] = None
         self.prev_resist: Optional[float] = None
+        self.prev_fusion: Optional[float] = None
 
     def _k_winners(self, drive: np.ndarray) -> np.ndarray:
         n_kc = drive.size
@@ -93,6 +102,10 @@ class MushroomBodyNetwork:
 
     def encode(self, observation: ObservationRecord) -> Dict[str, np.ndarray]:
         y = np.asarray(observation.as_vector(), dtype=float)
+        if y.size < self.config.n_obs:
+            y = np.pad(y, (0, self.config.n_obs - y.size))
+        elif y.size > self.config.n_obs:
+            y = y[: self.config.n_obs]
         # Gentle normalization so different archetypes stay in a similar band.
         y_n = y / (1.0 + np.abs(y))
         pn = np.tanh(self.w_in @ y_n + self.pn_bias)
@@ -126,15 +139,19 @@ class MushroomBodyNetwork:
     ) -> float:
         burden = observation.tumor_burden
         resist = observation.resistance_frequency
+        fusion = observation.fusion_allele_fraction
         if self.prev_burden is None:
             delta_b = 0.0
             delta_r = 0.0
+            delta_f = 0.0
         else:
             delta_b = burden - self.prev_burden
             delta_r = resist - self.prev_resist
+            delta_f = fusion - (self.prev_fusion or 0.0)
         self.prev_burden = burden
         self.prev_resist = resist
-        da = dopamine_signal(delta_b, concentrations_sum, delta_r)
+        self.prev_fusion = fusion
+        da = dopamine_signal(delta_b, concentrations_sum, delta_r, delta_f)
         self.last_da = da
         return da
 

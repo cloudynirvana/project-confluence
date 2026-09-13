@@ -30,11 +30,18 @@ class PancreaticPDACArchetype(ArchetypeParams):
             p_tgfb=0.28,
             cl_tgfb=0.08,
             kappa_burden=0.050,
-            x0=(0.80, 0.18, 0.14, 0.20, 0.62, 0.55, 0.38, 1.00, 0.75, 0.12, 0.88),
+            fusion_id="nrg1_ntrk_like",
+            fusion_display="NRG1 / NTRK-class chimeric oncoprotein",
+            r_f=0.13,
+            tki_imatinib_weight=0.15,
+            tki_alk_weight=1.0,
+            kappa_fusion=0.75,
+            x0=(0.80, 0.18, 0.14, 0.20, 0.62, 0.55, 0.38, 1.00, 0.75, 0.12, 0.88, 0.10),
             notes=(
                 "Desmoplastic PDAC-like TME: high baseline fibrosis, TGF-β production, "
                 "and stromal shielding of immune kill. Builds on the v1 PDAC rogue-"
                 "closure intuition (KRAS persistence + exclusion) without claiming "
-                "patient-level calibration."
+                "patient-level calibration. Fusion clone is NRG1/NTRK-class "
+                "(KRAS-WT PDAC-inspired; research mapping)."
             ),
         )

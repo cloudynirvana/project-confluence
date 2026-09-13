@@ -1,7 +1,7 @@
 """Dopamine-modulated KC→MBON plasticity.
 
     dW_ij / dt = η · DA(t) · KC_j · MBON_i − λ W_ij
-    DA(t) = −Δburden − α · Σ C_k − β · Δresistance
+    DA(t) = −Δburden − α · Σ C_k − β · Δresistance − γ · Δfusion_AF
 
 Weights are clipped to a compact interval so they cannot explode under
 large reward transients (see tests/test_plasticity_bounds.py).
@@ -18,12 +18,19 @@ def dopamine_signal(
     delta_burden: float,
     concentrations_sum: float,
     delta_resistance: float,
+    delta_fusion: float = 0.0,
     alpha: float = 0.08,
     beta: float = 0.35,
+    gamma: float = 0.40,
     clip: float = 2.5,
 ) -> float:
-    """Negative when burden or resistance rises, or when drug load is high."""
-    da = -float(delta_burden) - alpha * float(concentrations_sum) - beta * float(delta_resistance)
+    """Negative when burden, resistance, or fusion AF rises, or drug load is high."""
+    da = (
+        -float(delta_burden)
+        - alpha * float(concentrations_sum)
+        - beta * float(delta_resistance)
+        - gamma * float(delta_fusion)
+    )
     return float(np.clip(da, -clip, clip))
 
 

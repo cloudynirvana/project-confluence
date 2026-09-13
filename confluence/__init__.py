@@ -13,6 +13,7 @@ from confluence.contracts import (
     ConnectomeSubcircuit,
     DrugSpecification,
     FULL_BRAIN_NEURONS,
+    FUSION_CHANNEL_IDS,
     InterventionAction,
     LatentCancerState,
     ObservationRecord,
@@ -30,5 +31,6 @@ __all__ = [
     "LatentCancerState",
     "ObservationRecord",
     "PROTEIN_CHANNEL_IDS",
+    "FUSION_CHANNEL_IDS",
     "__version__",
 ]

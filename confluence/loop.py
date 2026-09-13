@@ -124,15 +124,17 @@ class ClosedLoopSimulator:
         if not self.embodiment_enabled or self.embodiment.last is None:
             return obs
         mixed = self.embodiment.mix_observation(obs.as_vector(), alpha=self.embodiment_alpha)
-        return obs.model_copy(
-            update={
-                "tumor_burden": float(max(0.0, mixed[0])),
-                "resistance_frequency": float(np.clip(mixed[1], 0.0, 1.0)),
-                "lactate": float(max(0.0, mixed[2])),
-                "tgfb": float(max(0.0, mixed[3])),
-                "immune_competence_ratio": float(max(0.0, mixed[4])),
-            }
-        )
+        update = {
+            "tumor_burden": float(max(0.0, mixed[0])),
+            "resistance_frequency": float(np.clip(mixed[1], 0.0, 1.0)),
+            "lactate": float(max(0.0, mixed[2])),
+            "tgfb": float(max(0.0, mixed[3])),
+            "immune_competence_ratio": float(max(0.0, mixed[4])),
+        }
+        if mixed.size >= 7:
+            update["fusion_allele_fraction"] = float(np.clip(mixed[5], 0.0, 1.0))
+            update["junction_neoantigen"] = float(max(0.0, mixed[6]))
+        return obs.model_copy(update=update)
 
     def step(self, run_cancer: bool = True, run_embodiment: bool = True) -> SimFrame:
         obs_true = self._observe()

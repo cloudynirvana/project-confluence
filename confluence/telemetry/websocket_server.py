@@ -23,6 +23,7 @@ from confluence.cancer_env.archetypes import ARCHETYPES, DISPLAY_NAMES
 from confluence.contracts import (
     DEMO_BRAIN_NEURONS,
     FULL_BRAIN_NEURONS,
+    FUSION_CHANNEL_IDS,
     INTERACTIVE_BRAIN_NEURONS,
     PROTEIN_CHANNEL_IDS,
 )
@@ -70,6 +71,7 @@ async def health():
         "embodiment": flybody_status(),
         "full_brain_neurons": FULL_BRAIN_NEURONS,
         "protein_channels": list(PROTEIN_CHANNEL_IDS),
+        "fusion_channels": list(FUSION_CHANNEL_IDS),
     }
 
 
@@ -162,6 +164,7 @@ class LiveSession:
             "brain_mode": self.brain_mode,
             "n_neurons": self.n_neurons,
             "protein_channels": list(PROTEIN_CHANNEL_IDS),
+            "fusion_channels": list(FUSION_CHANNEL_IDS),
             "training": dict(self.training),
             "embodiment_status": flybody_status(),
         }

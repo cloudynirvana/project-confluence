@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Confluence v2</title>
-  <link rel="stylesheet" href="/static/style.css?v=fruitfly3" />
+  <link rel="stylesheet" href="/static/style.css?v=fusion1" />
 </head>
 <body class="lab mode-both">
   <canvas id="hero" aria-label="Flybody viewport"></canvas>
@@ -27,6 +27,7 @@
     <div class="stat"><span>resist</span><strong id="hud-resist">—</strong></div>
     <div class="stat"><span>DA</span><strong id="hud-da">—</strong></div>
     <div class="stat"><span>proteins</span><strong id="hud-proteins">—</strong></div>
+    <div class="stat"><span>fusion AF</span><strong id="hud-fusion">—</strong></div>
   </aside>
 
   <div class="hud-bottom">
@@ -137,6 +138,10 @@
       <h3 class="subhead">Protein / biologic channels</h3>
       <p class="src" id="protein-active">active: —</p>
       <div class="bars" id="protein-bars"></div>
+      <h3 class="subhead">Fusion-directed TKI channels</h3>
+      <p class="src" id="fusion-active">active: — · chimeric junction / fusion AF is a research proxy, not a clinical assay</p>
+      <p class="src" id="fusion-class">fusion class: —</p>
+      <div class="bars" id="fusion-bars"></div>
     </section>
 
     <section class="panel" id="panel-embodiment">
@@ -158,6 +163,6 @@
     <span id="warn" class="warn hidden">HOST TOXICITY WARNING</span>
   </footer>
 
-  <script src="/static/app.js?v=fruitfly3"></script>
+  <script src="/static/app.js?v=fusion1"></script>
 </body>
 </html>

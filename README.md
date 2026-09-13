@@ -39,7 +39,8 @@ See `CITATION.cff`. DOI badge added below once Zenodo publishes.
 
 **Honesty — read this first**
 
-- Confluence is a **research closed-loop**: noisy observations → connectome-style controller → simulated infusion `U(t)` → PK/PD → 11-D cancer ODE. In-silico burden / resistance / DA / “protein channel” scores are **not** a computational cure for cancer and are not a treatment recommendation.
+- Confluence is a **research closed-loop**: noisy observations → connectome-style controller → simulated infusion `U(t)` → PK/PD → 12-D cancer ODE (11-D TME + fusion clone `T_f`). In-silico burden / resistance / fusion-AF / DA / “protein channel” scores are **not** a computational cure for cancer and are not a treatment recommendation.
+- Fusion proteins in biology arise from **chimeric mRNAs** at a gene junction. Our `T_f` clone, fusion allele fraction, and junction-neoantigen traces are **computational proxies**, not a clinical NGS / ctDNA assay and not a claim that we detected or treated a real fusion.
 - The hero viewport and `docs/demo/cinematic.mp4` must show the **TuragaLab/flybody** anatomical MuJoCo mesh (`fruitfly.xml`, Apache 2.0; Vaxenburg et al., *Nature* 2025). A CPG / bead-fly stub is **not** an acceptable product visual. If flybody is missing, the UI shows an install CTA instead of a fake fly.
 - Visual fidelity requires the flybody extra + headless GL (`MUJOCO_GL=osmesa` or `egl`). NeuroMechFly / FlyGym is an acceptable alternate digital twin only if flybody cannot be installed — document which body is on screen.
 
@@ -51,15 +52,17 @@ The closed loop is:
 Y (noisy, partial) → sensory W_in → AL/LH projection → sparse Kenyon cells
     → MBON rates → motor decode U = clip(W_out · rates, 0)
     → PK  dC_k/dt = −(ln 2 / t½) C_k + U_k(t)
-    → 11-D ODE  X = (T_s, T_r, I_act, I_exh, S_fib, L, O, G, C_tgfb, C_ifng, H)
+    → 12-D ODE  X = (T_s, T_r, I_act, I_exh, S_fib, L, O, G, C_tgfb, C_ifng, H, T_f)
     → Y′
 ```
+
+`T_f` is a fusion-oncoprotein clone. Observed `Y` also carries a noisy chimeric-junction / fusion-AF pair (research simulation).
 
 Plasticity on KC→MBON synapses:
 
 ```
 dW_ij/dt = η · DA(t) · KC_j · MBON_i − λ W_ij
-DA(t)    = −Δburden − α · Σ C_k − β · Δresistance
+DA(t)    = −Δburden − α · Σ C_k − β · Δresistance − γ · Δfusion_AF
 ```
 
 Host health `H ∈ [0, 1]`; `H ≤ 0.2` is terminal toxicity. Phenotypic switching `ε_switch(C_drugs, L)` is attenuated by HDAC occupancy. Immune kill is stroma-shielded. Exhaustion `γ_exh` rises with TGF-β, lactate, and unblocked PD-1.
@@ -92,7 +95,7 @@ Interactive Kenyon-cell count defaults to **256** for real-time FPS (documented)
 
 ```bash
 # package tests
-python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py tests/test_flybody_bridge.py tests/test_protein_channels.py tests/test_full_brain_scale.py tests/test_training_smoke.py tests/test_cinematic_render.py -q
+python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py tests/test_flybody_bridge.py tests/test_protein_channels.py tests/test_full_brain_scale.py tests/test_training_smoke.py tests/test_cinematic_render.py tests/test_fusion_biology.py -q
 
 # short controller bake-off (3 archetypes × A–E)
 python -m confluence --benchmark --trials 2 --horizon 40
@@ -167,9 +170,9 @@ The user-named size `FULL_BRAIN_NEURONS = 166700` is a FlyWire-class whole-brain
 
 Interactive FPS stays on the 256-KC mushroom body. Switching the UI to **Full-brain 166,700** will construct the sparse net in-process and may hitch the browser loop; prefer the CLI for long runs.
 
-### Effector layer (small molecules + biologics)
+### Effector layer (small molecules + biologics + fusion TKIs)
 
-Controllers A–E still emit the original 5-D `U` (`anti_pd1`, `tgfb_inhibitor`, `mct1`, `hdac`, `targeted_kinase`). The closed-loop PK state is 9-D: those five plus four **protein/biologic** channels that default to 0 unless controller F (or a manual override) drives them:
+Controllers A–D still emit the original 5-D `U` (`anti_pd1`, `tgfb_inhibitor`, `mct1`, `hdac`, `targeted_kinase`). Controller **E** also emits two fusion-directed TKI channels. The closed-loop PK state is 11-D: those five plus four **protein/biologic** channels plus two **fusion TKIs**. Proteins default to 0 unless controller F (or a manual override) drives them.
 
 | Channel | Simulated class | Notes |
 |---------|-----------------|-------|
@@ -177,14 +180,26 @@ Controllers A–E still emit the original 5-D `U` (`anti_pd1`, `tgfb_inhibitor`,
 | `protein_tgfb_trap` | TGF-β neutralizing trap | Slower clearance than galunisertib |
 | `protein_ifng` | IFN-γ cytokine | Adds to `C_ifng` production |
 | `protein_il2` | IL-2 / fusion-adjacent cytokine | Boosts immune recruitment; higher `tox_weight` |
+| `tki_imatinib_like` | BCR–ABL / KIT / PDGFR-class TKI | Preferential kill on `T_f` (Druker et al. class reference) |
+| `tki_alk` | EML4–ALK / ROS1 / NTRK-class TKI | Preferential kill on `T_f` (Kwak et al. class reference) |
 
 Half-lives and organ weights are **simulation-scaled** class references (catalog DOIs), not a dosing protocol. Host-health toxicity uses a per-channel `tox_weight` so biologics do not share small-molecule marrow/cardiac profiles.
+
+### Chimeric fusion biology (research simulation)
+
+Fusion oncoproteins arise from **chimeric mRNAs** at a chromosomal junction (BCR–ABL, EML4–ALK, TMPRSS2–ERG, FGFR3–TACC3, NRG1/NTRK). Confluence adds:
+
+- latent clone `T_f` (12th ODE coordinate; `H` stays at index 10)
+- noisy `Y` channels `fusion_allele_fraction` (ctDNA-like) and `junction_neoantigen` (chimeric junction peptide / transcript proxy)
+- per-archetype research labels: GBM `fgfr3_tacc3_like`, PDAC `nrg1_ntrk_like`, melanoma `alk_braf_fusion_like`
+
+This is **not** a clinical fusion assay, not patient genotyping, and **not a cure**. Controllers E/F receive the junction channels in `Y` and can up-weight fusion TKIs when that signal rises; DA includes `−γ Δfusion_AF`.
 
 Closed loop:
 
 ```
-Y (cancer ± proprio) → 166k-scale sparse net → U_small + U_protein
-    → first-order PK (slower mAb/trap clearance) → 11-D ODE → Y′
+Y (cancer ± proprio ± fusion AF / junction) → 166k-scale sparse net → U_small + U_protein + U_fusion
+    → first-order PK → 12-D ODE → Y′
 ```
 
 ### Training

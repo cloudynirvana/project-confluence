@@ -1,5 +1,5 @@
 {
-  "version": "2.1",
+  "version": "2.2",
   "unit_note": "half_life_hours are clinical-scale values used directly in PK. ic50/mtd/organ_toxicity are simulation-scaled so C(t) stays O(1) in the interactive ODE. clinical_ic50_note records published units.",
   "drugs": [
     {
@@ -304,6 +304,64 @@
       "provenance": {
         "doi": "10.1200/JCO.1989.7.12.1863",
         "note": "Rosenberg et al., JCO 1989 (high-dose IL-2). Class reference for a cytokine/fusion-adjacent effector. Simulated dosing only.",
+        "placeholder": false
+      }
+    },
+    {
+      "id": "tki_imatinib_like",
+      "name": "Imatinib-like fusion TKI",
+      "drug_class": "fusion_tki",
+      "mechanism": "Simulated BCR–ABL / KIT / PDGFR-class TKI. Preferential kill on the T_f fusion-oncoprotein clone. Class-reference PK, not a CML dosing protocol.",
+      "half_life_hours": 18.0,
+      "ic50": 0.28,
+      "hill": 1.5,
+      "mtd": 1.0,
+      "organ_toxicity": {
+        "liver": 0.12,
+        "kidney": 0.05,
+        "heart": 0.08,
+        "marrow": 0.18,
+        "immune": 0.02,
+        "gut": 0.12,
+        "nerve": 0.05
+      },
+      "control_channel": "tki_imatinib_like",
+      "clinical_half_life_hours": 18.0,
+      "clinical_ic50_note": "Imatinib t1/2 ~18 h. IC50 is simulation-scaled occupancy. RESEARCH SIMULATION of a fusion-directed TKI, not a prescribed regimen.",
+      "modality": "small_molecule",
+      "tox_weight": 0.75,
+      "provenance": {
+        "doi": "10.1056/NEJM200104053441401",
+        "note": "Druker et al., NEJM 2001 (imatinib in CML). Used only as a BCR–ABL-class PK/PD reference for a fusion-kinase channel.",
+        "placeholder": false
+      }
+    },
+    {
+      "id": "tki_alk",
+      "name": "ALK / NTRK-class fusion TKI",
+      "drug_class": "fusion_tki",
+      "mechanism": "Simulated EML4–ALK / ROS1 / NTRK-class TKI. Preferential kill on T_f. Maps to FGFR3–TACC3-like (GBM), NRG1/NTRK-like (PDAC), and ALK/BRAF-fusion-like (melanoma) research labels.",
+      "half_life_hours": 32.0,
+      "ic50": 0.24,
+      "hill": 1.6,
+      "mtd": 1.0,
+      "organ_toxicity": {
+        "liver": 0.18,
+        "kidney": 0.04,
+        "heart": 0.08,
+        "marrow": 0.08,
+        "immune": 0.02,
+        "gut": 0.10,
+        "nerve": 0.08
+      },
+      "control_channel": "tki_alk",
+      "clinical_half_life_hours": 32.0,
+      "clinical_ic50_note": "Crizotinib/alectinib-class t1/2 is hours-to-days. IC50 is simulation-scaled. Not a lung-ALK treatment plan.",
+      "modality": "small_molecule",
+      "tox_weight": 0.70,
+      "provenance": {
+        "doi": "10.1056/NEJMoa1001270",
+        "note": "Kwak et al., NEJM 2010 (crizotinib in ALK-rearranged NSCLC). Class reference for an ALK/NTRK-like fusion TKI channel.",
         "placeholder": false
       }
     }

@@ -19,6 +19,7 @@ LATENT_NAMES = (
     "C_tgfb",
     "C_ifng",
     "H",
+    "T_f",
 )
 
 CONTROL_DRUG_IDS = (
@@ -39,7 +40,26 @@ PROTEIN_CHANNEL_IDS = (
     "protein_il2",
 )
 
-ALL_EFFECTOR_IDS = CONTROL_DRUG_IDS + PROTEIN_CHANNEL_IDS
+# Fusion-directed TKI class channels. Kill terms prefer the T_f clone.
+# Catalog PK is class-reference (imatinib / ALK-inhibitor), not a regimen.
+FUSION_CHANNEL_IDS = (
+    "tki_imatinib_like",
+    "tki_alk",
+)
+
+ALL_EFFECTOR_IDS = CONTROL_DRUG_IDS + PROTEIN_CHANNEL_IDS + FUSION_CHANNEL_IDS
+
+# Y(t) sensory vector. First five channels stay the original cancer readout;
+# last two are chimeric-junction / fusion-AF proxies (research simulation).
+OBS_VECTOR_NAMES = (
+    "tumor_burden",
+    "resistance_frequency",
+    "lactate",
+    "tgfb",
+    "immune_competence_ratio",
+    "fusion_allele_fraction",
+    "junction_neoantigen",
+)
 
 # FlyWire-scale class size named by the user. Published adult FlyWire
 # reconstructions are the same order (~1e5 neurons); this repo uses a
@@ -50,7 +70,7 @@ DEMO_BRAIN_NEURONS = 256
 
 
 class LatentCancerState(BaseModel):
-    """Latent microenvironment state X ∈ R^11."""
+    """Latent microenvironment state X ∈ R^12 (11-D TME + fusion clone)."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -65,20 +85,34 @@ class LatentCancerState(BaseModel):
     C_tgfb: float = Field(..., description="TGF-β cytokine")
     C_ifng: float = Field(..., description="IFN-γ cytokine")
     H: float = Field(..., ge=0.0, le=1.0, description="Host health in [0, 1]")
+    T_f: float = Field(
+        0.0,
+        description="Fusion-oncoprotein clone (chimeric-driver–positive)",
+    )
     t: float = Field(0.0, description="Simulation time (days)")
+    fusion_id: str = Field(
+        "fusion_oncoprotein",
+        description="Archetype fusion class id (research label, not a genotype)",
+    )
+    fusion_display: str = Field(
+        "",
+        description="Human-readable fusion class (e.g. FGFR3–TACC3-like)",
+    )
 
     def as_vector(self) -> List[float]:
         return [getattr(self, name) for name in LATENT_NAMES]
 
     @classmethod
     def from_vector(cls, x, t: float = 0.0) -> "LatentCancerState":
-        values = {name: float(x[i]) for i, name in enumerate(LATENT_NAMES)}
+        values = {}
+        for i, name in enumerate(LATENT_NAMES):
+            values[name] = float(x[i]) if i < len(x) else 0.0
         values["t"] = float(t)
         return cls(**values)
 
     @property
     def tumor_burden(self) -> float:
-        return max(0.0, self.T_s + self.T_r)
+        return max(0.0, self.T_s + self.T_r + self.T_f)
 
     @property
     def resistance_frequency(self) -> float:
@@ -86,6 +120,19 @@ class LatentCancerState(BaseModel):
         if burden <= 1e-12:
             return 0.0
         return self.T_r / burden
+
+    @property
+    def fusion_allele_fraction(self) -> float:
+        """Fusion+ share of tumor — ctDNA-like fusion AF (latent, noiseless)."""
+        burden = self.tumor_burden
+        if burden <= 1e-12:
+            return 0.0
+        return max(0.0, self.T_f) / burden
+
+    @property
+    def junction_neoantigen(self) -> float:
+        """Chimeric junction peptide / mRNA pool proxy (∝ T_f)."""
+        return max(0.0, self.T_f) * 0.85
 
     @property
     def terminal_toxicity(self) -> bool:
@@ -103,19 +150,22 @@ class ObservationRecord(BaseModel):
     lactate: float
     tgfb: float
     immune_competence_ratio: float
+    fusion_allele_fraction: float = Field(
+        0.0,
+        description="Noisy ctDNA-like fusion allele fraction (research proxy, not a clinical NGS assay)",
+    )
+    junction_neoantigen: float = Field(
+        0.0,
+        description="Noisy chimeric-junction neoantigen / fusion-transcript proxy",
+    )
+    fusion_id: str = Field("fusion_oncoprotein", description="Archetype fusion class id")
     host_toxicity_warning: bool = False
     host_health: Optional[float] = Field(
         None, description="Optional privileged readout (not used by default controller)"
     )
 
     def as_vector(self) -> List[float]:
-        return [
-            self.tumor_burden,
-            self.resistance_frequency,
-            self.lactate,
-            self.tgfb,
-            self.immune_competence_ratio,
-        ]
+        return [float(getattr(self, name)) for name in OBS_VECTOR_NAMES]
 
 
 class OrganToxicityCoeffs(BaseModel):

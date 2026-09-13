@@ -79,7 +79,7 @@ def population_sizes(n_neurons: int) -> Dict[str, int]:
 @dataclass
 class FullBrainConfig:
     n_neurons: int = INTERACTIVE_BRAIN_NEURONS
-    n_obs: int = 5
+    n_obs: int = 7
     n_out: int = len(ALL_EFFECTOR_IDS)
     sparsity: float = 0.05
     fan_in: int = 7
@@ -110,6 +110,8 @@ class FullBrainNetwork:
         rng = np.random.default_rng(self.config.seed)
 
         self.w_in = rng.normal(0.0, 0.8, size=(self.n_pn, self.config.n_obs)).astype(np.float32)
+        if self.config.n_obs >= 7:
+            self.w_in[:, -2:] += rng.normal(0.35, 0.15, size=(self.n_pn, 2)).astype(np.float32)
         self.pn_bias = rng.normal(0.0, 0.1, size=self.n_pn).astype(np.float32)
         self.hidden_idx = rng.integers(
             0, self.n_pn, size=(self.n_hidden, self.config.fan_in), dtype=np.int32
@@ -145,6 +147,7 @@ class FullBrainNetwork:
         self.last_sparsity = 0.0
         self.prev_burden: Optional[float] = None
         self.prev_resist: Optional[float] = None
+        self.prev_fusion: Optional[float] = None
 
     def _k_winners(self, drive: np.ndarray) -> np.ndarray:
         n = drive.size
@@ -210,15 +213,19 @@ class FullBrainNetwork:
     ) -> float:
         burden = observation.tumor_burden
         resist = observation.resistance_frequency
+        fusion = observation.fusion_allele_fraction
         if self.prev_burden is None:
             delta_b = 0.0
             delta_r = 0.0
+            delta_f = 0.0
         else:
             delta_b = burden - self.prev_burden
             delta_r = resist - self.prev_resist
+            delta_f = fusion - (self.prev_fusion or 0.0)
         self.prev_burden = burden
         self.prev_resist = resist
-        da = dopamine_signal(delta_b, concentrations_sum, delta_r)
+        self.prev_fusion = fusion
+        da = dopamine_signal(delta_b, concentrations_sum, delta_r, delta_f)
         self.last_da = da
         return da
 
@@ -253,6 +260,7 @@ class FullBrainNetwork:
         self.u_rate[:] = 0.0
         self.prev_burden = None
         self.prev_resist = None
+        self.prev_fusion = None
         self.last_da = 0.0
 
     def save(self, path: str | Path) -> Path:

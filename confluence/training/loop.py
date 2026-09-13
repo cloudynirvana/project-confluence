@@ -73,6 +73,7 @@ def step_reward(latent, tox_load: float) -> float:
     return float(
         -1.2 * latent.tumor_burden
         - 0.9 * latent.resistance_frequency
+        - 0.8 * latent.fusion_allele_fraction
         - 0.6 * max(0.0, 0.7 - latent.H)
         - 0.08 * tox_load
         + 0.10 * latent.I_act

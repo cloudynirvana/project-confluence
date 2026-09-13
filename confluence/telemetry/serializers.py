@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
-from confluence.contracts import CONTROL_DRUG_IDS, PROTEIN_CHANNEL_IDS
+from confluence.contracts import CONTROL_DRUG_IDS, FUSION_CHANNEL_IDS, PROTEIN_CHANNEL_IDS
 from confluence.loop import SimFrame
 
 
@@ -31,8 +31,13 @@ def frame_to_dict(frame: SimFrame) -> Dict[str, Any]:
             "C_tgfb": latent.C_tgfb,
             "C_ifng": latent.C_ifng,
             "H": latent.H,
+            "T_f": latent.T_f,
             "tumor_burden": latent.tumor_burden,
             "resistance_frequency": latent.resistance_frequency,
+            "fusion_allele_fraction": latent.fusion_allele_fraction,
+            "junction_neoantigen": latent.junction_neoantigen,
+            "fusion_id": latent.fusion_id,
+            "fusion_display": latent.fusion_display,
         },
         "observed": {
             "tumor_burden": obs.tumor_burden,
@@ -40,6 +45,9 @@ def frame_to_dict(frame: SimFrame) -> Dict[str, Any]:
             "lactate": obs.lactate,
             "tgfb": obs.tgfb,
             "immune_competence_ratio": obs.immune_competence_ratio,
+            "fusion_allele_fraction": obs.fusion_allele_fraction,
+            "junction_neoantigen": obs.junction_neoantigen,
+            "fusion_id": obs.fusion_id,
             "host_toxicity_warning": obs.host_toxicity_warning,
         },
         "drugs": {
@@ -60,6 +68,16 @@ def frame_to_dict(frame: SimFrame) -> Dict[str, Any]:
                     for pid in PROTEIN_CHANNEL_IDS
                     if float(frame.action.infusion.get(pid, 0.0)) > 0.05
                     or float(frame.occupancies.get(pid, 0.0)) > 0.05
+                ],
+            },
+            "fusion": {
+                "U": _subset(frame.action.infusion, FUSION_CHANNEL_IDS),
+                "C": _subset(frame.concentrations, FUSION_CHANNEL_IDS),
+                "active": [
+                    fid
+                    for fid in FUSION_CHANNEL_IDS
+                    if float(frame.action.infusion.get(fid, 0.0)) > 0.05
+                    or float(frame.occupancies.get(fid, 0.0)) > 0.05
                 ],
             },
         },

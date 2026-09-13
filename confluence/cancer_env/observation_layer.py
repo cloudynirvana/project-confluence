@@ -17,6 +17,8 @@ class ObservationNoise:
     lactate: float = 0.05
     tgfb: float = 0.05
     immune_competence_ratio: float = 0.04
+    fusion_allele_fraction: float = 0.035
+    junction_neoantigen: float = 0.05
 
 
 class ObservationLayer:
@@ -48,6 +50,8 @@ class ObservationLayer:
         resist_obs = float(np.clip(resist_obs, 0.0, 1.0))
         competence_obs = float(np.clip(_n(competence, n.immune_competence_ratio), 0.0, 1.5))
 
+        fusion_af = float(np.clip(_n(state.fusion_allele_fraction, n.fusion_allele_fraction), 0.0, 1.0))
+        junction = _n(state.junction_neoantigen, n.junction_neoantigen)
         return ObservationRecord(
             t=state.t,
             tumor_burden=_n(burden, n.tumor_burden),
@@ -55,6 +59,9 @@ class ObservationLayer:
             lactate=_n(state.L, n.lactate),
             tgfb=_n(state.C_tgfb, n.tgfb),
             immune_competence_ratio=competence_obs,
+            fusion_allele_fraction=fusion_af,
+            junction_neoantigen=junction,
+            fusion_id=state.fusion_id,
             host_toxicity_warning=state.H <= self.health_warn_threshold,
             host_health=state.H,
         )

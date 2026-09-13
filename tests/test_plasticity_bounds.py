@@ -8,8 +8,8 @@ from confluence.contracts import ObservationRecord
 
 
 def test_dopamine_formula_signs():
-    da_bad = dopamine_signal(delta_burden=0.4, concentrations_sum=2.0, delta_resistance=0.2)
-    da_good = dopamine_signal(delta_burden=-0.4, concentrations_sum=0.1, delta_resistance=-0.1)
+    da_bad = dopamine_signal(delta_burden=0.4, concentrations_sum=2.0, delta_resistance=0.2, delta_fusion=0.15)
+    da_good = dopamine_signal(delta_burden=-0.4, concentrations_sum=0.1, delta_resistance=-0.1, delta_fusion=-0.15)
     assert da_bad < 0
     assert da_good > da_bad
 

@@ -29,10 +29,17 @@ class MelanomaPersisterArchetype(ArchetypeParams):
             p_tgfb=0.10,
             p_ifng=0.30,
             kappa_burden=0.035,
-            x0=(0.78, 0.10, 0.42, 0.10, 0.12, 0.28, 0.80, 1.05, 0.22, 0.40, 0.93),
+            fusion_id="alk_braf_fusion_like",
+            fusion_display="ALK / BRAF-fusion-class chimeric oncoprotein",
+            r_f=0.15,
+            tki_imatinib_weight=0.35,
+            tki_alk_weight=0.85,
+            kappa_fusion=0.70,
+            x0=(0.78, 0.10, 0.42, 0.10, 0.12, 0.28, 0.80, 1.05, 0.22, 0.40, 0.93, 0.14),
             notes=(
                 "Immune-hot cutaneous melanoma with a fast drug-tolerant persister "
                 "switch (HDAC-sensitive). Kinase channel maps onto MEK pressure "
-                "(trametinib catalog entry). Checkpoint occupancy is more potent here."
+                "(trametinib catalog entry). Checkpoint occupancy is more potent here. "
+                "Fusion clone is ALK/BRAF-fusion-class (rare but documented; research mapping)."
             ),
         )
