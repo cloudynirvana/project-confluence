@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Project Confluence — clinical briefing (research / education)</title>
+  <meta name="description" content="A 60-second research briefing on Project Confluence: in-silico methods for adaptive therapy, clonal evolution, and toxicity trade-offs. Not a medical device. Not clinical decision support." />
+  <meta name="robots" content="index,follow" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="stamp">
+    Research / education only — not a medical device — not clinical decision support
+  </div>
+
+  <header class="mast">
+    <p class="eyebrow">University of Uyo / teaching-hospital briefing</p>
+    <h1>Project Confluence</h1>
+    <p class="lede">
+      Open-source <strong>in-silico research methods</strong> for questions that
+      sit between haematology, surgical oncology, and pathology: adaptive therapy,
+      clonal evolution, and the toxicity cost of pressure. This page is a
+      60-second read. It is not a clinic, not a trial dashboard, and not a
+      treatment recommendation.
+    </p>
+    <p class="meta">
+      Computational research · MIT license ·
+      <a href="https://github.com/cloudynirvana/project-confluence">GitHub repository</a>
+    </p>
+  </header>
+
+  <main>
+    <section aria-labelledby="problem">
+      <h2 id="problem">The clinical problem this models</h2>
+      <p>
+        Continuous maximum-tolerated dosing can shrink measurable burden and, in
+        the same motion, select resistant clones. Adaptive therapy asks whether
+        modulating pressure can keep a sensitive population competitive enough
+        to contain resistance — while host-health (marrow, mucosa, cardiac,
+        immune competence) sets a hard toxicity budget. Those trade-offs are
+        difficult to rehearse at the bedside. This repository is a computational
+        sandbox for that argument, not a bedside tool.
+      </p>
+    </section>
+
+    <section aria-labelledby="what">
+      <h2 id="what">What this repository is</h2>
+      <p>
+        A set of <strong>open-source in-silico research methods</strong> you can
+        inspect, fork, and attack:
+      </p>
+      <ul class="plain">
+        <li>
+          A mechanistic <strong>ODE tumor-microenvironment</strong> (burden,
+          resistant clone, immune competence, stroma, host-health
+          <code>H</code>).
+        </li>
+        <li>
+          <strong>Controller benchmarks</strong> — standard-of-care MTD versus
+          Gatenby-style adaptive halt/resume versus connectome-style policies —
+          on the same virtual patient.
+        </li>
+        <li>
+          An <strong>in-silico endpoint mapping</strong> layer: RECIST-like
+          burden classes, CTCAE-like toxicity bands from host-health
+          <code>H</code>, and Kaplan–Meier / log-rank / Cox on
+          <em>virtual</em> cohorts. Mapped scores, not adjudicated imaging or
+          a Phase I–III result.
+        </li>
+      </ul>
+      <p class="quiet">
+        Infusion commands are unitless and normalized. They are not a mg/kg
+        regimen. TCGA-shaped scripts in this repo still use
+        <strong>synthetic patients</strong> until real GDC extracts exist;
+        there is no completed TCGA clinical validation here.
+      </p>
+    </section>
+
+    <section aria-labelledby="clinician">
+      <h2 id="clinician">What a clinician can do with it</h2>
+      <ol class="do">
+        <li>
+          <strong>Critique the assumptions.</strong> Growth rates, phenotypic
+          switching, immune kill, PK/PD class half-lives, and what “host-health”
+          is allowed to stand in for.
+        </li>
+        <li>
+          <strong>Suggest assays that would falsify the model.</strong> Serial
+          ctDNA or fusion-allele fraction, immune-competence markers, and
+          toxicity readouts that should move if the ODE were describing a
+          real patient.
+        </li>
+        <li>
+          <strong>Mentor a DE Medicine student.</strong> Walk the closed loop,
+          demand honesty about what is simulated, and treat the codebase as a
+          teaching object — not a product to deploy on a ward.
+        </li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="loop">
+      <h2 id="loop">The research loop (four steps)</h2>
+      <p class="quiet">
+        Same loop the scientific modules run. Nothing here is a clinical order.
+      </p>
+      <ol class="flow">
+        <li>
+          <span class="n" aria-hidden="true">1</span>
+          <h3>Observation</h3>
+          <p>
+            Noisy, partial measurements: burden, resistance proxies,
+            immune competence, host-health. Not a complete EHR and not a
+            pathology report.
+          </p>
+        </li>
+        <li>
+          <span class="n" aria-hidden="true">2</span>
+          <h3>Decision</h3>
+          <p>
+            A research controller proposes a unitless policy
+            <code>U(t)</code> — MTD, adaptive, or connectome-style.
+            A hypothesis about pressure, not a prescription.
+          </p>
+        </li>
+        <li>
+          <span class="n" aria-hidden="true">3</span>
+          <h3>Simulated infusion</h3>
+          <p>
+            First-order PK/PD into the ODE. Concentrations are
+            simulation-scaled class references, not a dosing protocol.
+          </p>
+        </li>
+        <li>
+          <span class="n" aria-hidden="true">4</span>
+          <h3>Mapped endpoints</h3>
+          <p>
+            RECIST-like classes, toxicity bands, Kaplan–Meier on virtual
+            cohorts. Research scores for scrutiny — not a trial readout.
+          </p>
+        </li>
+      </ol>
+    </section>
+
+    <aside class="not-box" aria-labelledby="not">
+      <h2 id="not">What this is not</h2>
+      <ul>
+        <li>Not a medical device, diagnostic, or clinical decision support system.</li>
+        <li>Not a treatment planner, dosing engine, or path to a clinical outcome.</li>
+        <li>Not FDA / EMA cleared, and not a Phase I / II / III result.</li>
+        <li>Not a completed TCGA (GDC) retrospective clinical validation.</li>
+        <li>Not a claim of cure, disease eradication, or ward-ready software.</li>
+      </ul>
+      <p>
+        See
+        <a href="https://github.com/cloudynirvana/project-confluence/blob/main/DISCLAIMER.md">DISCLAIMER.md</a>
+        and
+        <a href="https://github.com/cloudynirvana/project-confluence/blob/main/docs/AWAITING_CLINICAL_VALIDATION.md">docs/AWAITING_CLINICAL_VALIDATION.md</a>.
+        External IRB, wet-lab, and trial apparatus — not this git repository —
+        own any later clinical claim.
+      </p>
+    </aside>
+
+    <section class="cta" aria-labelledby="ask">
+      <h2 id="ask">The ask: mentorship, critique, falsification</h2>
+      <p>
+        If you teach or practice at the University of Uyo teaching hospital
+        (or a similar service), the useful next step is not endorsement. It is
+        a marked-up list of where the biology is wrong, which assay would
+        kill a given assumption, and whether a DE Medicine student should
+        sit with this codebase under your supervision.
+      </p>
+      <p class="links">
+        <a class="btn primary" href="https://github.com/cloudynirvana/project-confluence">Open the GitHub repository</a>
+        <a class="btn" href="https://github.com/cloudynirvana/project-confluence/blob/main/DISCLAIMER.md">DISCLAIMER.md</a>
+        <a class="btn" href="https://github.com/cloudynirvana/project-confluence/blob/main/docs/AWAITING_CLINICAL_VALIDATION.md">Awaiting clinical validation</a>
+      </p>
+    </section>
+
+    <section class="secondary" aria-labelledby="lab">
+      <h2 id="lab">Optional: computational lab reel</h2>
+      <p>
+        Reviewers who want the cinematic flybody / connectome HUD can open the
+        separate static lab reel. It is a research visualization
+        (<span class="sim">SIMULATION / RESEARCH</span>), not this briefing,
+        and it is not the public face intended for mentors.
+      </p>
+      <p class="links">
+        <a href="https://github.com/cloudynirvana/project-confluence/tree/main/evidence">evidence/ on GitHub</a>
+        ·
+        <a href="https://github.com/cloudynirvana/project-confluence/blob/main/docs/demo/README.md">docs/demo cinematic notes</a>
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    Project Confluence · computational research · MIT
+    · <a href="https://github.com/cloudynirvana/project-confluence">github.com/cloudynirvana/project-confluence</a>
+    · not a medical device
+  </footer>
+</body>
+</html>

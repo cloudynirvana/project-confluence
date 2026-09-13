@@ -1,4 +1,4 @@
-"""Evidence site + hosted-sim deployables (research only, no secrets)."""
+"""Clinical briefing + evidence lab reel + hosted-sim deployables (research only)."""
 
 from __future__ import annotations
 
@@ -41,12 +41,57 @@ def test_evidence_site_is_static_and_honest() -> None:
     assert (REPO / "evidence" / "awaiting-clinical-validation.html").is_file()
 
 
+def test_clinical_site_is_static_and_honest() -> None:
+    index_path = REPO / "clinical" / "index.html"
+    assert index_path.is_file()
+    index = index_path.read_text(encoding="utf-8")
+    lowered = index.lower()
+    assert "research" in lowered
+    assert "disclaimer" in lowered
+    assert "not a medical device" in lowered
+    assert "clinical decision support" in lowered
+    assert "not" in lowered
+    assert "falsif" in lowered
+    assert "critique" in lowered or "mentor" in lowered
+    assert "DISCLAIMER.md" in index
+    assert "AWAITING_CLINICAL_VALIDATION.md" in index
+    assert "github.com/cloudynirvana/project-confluence" in lowered
+    assert "observation" in lowered and "decision" in lowered
+    assert "simulated infusion" in lowered
+    assert "mapped endpoints" in lowered
+    assert "what this is not" in lowered
+    compact = " ".join(lowered.split())
+    assert "not a completed tcga" in compact or "not a completed tcga (gdc)" in compact
+    for phrase in (
+        "this is a cure",
+        "we cured",
+        "cured cancer",
+        "fda-approved",
+        "fda-ready",
+        "phase ii result",
+        "clinically validated treatment",
+        "tcga retrospective validation is complete",
+        "tcga validation is complete",
+        "completed tcga validation",
+    ):
+        assert phrase not in lowered
+    vercel = (REPO / "clinical" / "vercel.json").read_text(encoding="utf-8")
+    assert '"outputDirectory": "."' in vercel
+    assert not (REPO / "clinical" / "public").exists()
+    assert (REPO / "clinical" / "README.md").is_file()
+    assert (REPO / "clinical" / "styles.css").is_file()
+    assert "<img" not in index.lower()
+    assert "<video" not in index.lower()
+    assert "fruitfly.xml" not in lowered
+
+
 def test_hosting_docs_split_vercel_and_container() -> None:
     hosting = (REPO / "docs" / "HOSTING.md").read_text(encoding="utf-8")
     readme = (REPO / "README.md").read_text(encoding="utf-8")
-    assert "Root Directory" in readme and "evidence" in readme
-    assert "Deploy evidence to Vercel" in readme
+    assert "Root Directory" in readme and "clinical" in readme
+    assert "Deploy the clinical briefing to Vercel" in readme
     assert "docs/HOSTING.md" in readme
+    assert "Root Directory" in hosting and "`clinical`" in hosting
     assert "Railway" in hosting and "Fly" in hosting
     assert "CONFLUENCE_CORS_ORIGINS" in hosting
     assert "free" in hosting.lower() and "sleep" in hosting.lower()
