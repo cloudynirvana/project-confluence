@@ -443,25 +443,27 @@ def four_panel_figure(cohort: Dict[str, Any], out_path: Path) -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    fig, axes = plt.subplots(2, 2, figsize=(10.5, 7.4))
+    fig, axes = plt.subplots(2, 2, figsize=(11.2, 7.8), constrained_layout=True)
     # KM OS
     ax = axes[0, 0]
-    for arm, color in zip(ARMS, ("#888", "#d4a054", "#3ecfc0", "#e06b5c")):
+    for arm, color in zip(ARMS, ("#666666", "#d4a054", "#2a9d8f", "#e06b5c")):
         km = cohort["km"][arm]["os"]
-        ax.step(km["t"], km["s"], where="post", label=f"{arm} n={km['n']}", color=color)
+        ax.step(km["t"], km["s"], where="post", label=f"{arm}  n={km['n']}", color=color, lw=1.8)
     ax.set_ylim(0, 1.05)
-    ax.set_xlabel("sim days")
-    ax.set_ylabel("OS (in silico)")
-    ax.set_title("Kaplan–Meier OS (virtual cohort)")
-    ax.legend(fontsize=8)
+    ax.set_xlabel("simulated days")
+    ax.set_ylabel("OS (in-silico mapping)")
+    ax.set_title("Kaplan-Meier OS (virtual cohort)")
+    ax.legend(fontsize=8, loc="lower left")
+    ax.grid(True, alpha=0.25)
     # RECIST
     ax = axes[0, 1]
     cats = ["CR", "PR", "SD", "PD"]
     x = np.arange(len(ARMS))
     width = 0.18
+    colors = ("#4c8bf5", "#3ecf8e", "#c0c0c0", "#d45d5d")
     for i, cat in enumerate(cats):
         vals = [cohort["recist_counts"][a].get(cat, 0) for a in ARMS]
-        ax.bar(x + i * width, vals, width, label=cat)
+        ax.bar(x + i * width, vals, width, label=cat, color=colors[i])
     ax.set_xticks(x + 1.5 * width)
     ax.set_xticklabels(list(ARMS))
     ax.set_ylabel("virtual patients")
@@ -470,9 +472,10 @@ def four_panel_figure(cohort: Dict[str, Any], out_path: Path) -> None:
     # CTCAE
     ax = axes[1, 0]
     grades = [str(g) for g in range(6)]
+    cmap = ("#9ad1b3", "#d4e157", "#ffc107", "#ff8a65", "#e53935", "#4a148c")
     for i, g in enumerate(grades):
         vals = [cohort["ctcae_counts"][a].get(g, 0) for a in ARMS]
-        ax.bar(x + i * 0.12, vals, 0.12, label=f"G{g}")
+        ax.bar(x + i * 0.12, vals, 0.12, label=f"G{g}", color=cmap[i])
     ax.set_xticks(x + 0.3)
     ax.set_xticklabels(list(ARMS))
     ax.set_ylabel("virtual patients")
@@ -481,17 +484,17 @@ def four_panel_figure(cohort: Dict[str, Any], out_path: Path) -> None:
     # Trajectory
     ax = axes[1, 1]
     ex = cohort["example"]
-    ax.plot(ex["times"], ex["burden"], color="#e06b5c", label="burden")
-    ax.plot(ex["times"], ex["health"], color="#8fbc8f", label="H")
-    ax.axhline(0.2, color="#aa3333", ls="--", lw=0.8, label="H=0.2 terminal")
-    ax.set_xlabel("sim days")
+    ax.plot(ex["times"], ex["burden"], color="#e06b5c", label="tumor burden")
+    ax.plot(ex["times"], ex["health"], color="#2a9d8f", label="host health H")
+    ax.axhline(0.2, color="#aa3333", ls="--", lw=0.9, label="H=0.2 terminal")
+    ax.set_xlabel("simulated days")
     ax.set_title(f"Example trajectory (arm {ex['controller']})")
     ax.legend(fontsize=8)
+    ax.grid(True, alpha=0.25)
     fig.suptitle(
-        "In-silico endpoint mapping — not a clinical trial / not FDA-EMA readiness",
-        fontsize=10,
+        "In-silico endpoint mapping  |  not a clinical trial  |  not FDA/EMA readiness",
+        fontsize=11,
     )
-    fig.tight_layout()
     out_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_path, dpi=140)
     plt.close(fig)

@@ -234,7 +234,8 @@ def log_rank(
             "reason": "too few events for log-rank",
         }
     z = o_e / np.sqrt(var)
-    p = float(2.0 * (1.0 - norm.cdf(abs(z))))
+    # Survival function (not 1-cdf) so large |z| does not underflow to p=0.0.
+    p = float(2.0 * norm.sf(abs(z)))
     return {
         "stat": float(z * z),
         "z": float(z),

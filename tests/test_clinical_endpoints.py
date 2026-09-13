@@ -72,6 +72,14 @@ def test_log_rank_is_computed_not_hardcoded():
     weak = log_rank([5.0], [1], [6.0], [0])
     assert weak["inconclusive"] is True
     assert weak["p"] is None
+    # Large separation must not underflow to a fake-looking 0.0.
+    t_lo = [1.0] * 20
+    t_hi = [30.0] * 20
+    ev = [1] * 20
+    extreme = log_rank(t_lo, ev, t_hi, ev)
+    assert extreme["p"] is not None
+    assert float(extreme["p"]) > 0.0
+    assert float(extreme["p"]) < 1e-6
 
 
 def test_cox_marks_underpowered_when_few_events():
