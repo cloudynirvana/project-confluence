@@ -76,6 +76,8 @@ def render_clip(
     )
     sim.embodiment.camera = "walker/hero"
     sim.embodiment.render_size = (width, height)
+    # Skip per-step JPEG; this job writes high-res RGB frames itself.
+    sim.embodiment.render_enabled = False
     if sim.embodiment.backend != "flybody" or sim.embodiment._env is None:
         raise SystemExit(
             "flybody imported but the MuJoCo env is not live. "
