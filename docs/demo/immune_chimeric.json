@@ -1,0 +1,26 @@
+{
+  "research_only": true,
+  "not_a_cure": true,
+  "mesh": "TuragaLab/flybody fruitfly.xml",
+  "controller": "F",
+  "archetype": "melanoma_persister",
+  "fusion_class": "ALK / BRAF-fusion-class chimeric oncoprotein",
+  "t_days": 7.99999999999998,
+  "I_act_start": 0.42,
+  "I_act_end": 0.6565263070516405,
+  "fusion_af_start": 0.13725490196078433,
+  "fusion_af_end": 0.18618807498925483,
+  "burden_start": 1.02,
+  "burden_end": 0.12209590309544491,
+  "proteins_end": [
+    "protein_anti_pd1",
+    "protein_tgfb_trap",
+    "protein_ifng",
+    "protein_il2",
+    "protein_chimeric_engager"
+  ],
+  "fusion_tki_end": [
+    "tki_alk"
+  ],
+  "engager": 0.24750761048933664
+}

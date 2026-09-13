@@ -43,7 +43,9 @@ def render_immune_clip(
     sim = ClosedLoopSimulator(
         archetype="melanoma_persister",
         controller=ctrl,
-        dt=0.35,
+        # Short cancer clock so an 8 s / 20 fps clip stays in the
+        # immune-rise window (~8 sim days), not a 50-day burden wipe.
+        dt=0.05,
         seed=11,
         embodiment_enabled=True,
     )
