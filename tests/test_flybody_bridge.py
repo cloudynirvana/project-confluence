@@ -70,3 +70,19 @@ def test_stub_does_not_claim_to_be_the_mesh():
     assert bridge.render_rgb() is None
     assert bridge.render_jpeg() is None
     assert flybody_status()["install"]
+
+
+@pytest.mark.skipif(not flybody_available(), reason="flybody / MuJoCo not installed")
+def test_ws_meta_does_not_clobber_mesh_jpeg():
+    from confluence.telemetry.serializers import frame_to_dict
+    from confluence.telemetry.websocket_server import LiveSession
+
+    session = LiveSession()
+    frame = frame_to_dict(session.sim.step(run_cancer=True, run_embodiment=True))
+    assert frame["embodiment"].get("backend") == "flybody"
+    assert frame["embodiment"].get("frame_jpeg")
+    meta = session.session_meta()
+    assert "embodiment" not in meta
+    assert meta.get("embodiment_status", {}).get("backend") == "flybody"
+    merged = {**frame, **meta}
+    assert merged["embodiment"].get("frame_jpeg")

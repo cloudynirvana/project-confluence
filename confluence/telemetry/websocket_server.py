@@ -163,7 +163,7 @@ class LiveSession:
             "n_neurons": self.n_neurons,
             "protein_channels": list(PROTEIN_CHANNEL_IDS),
             "training": dict(self.training),
-            "embodiment": flybody_status(),
+            "embodiment_status": flybody_status(),
         }
 
 
@@ -225,7 +225,7 @@ async def sim_socket(ws: WebSocket):
                     await ws.send_json({
                         "type": "mode",
                         "mode": session.mode,
-                        "embodiment": flybody_status(),
+                        "embodiment_status": flybody_status(),
                     })
                 elif cmd == "set_brain_mode":
                     session.running = False
