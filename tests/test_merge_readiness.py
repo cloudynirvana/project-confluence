@@ -9,6 +9,7 @@ def test_disclaimer_and_gate_docs_exist() -> None:
     assert (REPO / "DISCLAIMER.md").is_file()
     assert (REPO / "docs" / "MERGE_READINESS.md").is_file()
     assert (REPO / "docs" / "AWAITING_CLINICAL_VALIDATION.md").is_file()
+    assert (REPO / "docs" / "HOSTING.md").is_file()
     assert (REPO / ".github" / "workflows" / "pytest.yml").is_file()
 
 
@@ -60,3 +61,4 @@ def test_ci_skips_slow_and_flybody() -> None:
     assert 'pip install -e ".[dev]"' in yml
     assert "tests/test_clinical_endpoints.py" in yml
     assert "tests/test_merge_readiness.py" in yml
+    assert "tests/test_deployables.py" in yml

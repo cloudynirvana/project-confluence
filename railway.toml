@@ -1,0 +1,14 @@
+# Railway — Dockerfile build of the FastAPI + WebSocket sim.
+# No secrets are required for a public research demo.
+# Free / hobby tiers may sleep; the first request after idle can be slow.
+# Do not present the public URL as a clinical tool.
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

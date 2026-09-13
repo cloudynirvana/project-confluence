@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Awaiting external clinical validation — Project Confluence</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="stamp">Simulation / research — next gate is outside this repository</div>
+  <nav class="nav" aria-label="Primary">
+    <a class="wordmark" href="./">Confluence</a>
+    <div class="nav-links">
+      <a href="./">Evidence</a>
+      <a href="disclaimer.html">Disclaimer</a>
+      <a href="https://github.com/cloudynirvana/project-confluence/blob/main/docs/AWAITING_CLINICAL_VALIDATION.md">Source doc</a>
+    </div>
+  </nav>
+  <article class="doc">
+    <p class="kicker">Source of truth: docs/AWAITING_CLINICAL_VALIDATION.md</p>
+    <h1>Awaiting external clinical validation</h1>
+    <p>
+      This page restates
+      <a href="https://github.com/cloudynirvana/project-confluence/blob/main/docs/AWAITING_CLINICAL_VALIDATION.md">docs/AWAITING_CLINICAL_VALIDATION.md</a>.
+      The simulator does <strong>not</strong> validate itself as a cure, a Phase II
+      result, or FDA/EMA readiness.
+    </p>
+
+    <h2>What is complete here (research)</h2>
+    <ul>
+      <li>Mechanistic closed loop: observations → controller A/B/E/F → unitless <code>U</code> → PK/PD → CancerODE (LSODA)</li>
+      <li>Disease taxonomy + immune/antibody readiness (state signatures, not TNM)</li>
+      <li>In-silico endpoint mapping with computed statistics</li>
+      <li>Scientific visualization: flybody fruitfly.xml + Blender sidecar / HUD</li>
+      <li>Honesty package: DISCLAIMER.md, MERGE_READINESS.md</li>
+    </ul>
+
+    <h2>What happens next (external)</h2>
+    <p>Partners and reviewers — not this git repo — own:</p>
+    <ol>
+      <li>IRB / ethics review for any human-data protocol</li>
+      <li>Wet-lab / preclinical models that can falsify the ODE</li>
+      <li>Clinical trials (Phase I → III) only if independent evidence supports that path</li>
+      <li>Regulatory submissions if a product is ever proposed</li>
+    </ol>
+    <p>None of those artifacts are produced by pytest or by a virtual cohort.</p>
+
+    <h2>What this project will not claim while awaiting that gate</h2>
+    <ul>
+      <li>Cure, disease eradication, or a treatment path</li>
+      <li>FDA / EMA readiness or a cleared medical device</li>
+      <li>A real Phase I / II / III result</li>
+      <li>That a log-rank p or Cox HR on a virtual cohort is a clinical effect</li>
+      <li>That F-256 (or 166k) “thinks,” synthesizes biologics, or doses patients</li>
+    </ul>
+    <p>
+      Until an external lab, IRB, and trial apparatus exist, Confluence remains a
+      <strong>research codebase</strong>.
+    </p>
+    <p>
+      <a href="https://github.com/cloudynirvana/project-confluence/blob/main/docs/AWAITING_CLINICAL_VALIDATION.md">Open the repository document</a>
+      ·
+      <a href="https://github.com/cloudynirvana/project-confluence/blob/main/DISCLAIMER.md">DISCLAIMER.md</a>
+    </p>
+  </article>
+  <footer class="site"><a href="./">← Evidence home</a></footer>
+</body>
+</html>

@@ -16,7 +16,8 @@ from typing import Optional
 os.environ.setdefault("MUJOCO_GL", "osmesa")
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from confluence.cancer_env.archetypes import ARCHETYPES, DISPLAY_NAMES
@@ -38,10 +39,25 @@ from confluence.training.loop import run_live_episode
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
+
+def _cors_origins() -> list[str]:
+    raw = os.environ.get("CONFLUENCE_CORS_ORIGINS", "*").strip() or "*"
+    if raw == "*":
+        return ["*"]
+    return [origin.strip() for origin in raw.split(",") if origin.strip()]
+
+
 app = FastAPI(
     title="Confluence v2",
     description="Interactive fly-MB / cancer-microenvironment simulation (research only).",
     version="2.0.0",
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_cors_origins(),
+    allow_credentials=False,
+    allow_methods=["GET", "HEAD", "OPTIONS"],
+    allow_headers=["*"],
 )
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
@@ -65,10 +81,12 @@ async def archetypes():
 
 
 @app.get("/health")
+@app.get("/healthz")
 async def health():
     return {
         "status": "ok",
         "service": "confluence-v2",
+        "research_only": True,
         "embodiment": flybody_status(),
         "full_brain_neurons": FULL_BRAIN_NEURONS,
         "protein_channels": list(PROTEIN_CHANNEL_IDS),
@@ -184,8 +202,10 @@ def _take_session() -> "LiveSession":
 
 @app.on_event("startup")
 async def _warmup_flybody_session():
-    """Build fruitfly.xml once so the first hello already has a JPEG."""
+    """Optionally pre-build a session. Flybody/MuJoCo is not required to boot."""
     global _warm_session
+    if os.environ.get("CONFLUENCE_SKIP_WARMUP", "").strip().lower() in {"1", "true", "yes"}:
+        return
     try:
         _warm_session = await asyncio.to_thread(LiveSession)
     except Exception:

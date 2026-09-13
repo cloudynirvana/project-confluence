@@ -1,0 +1,25 @@
+# syntax=docker/dockerfile:1
+# Optional extra: TuragaLab/flybody fruitfly.xml viewport.
+# The default Dockerfile already serves the interactive UI without this.
+#
+#   docker build -t confluence-sim .
+#   docker build -f Dockerfile.mesh -t confluence-sim:mesh .
+#
+# Research simulation only. Not a medical device.
+
+FROM confluence-sim
+
+USER root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        git \
+        ca-certificates \
+        libosmesa6 \
+        libosmesa6-dev \
+        libgl1 \
+        libglew-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir mujoco dm_control h5py mediapy pillow \
+    && pip install --no-cache-dir --no-deps \
+        "flybody @ git+https://github.com/TuragaLab/flybody.git@d015e9bfe441bd90ae431bac24c55cb74bdbce26"
