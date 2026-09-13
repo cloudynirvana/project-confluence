@@ -305,6 +305,8 @@ def export_closed_loop_blender(
         "still_mesh": still.name if still else None,
         "mujoco_preview_mp4": preview_mp4.name if preview_mp4 else None,
         "bpy_script": "confluence_blender_hud.py",
+        "renders_dir": "renders",
+        "viz_complete": True,
         "mesh": MESH_NAME if live_mesh else None,
         "mesh_live": live_mesh,
         "n_frames": len(rows),

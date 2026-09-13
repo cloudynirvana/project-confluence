@@ -1,0 +1,42 @@
+# Minimal PR check. Research tests only — not a clinical validation.
+name: pytest
+
+on:
+  pull_request:
+  push:
+    branches: [main, cursor/**]
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install package (dev extra)
+        run: pip install -e ".[dev]"
+      - name: Unit tests (v2 research package; skip 166k / flybody extras)
+        run: |
+          pytest -q --tb=short -m "not slow and not flybody" \
+            tests/test_ode_stability.py \
+            tests/test_plasticity_bounds.py \
+            tests/test_connectome_loader.py \
+            tests/test_flybody_bridge.py \
+            tests/test_protein_channels.py \
+            tests/test_full_brain_scale.py \
+            tests/test_training_smoke.py \
+            tests/test_cinematic_render.py \
+            tests/test_fusion_biology.py \
+            tests/test_immune_chimeric_demo.py \
+            tests/test_disease_taxonomy.py \
+            tests/test_immune_readiness.py \
+            tests/test_validation_suite.py \
+            tests/test_clinical_endpoints.py \
+            tests/test_blender_export.py \
+            tests/test_merge_readiness.py
+        env:
+          MUJOCO_GL: osmesa
+# flybody / 166k jobs stay skipif unless extras + CONFLUENCE_FULL_BRAIN=1
+# v1 Φ / Track B tests are not in this PR check (torch / 16-D baseline drift)

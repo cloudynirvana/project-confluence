@@ -55,7 +55,20 @@ def main(argv=None) -> int:
     print("wrote", report["out_dir"], "frames", report["n_frames"], "png", report["n_png"], "mesh_live", report["mesh_live"])
     print("sidecar", report["sidecar"])
     if not report["mesh_live"]:
-        print("No fruitfly.xml dump. Sidecar is still the logged ODE series. Open bpy script locally after installing .[flybody].")
+        from confluence.embodiment.flybody_bridge import flybody_status
+
+        cta = Path(args.out) / "INSTALL_FLYBODY.txt"
+        cta.write_text(
+            "SIMULATION / RESEARCH\n"
+            "fruitfly.xml did not render. Sidecar telemetry.json is still the logged ODE series.\n"
+            "Mesh frames refuse the CPG stub. Install and re-run:\n\n"
+            f"{flybody_status()['install']}\n\n"
+            "python3 -m confluence.demo_blender --out docs/demo/blender --require-mesh\n",
+            encoding="utf-8",
+        )
+        print("No fruitfly.xml dump. Wrote", cta)
+        print("Sidecar is still the logged ODE series.")
+        return 1
     return 0
 
 

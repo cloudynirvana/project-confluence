@@ -48,4 +48,5 @@ testpaths = ["tests"]
 pythonpath = ["."]
 markers = [
     "slow: optional long / 166700-neuron jobs (CONFLUENCE_FULL_BRAIN=1)",
+    "flybody: requires TuragaLab/flybody fruitfly.xml + MUJOCO_GL",
 ]

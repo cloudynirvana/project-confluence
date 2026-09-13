@@ -35,7 +35,7 @@ See `CITATION.cff`. DOI badge added below once Zenodo publishes.
 
 # Confluence v2 — fly mushroom body × cancer microenvironment
 
-> **Computational research / simulation only.** This is not a medical device, not a treatment planner, and it does not claim clinical admissibility or disease eradication. See [DISCLAIMER.md](DISCLAIMER.md).
+> **Computational research / simulation only.** This is not a medical device, not a treatment planner, and it does not claim clinical admissibility or disease eradication. See [DISCLAIMER.md](DISCLAIMER.md). Merging this branch lands a **research codebase**, not a medical product. Feature-complete for the current in-silico scope → [awaiting external clinical validation](docs/AWAITING_CLINICAL_VALIDATION.md) (IRB / wet-lab / trials). [Merge readiness](docs/MERGE_READINESS.md).
 
 **Honesty — read this first**
 
@@ -74,10 +74,11 @@ This sits beside the original 16-D Φ / BAC stack in `models/` — v2 does not r
 ## Run the interactive session
 
 ```bash
-pip install -e .
+pip install -e ".[dev]"
 # or, at minimum:
 pip install numpy scipy pydantic fastapi "uvicorn[standard]"
 
+pytest -q -m "not slow"
 python -m confluence
 # equivalent:
 uvicorn confluence.telemetry.websocket_server:app --host 127.0.0.1 --port 8765
@@ -98,8 +99,8 @@ Share clip (≈12 s, real mesh): [`docs/demo/cinematic.mp4`](docs/demo/cinematic
 Interactive Kenyon-cell count defaults to **256** for real-time FPS (documented). Pass `n_kc=2048` in `MushroomBodyNetwork` / controllers for a more FlyWire-like expansion. Controller **F** is a separate sparse rate-based net that can be constructed at `n_neurons=166700` (see below); the UI default stays on the small demo.
 
 ```bash
-# package tests
-python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py tests/test_flybody_bridge.py tests/test_protein_channels.py tests/test_full_brain_scale.py tests/test_training_smoke.py tests/test_cinematic_render.py tests/test_fusion_biology.py tests/test_immune_chimeric_demo.py tests/test_disease_taxonomy.py tests/test_immune_readiness.py tests/test_validation_suite.py tests/test_clinical_endpoints.py tests/test_blender_export.py -q
+# package tests (skips 166k / slow; flybody tests skip unless extras are installed)
+pytest -q -m "not slow"
 
 # short controller bake-off (3 archetypes × A–E)
 python -m confluence --benchmark --trials 2 --horizon 40
@@ -256,6 +257,8 @@ python3 -m confluence.demo_blender --out docs/demo/blender
 ```
 
 Writes PNG frames from `fruitfly.xml` plus `telemetry.json` / `.csv` synced to frame index. Local Blender 4.x: see [`docs/demo/blender/README.md`](docs/demo/blender/README.md). Every output is labeled **SIMULATION / RESEARCH**.
+
+**Viz complete (research):** scientific visualization is finished without Higgsfield — path [`docs/demo/blender/`](docs/demo/blender/README.md) (MuJoCo dump + sidecar + bpy HUD). Workstation: `blender --background --python docs/demo/blender/confluence_blender_hud.py -- --root docs/demo/blender`. Sample HUD still: [`docs/demo/blender/renders/blender_still.png`](docs/demo/blender/renders/blender_still.png) (stamped `SIMULATION / RESEARCH`). If Blender is missing, use [`docs/demo/blender/mujoco_preview.mp4`](docs/demo/blender/mujoco_preview.mp4).
 
 How to run (one command, fixed master seed 17):
 
@@ -485,8 +488,11 @@ git clone https://github.com/cloudynirvana/project-confluence.git
 cd project-confluence
 
 # Install (v2 interactive extras are in pyproject.toml / requirements.txt)
-pip install -e .
+pip install -e ".[dev]"
 pip install -r requirements.txt
+
+# Package tests (skips 166k / slow jobs)
+pytest -q -m "not slow"
 
 # Interactive closed-loop session (primary v2 demo)
 python -m confluence
@@ -771,10 +777,10 @@ powershell -File scripts/pin_requirements.ps1
 
 ## Safety & Regulatory
 
-- All protocols constrained by `clinical_guardrails.json` (CTCAE v5.0)
-- Φ dimensions mapped to LOINC / SNOMED-CT codes
-- FDA MIDD (Model-Informed Drug Development) aligned
-- See [DISCLAIMER.md](DISCLAIMER.md) for medical use limitations
+- All protocols constrained by `clinical_guardrails.json` (research CTCAE-style notes, not adjudicated toxicity)
+- Φ dimensions mapped to LOINC / SNOMED-CT codes (research labels)
+- Mentions of FDA MIDD are bibliographic, not clearance or a medical-product claim
+- See [DISCLAIMER.md](DISCLAIMER.md) and [docs/AWAITING_CLINICAL_VALIDATION.md](docs/AWAITING_CLINICAL_VALIDATION.md)
 
 ## 🇳🇬 Nigeria Clinical Guidelines Integration
 

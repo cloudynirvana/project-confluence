@@ -1,40 +1,65 @@
-# Blender scientific visualization (data-driven)
+# Scientific visualization — **complete** (no Higgsfield)
 
-**SIMULATION / RESEARCH.** Logged Confluence closed-loop series + TuragaLab/flybody `fruitfly.xml` frames. Not a clinical trial, not a cure, not FDA/EMA readiness, not generative tumor-shrink footage (no Higgsfield in this pass).
+This folder is the **finished** scientific-viz path for PR #2. Embodiment
+frames come from **TuragaLab/flybody** MuJoCo; optional **Blender 4.x**
+HUD stills/animation burn in `SIMULATION / RESEARCH`. There is **no**
+Higgsfield (or other generative-video) dependency.
 
-HUD numbers (burden, H, fusion AF, antibody readiness, U) are **exactly** the ODE / controller values written to the sidecar. The bpy script does not invent biology.
+## Status
 
-## One-command export
+| Artifact | Role |
+|---|---|
+| `frames/*.png` | MuJoCo/OSMesa stills (hero mesh) |
+| `mujoco_preview.mp4` | ffmpeg stitch of those frames |
+| `telemetry.json` / `telemetry.csv` | Per-frame 15-D + `U` + `I_surv` + `A_ready` |
+| `pose.json` | Root qpos / heading / xpos |
+| `manifest.json` | Provenance (`hero_mesh`, `viz_complete`) |
+| `INSTALL_FLYBODY.txt` | Written **only** if the mesh is missing |
+| `renders/blender_still.png` | Blender 4.x HUD still (when Blender is installed) |
+| `renders/blender_anim.mp4` | Optional short HUD animation |
+
+`manifest.json` sets `"viz_complete": true` after a live-mesh export.
+
+## 1. Export sidecar (required)
 
 ```bash
-export MUJOCO_GL=osmesa
+pip install -e ".[dev]"
 python3 -m confluence.demo_blender --out docs/demo/blender
 ```
 
-Requires `.[flybody]` for the PNG / pose dump. The JSON/CSV sidecar is written from `ClosedLoopSimulator` even if MuJoCo is missing (then `n_png=0` and the README tells you to install flybody). Mesh frames **refuse** the CPG stub.
+Requires a **live** TuragaLab/flybody install (`pip install -e '.[flybody]'`
+plus `MUJOCO_GL=osmesa`). Stub/CPG frames are **refused**. `--allow-stub`
+is rejected. If the mesh is missing, the command writes
+`INSTALL_FLYBODY.txt` and exits non-zero.
 
-## Outputs
+## 2. Optional Blender HUD (workstation or this VM)
 
-| File | What |
-|------|------|
-| `telemetry.json` / `telemetry.csv` | HUD series keyed by `frame` and `t_days` |
-| `pose.json` | MuJoCo root pose (`qpos_root`, xpos, heading) per frame |
-| `frames/frame_XXXX.png` | Clean `walker/hero` RGB from `env.physics.render` |
-| `still_mesh.png` / `still_mid.png` | First / mid MuJoCo stills |
-| `mujoco_preview.mp4` | ffmpeg of the PNG sequence (MuJoCo dump, not a Blender render) |
-| `manifest.json` | Paths + honesty flags |
-| `confluence_blender_hud.py` | Local Blender 4.x importer / HUD driver |
-
-## Open in local Blender 4.x
-
-This agent VM has no Blender GUI. On a workstation with Blender 4.x:
+Blender is **not** a Python dependency. On Ubuntu:
 
 ```bash
-blender --background --python docs/demo/blender/confluence_blender_hud.py -- --root docs/demo/blender
-# optional full sequence:
-blender --background --python docs/demo/blender/confluence_blender_hud.py -- --root docs/demo/blender --animation
+sudo apt-get update && sudo apt-get install -y blender
 ```
 
-The script loads the PNG sequence as an emission plane and drives text + a burden curve from `telemetry.json`. Overlay copy always includes `SIMULATION / RESEARCH`.
+Headless still (always stamps `SIMULATION / RESEARCH`):
 
-`fruitfly.xml` itself can also be opened in Blender via community MJCF importers if you want a true mesh; this path ships the **already rendered** scientific frames plus the synced sidecar so nothing is hallucinated.
+```bash
+blender --background --python docs/demo/blender/confluence_blender_hud.py -- \
+  --root docs/demo/blender
+```
+
+Short animation (few frames; also stamped):
+
+```bash
+blender --background --python docs/demo/blender/confluence_blender_hud.py -- \
+  --root docs/demo/blender --animation --max-frames 8
+```
+
+If `blender` is not on `PATH`, skip this step. The MuJoCo preview MP4
+and sidecar remain the complete scientific record.
+
+## Honesty
+
+This is a **simulation overlay**, not a clinical scan, not a treatment
+video, and not evidence of a cure. See
+[DISCLAIMER.md](../../DISCLAIMER.md) and
+[AWAITING_CLINICAL_VALIDATION.md](../../AWAITING_CLINICAL_VALIDATION.md).

@@ -61,6 +61,16 @@ def test_bpy_script_is_parseable():
     ast.parse(src)
     assert "SIMULATION / RESEARCH" in src
     assert "telemetry.json" in src
+    assert "use_stamp" in src
+
+
+def test_committed_blender_still_exists():
+    still = Path("docs/demo/blender/renders/blender_still.png")
+    preview = Path("docs/demo/blender/mujoco_preview.mp4")
+    assert still.is_file() or preview.is_file()
+    if still.is_file():
+        assert still.stat().st_size > 1000
+        assert still.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
 
 
 def test_export_sidecar_and_optional_mesh(tmp_path):
@@ -89,6 +99,7 @@ def test_export_sidecar_and_optional_mesh(tmp_path):
         assert report["n_png"] == 0
 
 
+@pytest.mark.flybody
 @pytest.mark.skipif(not flybody_available(), reason="flybody / MuJoCo not installed")
 def test_require_mesh_dumps_fruitfly_pngs(tmp_path):
     report = export_closed_loop_blender(
