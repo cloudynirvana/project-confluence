@@ -1,8 +1,8 @@
-"""Dark-lab cinematic renderer for the fly hero (numpy, no MuJoCo required).
+"""Kinematic CPG / bead-fly renderer — unit tests only.
 
-Used by the offline demo clip and as the visual contract for the live canvas.
-When TuragaLab/flybody is installed the live UI can overlay a real
-``physics.render`` JPEG; this module is the intentional stub look.
+Share clips and the live hero viewport must use TuragaLab/flybody
+``fruitfly.xml`` via ``env.physics.render``. This module is not a product
+visual and must not be labeled cinematic.
 """
 
 from __future__ import annotations
@@ -222,6 +222,19 @@ def _sparks(rgb, zbuf, cam, thorax, mbon, da, secretory, w, h, rng) -> None:
         col = AMBER if (da or 0) >= 0 else TEAL
         glow = 0.45 + 0.55 * min(1.0, abs(amp) * 1.6 + abs(da or 0))
         _disk(rgb, zbuf, float(uv[0, 0]), float(uv[0, 1]), float(z[0]) - 0.01, 1.6 + 2.4 * glow, col * glow)
+
+
+def overlay_hud(
+    rgb: np.ndarray,
+    burden: float,
+    resist: float,
+    da: float,
+    proteins: Iterable[str],
+    t_days: float = 0.0,
+) -> np.ndarray:
+    """Slim ticks on a real MuJoCo frame. Mutates and returns rgb."""
+    _hud(rgb, burden, resist, da, proteins, t_days)
+    return rgb
 
 
 def _hud(rgb: np.ndarray, burden: float, resist: float, da: float, proteins: Iterable[str], t_days: float) -> None:

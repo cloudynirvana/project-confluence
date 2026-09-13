@@ -55,7 +55,7 @@ class ClosedLoopSimulator:
             self.controller = PlasticMushroomBodyController()
         self.manual_override = False
         self.manual_u = {d: 0.0 for d in ALL_EFFECTOR_IDS}
-        self.embodiment = FlybodyBridge(task="walk_imitation", prefer_real=True, seed=self.seed)
+        self.embodiment = FlybodyBridge(task="template", prefer_real=True, seed=self.seed)
         self.embodiment_alpha = 0.25
         self.reset()
 

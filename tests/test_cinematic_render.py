@@ -1,6 +1,7 @@
 """Cinematic hero renderer stays finite and non-blank."""
 
 import numpy as np
+import pytest
 
 from confluence.cinematic import fly_kinematics, render_frame
 from confluence.embodiment.flybody_bridge import FlybodyBridge
@@ -40,3 +41,11 @@ def test_stub_telemetry_includes_wings():
     assert "wings" in d
     assert len(d["wings"]) == 2
     assert "frame_jpeg" not in d
+
+
+def test_demo_cinematic_refuses_stub(monkeypatch):
+    import confluence.demo_cinematic as demo
+
+    monkeypatch.setattr(demo, "flybody_available", lambda: False)
+    with pytest.raises(SystemExit, match="refuses to ship stub"):
+        demo.render_clip(seconds=0.1, fps=2, width=64, height=48)

@@ -59,3 +59,14 @@ def test_real_flybody_template_steps_finite():
         tel = bridge.step(u, mbon)
         assert np.all(np.isfinite(tel.action))
         assert tel.action.size >= 1
+    rgb = bridge.render_rgb(width=160, height=90)
+    assert rgb is not None
+    assert rgb.shape == (90, 160, 3)
+    assert tel.as_dict().get("frame_jpeg")
+
+
+def test_stub_does_not_claim_to_be_the_mesh():
+    bridge = FlybodyBridge(task="walk_imitation", prefer_real=False, seed=3)
+    assert bridge.render_rgb() is None
+    assert bridge.render_jpeg() is None
+    assert flybody_status()["install"]

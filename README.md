@@ -37,6 +37,12 @@ See `CITATION.cff`. DOI badge added below once Zenodo publishes.
 
 > **Computational research / simulation only.** This is not a medical device, not a treatment planner, and it does not claim a clinical cure. See [DISCLAIMER.md](DISCLAIMER.md).
 
+**Honesty — read this first**
+
+- Confluence is a **research closed-loop**: noisy observations → connectome-style controller → simulated infusion `U(t)` → PK/PD → 11-D cancer ODE. In-silico burden / resistance / DA / “protein channel” scores are **not** a computational cure for cancer and are not a treatment recommendation.
+- The hero viewport and `docs/demo/cinematic.mp4` must show the **TuragaLab/flybody** anatomical MuJoCo mesh (`fruitfly.xml`, Apache 2.0; Vaxenburg et al., *Nature* 2025). A CPG / bead-fly stub is **not** an acceptable product visual. If flybody is missing, the UI shows an install CTA instead of a fake fly.
+- Visual fidelity requires the flybody extra + headless GL (`MUJOCO_GL=osmesa` or `egl`). NeuroMechFly / FlyGym is an acceptable alternate digital twin only if flybody cannot be installed — document which body is on screen.
+
 Confluence v2 asks a concrete control-theoretic question: *can a Drosophila melanogaster mushroom-body-style associative circuit, driven by noisy cancer observations and a dopamine-like reward, generate adaptive multi-drug infusion policies on a mechanistic tumor microenvironment?*
 
 The closed loop is:
@@ -75,12 +81,12 @@ uvicorn confluence.telemetry.websocket_server:app --host 127.0.0.1 --port 8765
 Open **http://127.0.0.1:8765**. The live session is a **dark-lab hero viewport**: the fly fills the frame; cancer burden / resistance, DA, active protein channels, and play/pause sit in a slim HUD. Controllers A–F, full-brain train modes, infusion sliders, and charts stay in the ☰ drawer.
 
 - loop mode is a film-style **Cancer / Flybody / Both** switch (not a form)
-- real `physics.render` JPEG stream when `.[flybody]` is installed; otherwise a cinematic CPG stub (beige Drosophila, not a stick figure)
+- hero viewport streams **only** `env.physics.render` JPEGs from `fruitfly.xml`; no mesh → install CTA (CPG stub is hidden)
 - append `?cinema=1` to hide chrome for recording
 
 [![Cinematic still](docs/demo/still_hero.png)](docs/demo/cinematic.mp4)
 
-Short share clip (≈12 s): [`docs/demo/cinematic.mp4`](docs/demo/cinematic.mp4). Re-render with MuJoCo locally via `python -m confluence.demo_cinematic --prefer-real` (see [`docs/demo/README.md`](docs/demo/README.md)).
+Share clip (≈12 s, real mesh): [`docs/demo/cinematic.mp4`](docs/demo/cinematic.mp4). The cinematic job **fails** if fruitfly.xml cannot render — it will not ship stub footage. See [`docs/demo/README.md`](docs/demo/README.md).
 
 Interactive Kenyon-cell count defaults to **256** for real-time FPS (documented). Pass `n_kc=2048` in `MushroomBodyNetwork` / controllers for a more FlyWire-like expansion. Controller **F** is a separate sparse rate-based net that can be constructed at `n_neurons=166700` (see below); the UI default stays on the small demo.
 
@@ -113,21 +119,18 @@ Confluence can also close the loop through a **body**, using the DeepMind / HHMI
 This extra is **optional**. The core cancer closed-loop and controllers A–E install and run without MuJoCo.
 
 ```bash
-# Python 3.10 is the cleanest flybody target. Upstream pins numpy==1.26.4 —
-# use a separate venv if you do not want to downgrade Confluence's numpy 2.x.
-pip install -e ".[flybody]"
-# pinned to TuragaLab/flybody@d015e9bfe441bd90ae431bac24c55cb74bdbce26
-export MUJOCO_GL=osmesa   # or egl, for headless
-python -m confluence.embodiment --task template --steps 20
-python -m confluence          # UI loop selector: Cancer ODE / Flybody / Both
-```
-
-If flybody is missing, the hero viewport uses a **cinematic kinematic CPG stub** (articulated beige fly on a dark grid — not a stick figure). The smoke test `tests/test_flybody_bridge.py` skips the real-env case when the extra is absent. Headless MuJoCo re-render of the share clip:
-
-```bash
+# Keep Confluence on numpy 2.x: install flybody *without* its numpy==1.26.4 pin.
+sudo apt-get install -y libosmesa6 libosmesa6-dev   # or use EGL
+pip install mujoco dm_control h5py mediapy pillow
+pip install --no-deps "flybody @ git+https://github.com/TuragaLab/flybody.git@d015e9bfe441bd90ae431bac24c55cb74bdbce26"
+# equivalently: bash scripts/install_flybody.sh
 export MUJOCO_GL=osmesa
-python -m confluence.demo_cinematic --seconds 12 --prefer-real --out docs/demo/cinematic.mp4
+python -m confluence.embodiment --task template --steps 20
+python -m confluence.demo_cinematic --seconds 12 --out docs/demo/cinematic.mp4
+python -m confluence
 ```
+
+If flybody / OSMesa is missing, the **hero viewport shows an install CTA** (it does not substitute a stick figure). `python -m confluence.demo_cinematic` exits nonzero rather than writing fake footage. The CPG stub remains only for proprio unit tests (`prefer_real=False`).
 
 Citation (please keep if you use the body model):
 

@@ -9,8 +9,11 @@ Start:
 from __future__ import annotations
 
 import asyncio
+import os
 from pathlib import Path
 from typing import Optional
+
+os.environ.setdefault("MUJOCO_GL", "osmesa")
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse

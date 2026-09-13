@@ -231,105 +231,23 @@ function drawHero(emb, conn) {
     const ih = mujocoImg.naturalHeight;
     const scale = Math.max(w / iw, h / ih);
     ctx.drawImage(mujocoImg, (w - iw * scale) / 2, (h - ih * scale) / 2, iw * scale, ih * scale);
-    drawSparks(ctx, w, h, conn, w * 0.5, h * 0.48);
     return;
   }
 
-  const heading = emb ? emb.heading || 0 : 0;
-  const xpos = (emb && emb.xpos) || [0, 0, 0.12];
-  const joints = (emb && emb.joints) || [];
-  const tFly = (emb && emb.t_fly) || 0;
-  const cam = makeCam(xpos);
-  const P = (lx, ly, lz) => project(wld(heading, xpos, lx, ly, lz), cam, w, h);
-
-  ctx.strokeStyle = "rgba(255,255,255,0.07)";
-  ctx.lineWidth = 1;
-  for (let i = -8; i <= 8; i++) {
-    const a = project([i * 0.18, -1.6, 0], cam, w, h);
-    const b = project([i * 0.18, 1.8, 0], cam, w, h);
-    ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
-    const c = project([-1.6, i * 0.18, 0], cam, w, h);
-    const d = project([1.8, i * 0.18, 0], cam, w, h);
-    ctx.beginPath(); ctx.moveTo(c[0], c[1]); ctx.lineTo(d[0], d[1]); ctx.stroke();
-  }
-
-  const thorax = P(0.02, 0, 0.095);
-  const head = P(0.095, 0, 0.102);
-  const scale = 240 / Math.max(thorax[2], 0.12);
-
-  ctx.fillStyle = "rgba(0,0,0,0.35)";
-  ctx.beginPath();
-  ctx.ellipse(thorax[0], thorax[1] + 22, 36, 8, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  const wingZ = 0.148 + 0.008 * Math.sin(2.2 * tFly);
-  limb(ctx, P(0.00, 0.02, 0.128), P(-0.14, 0.10, wingZ), 7, "rgba(210,205,195,0.22)");
-  limb(ctx, P(0.00, -0.02, 0.128), P(-0.14, -0.10, wingZ + 0.004), 7, "rgba(210,205,195,0.22)");
-
-  const attach = [
-    [0.08, 0.03, 0.07], [0.01, 0.036, 0.065], [-0.06, 0.03, 0.06],
-    [0.08, -0.03, 0.07], [0.01, -0.036, 0.065], [-0.06, -0.03, 0.06],
-  ];
-  for (let i = 0; i < 6; i++) {
-    const side = i < 3 ? 1 : -1;
-    const coxa = joints[i * 3] || 0;
-    const femur = joints[i * 3 + 1] || 0;
-    const tibia = joints[i * 3 + 2] || 0;
-    const yaw = side * (0.85 + 0.45 * coxa);
-    const pitch = 0.35 + 0.55 * femur;
-    const a0 = wld(heading, xpos, attach[i][0], attach[i][1], attach[i][2]);
-    const step = (p, L, pit) => {
-      const d = [Math.cos(yaw) * L * Math.cos(pit), Math.sin(yaw) * L, -L * Math.sin(pit)];
-      const c = Math.cos(heading);
-      const s = Math.sin(heading);
-      return [p[0] + c * d[0] - s * d[1], p[1] + s * d[0] + c * d[1], p[2] + d[2]];
-    };
-    const a1 = step(a0, 0.055, pitch);
-    const a2 = step(a1, 0.085, pitch + 0.55 + 0.35 * tibia);
-    const a3 = step(a2, 0.075, pitch + 1.25);
-    a3[2] = Math.max(a3[2], 0.002);
-    const p0 = project(a0, cam, w, h);
-    const p1 = project(a1, cam, w, h);
-    const p2 = project(a2, cam, w, h);
-    const p3 = project(a3, cam, w, h);
-    limb(ctx, p0, p1, 5.2, "#96846c");
-    limb(ctx, p1, p2, 4.4, "#8a7860");
-    limb(ctx, p2, p3, 3.4, "#7a6a54");
-  }
-
-  [[-0.02, 0.20], [-0.07, 0.175], [-0.12, 0.14], [-0.16, 0.10]].forEach(([lx, r]) => {
-    const p = P(lx, 0, 0.088);
-    sphere(ctx, p[0], p[1], r * scale, "#c8b494", "#4a4032");
-  });
-  sphere(ctx, thorax[0], thorax[1], 0.22 * scale, "#d7c4a3", "#5a4c3a");
-  sphere(ctx, head[0], head[1], 0.155 * scale, "#d2c0a0", "#4a4032");
-  const eL = P(0.118, 0.020, 0.110);
-  const eR = P(0.118, -0.020, 0.110);
-  sphere(ctx, eL[0], eL[1], 0.055 * scale, "#c23030", "#3a0808");
-  sphere(ctx, eR[0], eR[1], 0.055 * scale, "#c23030", "#3a0808");
-  limb(ctx, P(0.175, 0.018, 0.125), P(0.205, 0.032, 0.155), 1.4, "#96846c");
-  limb(ctx, P(0.175, -0.018, 0.125), P(0.205, -0.032, 0.155), 1.4, "#96846c");
-
-  drawSparks(ctx, w, h, conn, thorax[0], thorax[1] - 8);
-}
-
-function drawSparks(ctx, w, h, conn, cx, cy) {
-  const mbon = (conn && conn.mbon_rates) || [];
-  const sec = (conn && conn.secretory_rates) || [];
-  const da = (conn && conn.da) || 0;
-  const rates = mbon.concat(sec);
-  const n = Math.min(36, 10 + rates.length);
-  for (let i = 0; i < n; i++) {
-    const amp = Math.abs(rates[i % Math.max(rates.length, 1)] || 0.15);
-    const ang = (i / n) * Math.PI * 2 + (da || 0);
-    const rad = 18 + 46 * amp;
-    const x = cx + Math.cos(ang) * rad;
-    const y = cy + Math.sin(ang) * rad * 0.55 - 8 * amp;
-    ctx.fillStyle = da >= 0 ? `rgba(212,160,84,${0.18 + 0.55 * amp})` : `rgba(62,207,192,${0.18 + 0.55 * amp})`;
-    ctx.beginPath();
-    ctx.arc(x, y, 1.4 + 2.2 * amp, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  // Never draw the CPG / bead fly as the product. Require fruitfly.xml.
+  ctx.fillStyle = "#0a0c10";
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = "#d4a054";
+  ctx.font = "600 13px ui-sans-serif, system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("FLYBODY MESH REQUIRED", w / 2, h / 2 - 28);
+  ctx.fillStyle = "#d8d0c4";
+  ctx.font = "15px ui-sans-serif, system-ui, sans-serif";
+  ctx.fillText("Hero viewport streams TuragaLab/flybody fruitfly.xml (MuJoCo).", w / 2, h / 2);
+  ctx.fillStyle = "#7a7468";
+  ctx.font = "13px ui-monospace, ui-sans-serif, monospace";
+  ctx.fillText("pip install mujoco dm_control && pip install --no-deps flybody", w / 2, h / 2 + 28);
+  ctx.fillText("export MUJOCO_GL=osmesa   ·   CPG stub is not shown here", w / 2, h / 2 + 50);
 }
 
 function drawFly(emb) {
@@ -391,8 +309,13 @@ function applyFrame(frame) {
     Object.values(traces).forEach((g) => g.forEach((tr) => tr.ys.shift()));
   }
   if (E.frame_jpeg) {
-    if (!mujocoImg) mujocoImg = new Image();
+    if (!mujocoImg) {
+      mujocoImg = new Image();
+      mujocoImg.onload = () => drawHero(lastEmb, lastConn);
+    }
     mujocoImg.src = `data:image/jpeg;base64,${E.frame_jpeg}`;
+  } else {
+    mujocoImg = null;
   }
   redraw();
   $("kc-sp").textContent = (C.kc_sparsity ?? 0).toFixed(3);

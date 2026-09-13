@@ -11,6 +11,8 @@ Project Confluence is a **computational research tool** designed for scientific 
 
 Connectome controllers (including the optional 166,700-unit sparse net and “protein” effector channels) are **in-silico control signals**. They do not synthesize therapeutics, express genes, or constitute a biologic manufacturing or dosing system.
 
+**We have not cured cancer computationally.** Simulated tumor-burden, resistance, and therapy-channel metrics in this repository are research scores on an ODE, not a claim of disease eradication, clinical benefit, or a path to a cure.
+
 ## No Medical Advice
 
 Nothing in this repository constitutes medical advice. The computational models, drug optimization outputs, and complexity profiles are **theoretical constructs** for research purposes only.

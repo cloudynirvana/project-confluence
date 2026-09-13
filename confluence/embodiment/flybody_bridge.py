@@ -8,9 +8,12 @@ Real API (TuragaLab/flybody, Apache 2.0), verified from upstream source:
     timestep = env.step(action)     # dm_env TimeStep
     pixels = env.physics.render(camera_id=1)
 
-This module never imports flybody at package import time. If MuJoCo / flybody
-are missing, ``FlybodyBridge`` uses a documented kinematic stub so the
-interactive UI still streams pose telemetry.
+This module never imports flybody at package import time.
+
+The **hero viewport and share clips must use real MuJoCo ``fruitfly.xml``
+frames**. The kinematic CPG stub is only for proprio / unit tests — it is
+not a product visual. If flybody is missing, ``render_rgb`` returns None
+and the UI shows an install CTA.
 
 Motor map (documented affine clip):
     features = concat(U ∈ R^5, MBON rates)
@@ -34,10 +37,14 @@ is not.
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
+
+# Must be set before the first dm_control / mujoco import on this process.
+os.environ.setdefault("MUJOCO_GL", "osmesa")
 
 FLYBODY_REPO = "https://github.com/TuragaLab/flybody"
 FLYBODY_COMMIT = "d015e9bfe441bd90ae431bac24c55cb74bdbce26"
@@ -51,6 +58,10 @@ JOINTS_PER_LEG = 3
 # dm_env specs are unavailable. Real env bounds come from action_spec.
 DEFAULT_ACTION_LOW = -1.0
 DEFAULT_ACTION_HIGH = 1.0
+# Official fruitfly.xml cameras (composer prefixes walker/).
+HERO_CAMERAS = ("walker/hero", "walker/track1", 1)
+UI_RENDER_SIZE = (720, 405)  # width, height
+MESH_NAME = "TuragaLab/flybody fruitfly.xml (MuJoCo Drosophila)"
 
 
 def flybody_available() -> bool:
@@ -69,7 +80,14 @@ def flybody_status() -> Dict[str, Any]:
         "commit": FLYBODY_COMMIT,
         "license": "Apache-2.0",
         "citation": "Vaxenburg et al., Nature 643:1312–1320 (2025) doi:10.1038/s41586-025-09029-4",
-        "backend": "flybody" if ok else "kinematic_stub",
+        "backend": "flybody" if ok else "unavailable",
+        "mesh": MESH_NAME if ok else None,
+        "render_ready": ok,
+        "install": (
+            "pip install mujoco dm_control h5py mediapy pillow && "
+            f"pip install --no-deps 'flybody @ git+{FLYBODY_REPO}.git@{FLYBODY_COMMIT}' "
+            "&& export MUJOCO_GL=osmesa"
+        ),
     }
 
 
@@ -261,13 +279,17 @@ class FlybodyBridge:
 
     def __init__(
         self,
-        task: str = "walk_imitation",
+        task: str = "template",
         prefer_real: bool = True,
         seed: int = 7,
         n_mbon: int = 8,
+        camera: str = "walker/hero",
+        render_size: Tuple[int, int] = UI_RENDER_SIZE,
     ):
         self.task_name = task
         self.seed = seed
+        self.camera = camera
+        self.render_size = tuple(render_size)
         self._env = None
         self._timestep = None
         self.backend = "kinematic_stub"
@@ -302,7 +324,7 @@ class FlybodyBridge:
         if self._env is None and not self.notes:
             self.notes = (
                 "flybody not installed. "
-                f"pip install -e \".[flybody]\"  # pins {FLYBODY_REPO}@{FLYBODY_COMMIT[:7]}"
+                + flybody_status()["install"]
             )
 
     def _make_real_env(self, task: str, seed: int):
@@ -322,6 +344,8 @@ class FlybodyBridge:
             self._timestep = self._env.reset()
         idle = np.zeros(self.action_dim, dtype=float)
         self.last = self._observe(idle, reward=0.0, discount=1.0, last=False)
+        if self.render_enabled and self.last is not None:
+            self.last.frame_jpeg = self.render_jpeg()
         return self.last
 
     def step(
@@ -409,29 +433,51 @@ class FlybodyBridge:
             notes=self.notes,
         )
 
-    def render_jpeg(self, width: int = 320, height: int = 180) -> Optional[str]:
-        """JPEG (base64) from MuJoCo when flybody is live; None for the stub.
+    def _camera_id(self):
+        names = []
+        try:
+            model = self._env.physics.model
+            names = [model.camera(i).name for i in range(model.ncam)]
+        except Exception:
+            names = []
+        for cand in (self.camera,) + HERO_CAMERAS:
+            if isinstance(cand, int):
+                return cand
+            if cand in names:
+                return cand
+        return 1
 
-        Headless: ``export MUJOCO_GL=osmesa`` (or ``egl``). This is a research
-        viewport, not a claim that the stub equals the physics mesh.
+    def render_rgb(self, width: Optional[int] = None, height: Optional[int] = None) -> Optional[np.ndarray]:
+        """Anatomical MuJoCo RGB frame, or None if flybody is not live.
+
+        Never invents a CPG / bead-fly substitute.
         """
         if self._env is None:
+            return None
+        w, h = width or self.render_size[0], height or self.render_size[1]
+        try:
+            pixels = self._env.physics.render(height=int(h), width=int(w), camera_id=self._camera_id())
+            arr = np.asarray(pixels, dtype=np.uint8)
+            if arr.ndim != 3 or arr.shape[2] != 3:
+                return None
+            return arr
+        except Exception:
+            return None
+
+    def render_jpeg(self, width: Optional[int] = None, height: Optional[int] = None) -> Optional[str]:
+        """JPEG (base64) from real fruitfly.xml; None if MuJoCo is unavailable."""
+        pixels = self.render_rgb(width=width, height=height)
+        if pixels is None:
             return None
         try:
             import base64
             from io import BytesIO
 
-            pixels = self._env.physics.render(height=height, width=width, camera_id=1)
-            try:
-                from PIL import Image
+            from PIL import Image
 
-                buf = BytesIO()
-                Image.fromarray(np.asarray(pixels, dtype=np.uint8)).save(
-                    buf, format="JPEG", quality=52
-                )
-                return base64.b64encode(buf.getvalue()).decode("ascii")
-            except Exception:
-                return None
+            buf = BytesIO()
+            Image.fromarray(pixels).save(buf, format="JPEG", quality=82)
+            return base64.b64encode(buf.getvalue()).decode("ascii")
         except Exception:
             return None
 
