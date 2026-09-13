@@ -13,14 +13,14 @@ class PlasticMushroomBodyController(BaseController):
     name = "Plastic mushroom body"
     uses_connectome = True
 
-    def __init__(self, n_kc: int = 256, seed: int = 7, **kwargs):
+    def __init__(self, n_kc: int = 256, seed: int = 7, plastic: bool = True, **kwargs):
         kwargs.setdefault("drug_ids", ALL_EFFECTOR_IDS)
         super().__init__(**kwargs)
         self.network = MushroomBodyNetwork(
             NetworkConfig(
                 n_kc=n_kc,
                 seed=seed,
-                plastic=True,
+                plastic=bool(plastic),
                 n_obs=len(OBS_VECTOR_NAMES),
                 n_out=len(self.drug_ids),
             ),

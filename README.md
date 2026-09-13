@@ -228,35 +228,37 @@ Notebook: [`notebooks/computational_validation_taxonomy.ipynb`](notebooks/comput
 
 ## In-silico endpoint mapping / computational–clinical translation layer
 
-**Title of this report:** in silico endpoint mapping / computational–clinical translation layer.
+**Title of this report:** IN SILICO ENDPOINT MAPPING / computational–clinical translation layer.
 
-This is **not** a clinical trial, **not** FDA/EMA readiness, and **not** a Phase II readout. RECIST 1.1-*like* and CTCAE v5.0-*like* labels are mappings from the real Confluence closed loop (`CancerODE.ode_system` + observation layer + PK/PD + controllers A / B / E / F). Kaplan–Meier, Mantel–Haenszel log-rank, and univariate Cox HR + 95% CI are **computed**; they are never hardcoded. If the virtual cohort is underpowered, the suite reports the CI and marks the comparison **inconclusive**.
+This is **not** a clinical trial, **not** FDA/EMA readiness, and **not** a Phase II readout. Endpoints are mappings from the **real** Confluence closed loop (`CancerODE.rhs` / `step` / `ClosedLoopSimulator` + PK/PD + A / B / E / **F-256 proxy**). There is no parallel shadow ODE. PPO/C is excluded unless trained. Infusion `U` is **unitless** and normalized to `[0, 1]`, not a mg/kg regimen.
 
-Part 1 — computational stress tests (real `ode_system`, not a standalone Euler toy):
+`CancerODE.step` and the closed loop default to **LSODA** (RK45 remains optional). Host-death (`H−0.2`) and near-eradication events are `solve_ivp` events on that same RHS.
 
-1. **Stiff solver** — LSODA / Radau / RK45 via scipy; trajectory agreement across rtol/atol and effective Δt ∈ [0.001, 0.05]; no NaN/Inf.
-2. **Conservation** — X_i ≥ 0; H ∈ [0, 1]; carrying capacity not breached; H ≤ 0.2 ⇒ terminal.
-3. **Robustness** — Latin-hypercube virtual cohort N≥100; r, σ_I (κ_immune), t½ perturbed ±25–40%; each patient is run on A (SoC MTD), B (Gatenby adaptive), E and F; report the **distribution**, not one seed.
-4. **Weight convergence** — ||W_KC→MBON||_F (plasticity_norm) stays bounded / no runaway.
+Part 1 — computational stress tests:
 
-Part 2 — oncology endpoint *language* mapped from the simulation:
+1. **Stiff solver** — LSODA / Radau / RK45; agreement uses **relative + absolute** tolerances (rtol=1e-3, atol=1e-4) and reports measured errors (no 0.25/0.35 green-pass).
+2. **Conservation** — pre-clip `X_i ≥ 0`; H ∈ [0, 1]; carrying; H ≤ 0.2 ⇒ terminal. Clip must not silently repair often.
+3. **Robustness** — LHS N≥100; r, σ_I, t½ ±25–40%; same patient noise on every arm; report the distribution.
+4. **Weights** — report ‖W‖_F(t) **plateau**. A hard clip at `w_max` is not called convergence.
 
-1. **RECIST 1.1-like** — CR / PR (≥30%↓) / SD / PD (≥20%↑ over nadir) from tumor-burden trajectories.
-2. **CTCAE v5.0-like** — G0–G5 from H(t) bands (G5 = H ≤ 0.2 terminal).
-3. **Kaplan–Meier OS/PFS** + log-rank + Cox HR when feasible, comparing E/F vs A vs B.
-4. **Clinical dosing discretization** — continuous U(t) → Q3W anti-PD-1-style pulses and daily TKI/HDAC with 5-on/2-off holidays. These are **simulated regimens**, not labeled schedules.
+Part 2 — honest endpoint language:
 
-How to run:
+1. **RECIST 1.1-like** — true **CR only if burden ≈ 0** (detection floor); otherwise near-CR / PR. Confirmation gap ≥28 d when the horizon allows.
+2. **H-band surrogate / CTCAE-like** — G1[0.85,1], G2[0.70,0.85), G3[0.45,0.70), G4[0.20,0.45), G5<0.20. Not organ-system CTCAE.
+3. **Horizon** — default virtual trial **180 days** for OS/PFS language. Shorter runs are labeled **short-horizon virtual event time**.
+4. **Stats** — custom KM / log-rank / Cox, optional `lifelines` extra (`pip install -e '.[stats]'`) cross-check. CI crossing 1.0 is reported as no demonstrated difference.
+
+How to run (one command, fixed master seed 17):
 
 ```bash
-# translation layer on the real closed loop (N=100 patients × 4 arms)
-python3 -m confluence.benchmarks.closed_loop_translation --n 100 --out results/validation_translation
+python3 -m confluence.benchmarks.closed_loop_translation
+# writes results/validation_translation/{four_panel_endpoints.png,translation_report.json,IN_SILICO_ENDPOINT_MAPPING.txt}
 
-# same layer via the validation-suite entrypoint
-python3 -m confluence.benchmarks.validation_suite --clinical --clinical-n 100 --clinical-out results/validation_translation
+# laptop / CI short-horizon label
+python3 -m confluence.benchmarks.closed_loop_translation --quick
 ```
 
-Writes `results/validation_translation/four_panel_endpoints.png` (KM, RECIST bars, CTCAE bars, example trajectory) and `translation_report.json`. Notebook: [`notebooks/computational_clinical_translation.ipynb`](notebooks/computational_clinical_translation.ipynb). Mapper: [`confluence/benchmarks/clinical_endpoint_mapper.py`](confluence/benchmarks/clinical_endpoint_mapper.py). Tests: `tests/test_clinical_endpoints.py`.
+Notebook: [`notebooks/computational_clinical_translation.ipynb`](notebooks/computational_clinical_translation.ipynb). Tests: `tests/test_clinical_endpoints.py`.
 
 Closed loop:
 
@@ -795,8 +797,8 @@ results = retriever.retrieve("first-line treatment for breast cancer in Nigeria"
 for r in results:
     print(f"[{r.score:.3f}] {r.chunk.condition_name}: {r.chunk.text[:100]}")
 
-# Structured clinical answer
-print(retriever.answer("What is the dosing for cisplatin in cervical cancer?"))
+# Structured lookup (research RAG — not a dosing engine, not a prescription)
+print(retriever.answer("What supportive-care topics exist for chemotherapy toxicity?"))
 
 # Direct protocol lookup
 protocol = retriever.get_treatment_protocol("BREAST CANCER")

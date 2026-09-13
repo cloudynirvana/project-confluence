@@ -28,6 +28,7 @@ flybody = [
     "mediapy",
     "pillow",
 ]
+stats = ["lifelines>=0.27", "pandas>=1.5"]
 
 [project.scripts]
 confluence = "confluence.__main__:main"

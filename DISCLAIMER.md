@@ -16,7 +16,7 @@ Connectome controllers (including the optional 166,700-unit sparse net and “pr
 
 Disease-class labels (`benign`, `malignant`, `occult`, `dormant`, `terminal`) are **state-signature modes** for computational discrimination. They are not clinical stage, TNM, or histopathology diagnoses.
 
-RECIST 1.1-like / CTCAE v5.0-like / Kaplan–Meier / log-rank / Cox outputs in this repository are an **in-silico endpoint mapping / computational–clinical translation layer**. They are simulated mappings from ODE burden and host-health H for scientific scrutiny. They are not a clinical trial, not RECIST/CTCAE adjudication, not FDA/EMA readiness, and not a Phase II result.
+RECIST 1.1-like / H-band surrogate (CTCAE-like) / Kaplan–Meier / log-rank / Cox outputs in this repository are an **in-silico endpoint mapping / computational–clinical translation layer**. They are simulated mappings from ODE burden and host-health H for scientific scrutiny. True CR is reserved for burden near the detection floor. Infusion U is unitless and normalized, not a mg/kg regimen. They are not a clinical trial, not RECIST/CTCAE adjudication, not FDA/EMA readiness, and not a Phase II result. Controller F figures use an F-256 proxy unless explicitly run at 166,700 units.
 
 ## No Medical Advice
 

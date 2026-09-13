@@ -138,6 +138,26 @@ PARAM_PROVENANCE: Dict[str, Dict[str, str]] = {
         "doi": "",
         "note": "PLACEHOLDER: surveillance priming rate. Not a measured vaccine or TIL expansion constant.",
     },
+    "r_s": {
+        "status": "placeholder",
+        "doi": "",
+        "note": "PLACEHOLDER: sensitive-clone growth rate. Simulation-scaled, not a fitted patient doubling time.",
+    },
+    "k_carry": {
+        "status": "placeholder",
+        "doi": "",
+        "note": "PLACEHOLDER: carrying capacity in research burden units, not a clinical tumor-volume K.",
+    },
+    "rho_immune": {
+        "status": "placeholder",
+        "doi": "",
+        "note": "PLACEHOLDER: immune recruitment rate. Not a measured TIL influx constant.",
+    },
+    "kappa_burden": {
+        "status": "placeholder",
+        "doi": "",
+        "note": "PLACEHOLDER: host-health burden load. Not a CTCAE organ-toxicity coefficient.",
+    },
 }
 
 

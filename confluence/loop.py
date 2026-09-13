@@ -42,6 +42,7 @@ class ClosedLoopSimulator:
     dt: float = 0.25
     seed: int = 0
     embodiment_enabled: bool = True
+    solver: str = "LSODA"
     history: List[SimFrame] = field(default_factory=list)
 
     def __post_init__(self) -> None:
@@ -169,6 +170,6 @@ class ClosedLoopSimulator:
                 mbon = tel.get("mbon_rates") or []
             self.embodiment.step(u, mbon)
         if run_cancer:
-            self.x, self.c = self.ode.step(self.x, self.c, u, self.dt)
+            self.x, self.c = self.ode.step(self.x, self.c, u, self.dt, method=self.solver)
             self.t += self.dt
         return self._frame(obs_true, action)

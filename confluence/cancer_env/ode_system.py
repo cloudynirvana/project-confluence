@@ -42,6 +42,27 @@ STATE_NAMES = LATENT_NAMES
 STATE_INDEX = {name: i for i, name in enumerate(STATE_NAMES)}
 DIM = 15
 CORE_DIM = 12  # TME + T_f; H at 10, T_f at 11
+DEFAULT_SOLVER = "LSODA"
+HOST_DEATH_H = 0.2
+NEAR_ERADICATION_BURDEN = 1e-3
+
+
+def host_death_event(t: float, z: np.ndarray) -> float:
+    """solve_ivp event: H − 0.2. Terminal when crossed downward."""
+    return float(z[10] - HOST_DEATH_H)
+
+
+host_death_event.terminal = True  # type: ignore[attr-defined]
+host_death_event.direction = -1.0  # type: ignore[attr-defined]
+
+
+def near_eradication_event(t: float, z: np.ndarray) -> float:
+    """solve_ivp event: (T_s+T_r+T_f) − detection floor. Non-terminal marker."""
+    return float(z[0] + z[1] + z[11] - NEAR_ERADICATION_BURDEN)
+
+
+near_eradication_event.terminal = False  # type: ignore[attr-defined]
+near_eradication_event.direction = -1.0  # type: ignore[attr-defined]
 
 
 def _sat(x: float, k: float) -> float:
@@ -133,6 +154,9 @@ class CancerODE:
         self.pk = pk or PKPDModel()
         self.dim = DIM + self.pk.n_drugs
         self.rng = np.random.default_rng(int(seed))
+        self.last_preclip_x: Optional[np.ndarray] = None
+        self.last_clip_repairs: int = 0
+        self.last_events: Dict[str, bool] = {"host_death": False, "near_eradication": False}
 
     def pack(self, x: np.ndarray, c: np.ndarray) -> np.ndarray:
         return np.concatenate([np.asarray(x, dtype=float), np.asarray(c, dtype=float)])
@@ -378,17 +402,25 @@ class CancerODE:
         c: np.ndarray,
         u: np.ndarray,
         dt: float,
-        method: str = "RK45",
+        method: str = DEFAULT_SOLVER,
         rtol: float = 1e-6,
         atol: float = 1e-8,
+        events: bool = True,
     ) -> Tuple[np.ndarray, np.ndarray]:
-        """Advance one interval with scipy; fallback RK4 if the solver rejects."""
+        """Advance one interval with scipy LSODA by default; RK45 remains optional.
+
+        The vector field is ``self.rhs`` (not a shadow ODE). Host-death and
+        near-eradication are optional ``solve_ivp`` events. ``last_preclip_x``
+        is the unclipped end state so tests can assert clip is not silently
+        repairing a leaking RHS.
+        """
         z0 = self.pack(self.clip_state(x), np.maximum(c, 0.0))
         u = np.asarray(u, dtype=float)
 
         def fun(t, z):
             return self.rhs(t, z, u)
 
+        ev = (host_death_event, near_eradication_event) if events else None
         try:
             sol = solve_ivp(
                 fun,
@@ -398,6 +430,7 @@ class CancerODE:
                 rtol=rtol,
                 atol=atol,
                 max_step=max(dt / 2.0, 1e-3),
+                events=ev,
             )
             if sol.success and np.all(np.isfinite(sol.y[:, -1])):
                 z1 = sol.y[:, -1]
@@ -407,12 +440,35 @@ class CancerODE:
             z1 = self._rk4(z0, u, dt)
 
         x1, c1 = self.unpack(z1)
+        self.last_preclip_x = x1.copy()
+        self.last_clip_repairs = int(self._count_clip_repairs(x1))
+        self.last_events = {
+            "host_death": bool(x1[10] <= HOST_DEATH_H),
+            "near_eradication": bool((x1[0] + x1[1] + x1[11]) <= NEAR_ERADICATION_BURDEN),
+        }
         x1 = self.clip_state(x1)
         if self.params.growth_awake_gate and self.params.awaken_hazard > 0.0:
             p_jump = 1.0 - np.exp(-float(self.params.awaken_hazard) * float(dt))
             if self.rng.random() < p_jump:
                 x1[14] = float(np.clip(x1[14] + self.params.awaken_jump, 0.0, 1.0))
         return x1, np.maximum(c1, 0.0)
+
+    @staticmethod
+    def _count_clip_repairs(x: np.ndarray) -> int:
+        """How many core coordinates the clip would have to fix."""
+        n = 0
+        if x[0] < -1e-12:
+            n += 1
+        if x[1] < -1e-12:
+            n += 1
+        if x[11] < -1e-12:
+            n += 1
+        if x[10] < -1e-12 or x[10] > 1.0 + 1e-12:
+            n += 1
+        for i in (2, 3, 4, 5, 6, 7, 8, 9):
+            if x[i] < -1e-12:
+                n += 1
+        return n
 
     def _rk4(self, z: np.ndarray, u: np.ndarray, dt: float) -> np.ndarray:
         k1 = self.rhs(0.0, z, u)
@@ -428,10 +484,11 @@ class CancerODE:
         u_of_t,
         t_span: Tuple[float, float],
         n_eval: int = 200,
-        method: str = "LSODA",
+        method: str = DEFAULT_SOLVER,
         rtol: float = 1e-6,
         atol: float = 1e-8,
         max_step: Optional[float] = None,
+        events: bool = True,
     ) -> Dict[str, np.ndarray]:
         z0 = self.pack(self.clip_state(x0), np.maximum(c0, 0.0))
         t_eval = np.linspace(t_span[0], t_span[1], n_eval)
@@ -442,9 +499,18 @@ class CancerODE:
         kwargs: Dict = {"t_eval": t_eval, "method": method, "rtol": rtol, "atol": atol}
         if max_step is not None:
             kwargs["max_step"] = float(max_step)
+        if events:
+            kwargs["events"] = (host_death_event, near_eradication_event)
         sol = solve_ivp(fun, t_span, z0, **kwargs)
         xs = np.array([self.clip_state(sol.y[:DIM, i]) for i in range(sol.y.shape[1])]).T
         cs = np.maximum(sol.y[DIM:, :], 0.0)
+        t_death = []
+        t_erad = []
+        if events and getattr(sol, "t_events", None):
+            if len(sol.t_events) >= 1:
+                t_death = [float(v) for v in np.asarray(sol.t_events[0]).ravel()]
+            if len(sol.t_events) >= 2:
+                t_erad = [float(v) for v in np.asarray(sol.t_events[1]).ravel()]
         return {
             "t": sol.t,
             "x": xs,
@@ -452,6 +518,8 @@ class CancerODE:
             "success": bool(sol.success),
             "method": method,
             "finite": bool(np.all(np.isfinite(sol.y))),
+            "host_death_times": t_death,
+            "near_eradication_times": t_erad,
         }
 
     def to_latent(self, x: np.ndarray, t: float = 0.0) -> LatentCancerState:

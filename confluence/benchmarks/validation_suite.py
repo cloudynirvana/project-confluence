@@ -377,7 +377,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="Also run the in-silico endpoint mapping layer on the real A/B/E/F loop",
     )
     parser.add_argument("--clinical-n", type=int, default=100)
-    parser.add_argument("--clinical-days", type=float, default=28.0)
+    parser.add_argument("--clinical-days", type=float, default=180.0)
     parser.add_argument("--clinical-out", default="results/validation_translation")
     args = parser.parse_args(list(argv) if argv is not None else None)
     report = run_suite(Path(args.out))
@@ -394,6 +394,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             n=args.clinical_n,
             out_dir=Path(args.clinical_out),
             days=args.clinical_days,
+            dt=2.0 if args.clinical_days >= 180 else 1.0,
         )
         print(
             "clinical translation layer (not a trial):",

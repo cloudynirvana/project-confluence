@@ -24,22 +24,30 @@ from scipy.stats import norm
 
 ENDPOINT_NON_CLAIM = (
     "In-silico endpoint mapping / computational–clinical translation layer. "
-    "RECIST 1.1-like and CTCAE v5.0-like labels are simulated mappings from "
-    "ODE burden and host-health H. Kaplan–Meier / log-rank / Cox are computed "
-    "on a virtual cohort. This is not a clinical trial, not FDA/EMA readiness, "
-    "and not a Phase II result."
+    "H-band surrogate / CTCAE-like grades and RECIST 1.1-like labels are "
+    "simulated mappings from ODE burden and host-health H. Kaplan–Meier / "
+    "log-rank / Cox are computed on a virtual cohort. This is not a clinical "
+    "trial, not FDA/EMA readiness, and not a Phase II result. Infusion U is "
+    "unitless and normalized to [0, 1], not a mg/kg regimen."
 )
 
-# CTCAE v5.0-*like* bands on host health H ∈ [0, 1].
-# G5 matches the model's terminal toxicity threshold (H ≤ 0.2).
+# H-band surrogate / CTCAE-like. Assumption: host health H is a monotonic
+# stand-in for graded toxicity. This is NOT CTCAE adjudication.
+# G1 [0.85, 1], G2 [0.70, 0.85), G3 [0.45, 0.70), G4 [0.20, 0.45), G5 < 0.20.
 CTCAE_H_BANDS = (
-    (0.85, 1.01, 0, "none / G0"),
-    (0.70, 0.85, 1, "G1"),
-    (0.55, 0.70, 2, "G2"),
-    (0.40, 0.55, 3, "G3"),
-    (0.20, 0.40, 4, "G4"),
-    (-0.01, 0.20, 5, "G5 / terminal"),
+    (0.85, 1.0000001, 1, "G1 (H-band surrogate)"),
+    (0.70, 0.85, 2, "G2 (H-band surrogate)"),
+    (0.45, 0.70, 3, "G3 (H-band surrogate)"),
+    (0.20, 0.45, 4, "G4 (H-band surrogate)"),
+    (-0.01, 0.20, 5, "G5 (H-band surrogate / H<0.20)"),
 )
+CTCAE_ASSUMPTION = (
+    "H-band surrogate / CTCAE-like: grades are thresholded on simulated H(t), "
+    "not organ-system CTCAE v5.0 terms. G5 is H<0.20 (model host-failure band)."
+)
+DETECTION_FLOOR = 1e-3
+CONFIRM_DAYS = 28.0
+OS_PFS_MIN_HORIZON_DAYS = 180.0
 
 Q2W_DAYS = 14.0
 Q3W_DAYS = 21.0
@@ -53,17 +61,20 @@ DAILY_LIKE = ("targeted_kinase", "hdac", "tki_imatinib_like", "tki_alk", "mct1")
 def recist_like(
     burden: Sequence[float],
     baseline: Optional[float] = None,
+    times: Optional[Sequence[float]] = None,
     cr_frac: float = 0.10,
     pr_frac: float = 0.30,
     pd_frac: float = 0.20,
     pd_abs: float = 0.05,
+    detection_floor: float = DETECTION_FLOOR,
+    confirm_days: float = CONFIRM_DAYS,
 ) -> Dict[str, object]:
-    """Best overall response from a burden trajectory (RECIST 1.1-like).
+    """RECIST 1.1-*like* best response from a burden trajectory.
 
-    CR: best burden ≤ ``cr_frac`` of baseline (disappearance analog).
-    PR: ≥30% decrease from baseline.
-    PD: ≥20% increase over nadir and ≥ ``pd_abs`` absolute.
-    SD: otherwise.
+    True CR only if nadir ≤ detection floor (≈0). A 10% residual is
+    ``near-CR``, not CR. PR is ≥30% drop. PD is ≥20% over nadir.
+    When a time axis spans ≥ ``confirm_days``, a response must still
+    hold at t*+28 d to be confirmed; otherwise it is labeled unconfirmed.
     """
     y = np.asarray(burden, dtype=float).ravel()
     if y.size == 0:
@@ -79,47 +90,104 @@ def recist_like(
         if val >= running_nadir * (1.0 + pd_frac) and (val - running_nadir) >= pd_abs:
             pd = True
             break
-    if nadir <= cr_frac * b0:
-        best = "CR"
+    if nadir <= detection_floor:
+        raw = "CR"
+    elif nadir <= cr_frac * b0:
+        raw = "near-CR"
     elif best_drop >= pr_frac:
-        best = "PR"
+        raw = "PR"
     elif pd:
-        best = "PD"
+        raw = "PD"
     else:
-        best = "SD"
+        raw = "SD"
+    confirmed: Optional[bool] = None
+    confirmation = "not_applicable"
+    t = np.asarray(times, dtype=float).ravel() if times is not None else None
+    if raw in {"CR", "near-CR", "PR"} and t is not None and t.size == y.size:
+        span = float(t[-1] - t[0])
+        if span + 1e-9 >= confirm_days:
+            first = None
+            for ti, yi in zip(t, y):
+                drop = (b0 - float(yi)) / b0
+                hit = (
+                    (raw == "CR" and yi <= detection_floor)
+                    or (raw == "near-CR" and yi <= cr_frac * b0)
+                    or (raw == "PR" and drop >= pr_frac)
+                )
+                if hit:
+                    first = float(ti)
+                    break
+            if first is None:
+                confirmed = False
+                confirmation = "criterion_never_isolated"
+            else:
+                later = [float(yi) for ti, yi in zip(t, y) if ti + 1e-9 >= first + confirm_days]
+                if not later:
+                    confirmed = False
+                    confirmation = "horizon_too_short_after_onset"
+                else:
+                    yi = later[0]
+                    drop = (b0 - yi) / b0
+                    if raw == "CR":
+                        confirmed = yi <= detection_floor
+                    elif raw == "near-CR":
+                        confirmed = yi <= cr_frac * b0
+                    else:
+                        confirmed = drop >= pr_frac
+                    confirmation = "confirmed" if confirmed else "unconfirmed"
+        else:
+            confirmation = "horizon_too_short"
+            confirmed = False
+    elif raw in {"CR", "near-CR", "PR"}:
+        confirmation = "no_time_axis"
+        confirmed = None
+    best = raw
+    if raw in {"CR", "near-CR", "PR"} and confirmed is False and confirmation.startswith("unconfirmed"):
+        best = f"unconfirmed-{raw}"
     return {
         "best": best,
+        "raw_best": raw,
+        "confirmed": confirmed,
+        "confirmation": confirmation,
         "nadir": nadir,
         "baseline": b0,
         "pct_from_baseline": float(100.0 * (nadir - b0) / b0),
         "pd": pd,
+        "detection_floor": detection_floor,
         "non_claim": ENDPOINT_NON_CLAIM,
     }
 
 
 def ctcae_grade_from_H(h: float) -> int:
-    """Worst-compatible grade for a single H sample."""
+    """H-band surrogate / CTCAE-like grade for one H sample."""
     h = float(h)
-    for lo, hi, grade, _name in CTCAE_H_BANDS:
-        if lo <= h < hi:
-            return int(grade)
-    return 5 if h < 0.2 else 0
+    if h < 0.20:
+        return 5
+    if h >= 0.85:
+        return 1
+    if h >= 0.70:
+        return 2
+    if h >= 0.45:
+        return 3
+    return 4
 
 
 def ctcae_like(health: Sequence[float]) -> Dict[str, object]:
-    """Worst CTCAE v5.0-like grade along H(t). G5 iff any H ≤ 0.2."""
+    """Worst H-band surrogate / CTCAE-like grade along H(t). G5 iff any H < 0.20."""
     h = np.asarray(health, dtype=float).ravel()
     if h.size == 0:
         return {"worst_grade": None, "grades": []}
     grades = [ctcae_grade_from_H(v) for v in h]
     worst = int(max(grades))
-    if np.any(h <= 0.2):
+    if np.any(h < 0.20):
         worst = max(worst, 5)
     return {
         "worst_grade": worst,
         "grades": grades,
         "min_H": float(np.min(h)),
         "bands": [(lo, hi, g, n) for lo, hi, g, n in CTCAE_H_BANDS],
+        "assumption": CTCAE_ASSUMPTION,
+        "label": "H-band surrogate / CTCAE-like",
         "non_claim": ENDPOINT_NON_CLAIM,
     }
 
@@ -152,12 +220,18 @@ def pfs_os_times(
         if hi <= 0.2 or pd:
             pfs_t, pfs_e = float(ti), 1.0
             break
+    label = (
+        "OS/PFS-mapped virtual event time"
+        if horizon + 1e-9 >= OS_PFS_MIN_HORIZON_DAYS
+        else "short-horizon virtual event time"
+    )
     return {
         "os_time": float(os_t),
         "os_event": float(os_e),
         "pfs_time": float(pfs_t),
         "pfs_event": float(pfs_e),
         "horizon": horizon,
+        "horizon_label": label,
     }
 
 
@@ -304,12 +378,15 @@ def cox_ph_binary(
     hr = float(np.exp(beta))
     lo = float(np.exp(beta - 1.96 * se))
     hi = float(np.exp(beta + 1.96 * se))
+    includes_one = bool(lo <= 1.0 <= hi)
     return {
         "hr": hr,
         "ci95": (lo, hi),
         "beta": float(beta),
         "se": se,
         "n_events": n_ev,
+        "ci_includes_one": includes_one,
+        "no_demonstrated_difference": includes_one,
         "inconclusive": False,
         "method": "univariate Cox PH (Breslow, Newton)",
     }
@@ -321,9 +398,9 @@ def discretize_infusion(
     pd1_interval: float = Q3W_DAYS,
     pulse_width: float = PULSE_WIDTH_DAYS,
 ) -> Dict[str, float]:
-    """Map continuous U → simulated Q2W/Q3W PD-1 pulses + 5/2 daily TKI/HDAC.
+    """Map continuous unitless U∈[0,1] → simulated Q2W/Q3W PD-1 pulses + 5/2 TKI.
 
-    Documented as a **simulated regimen**, not a labeled schedule.
+    U is a normalized infusion command, **not** mg/kg or a labeled schedule.
     """
     out = {k: float(v) for k, v in u.items()}
     cycle = float(t_days) % pd1_interval
@@ -339,6 +416,7 @@ def discretize_infusion(
 
 
 REGIMEN_DOC = {
+    "units": "U(t) is unitless and normalized to [0, 1] (fraction of catalog MTD). Not mg/kg, not mg/m².",
     "anti_pd1 / protein_anti_pd1": f"Q3W pulse ({Q3W_DAYS:.0f} d), width {PULSE_WIDTH_DAYS:.0f} d — pembrolizumab-class analog, simulated",
     "targeted_kinase / tki_* / hdac / mct1": "daily 5 days on / 2 days holiday — simulated oral TKI/HDAC",
     "other biologics": "left continuous (infusion analog) unless overridden",
@@ -351,7 +429,7 @@ def summarize_arm(
     burden: Sequence[float],
     health: Sequence[float],
 ) -> Dict[str, object]:
-    rec = recist_like(burden)
+    rec = recist_like(burden, times=times)
     ctc = ctcae_like(health)
     surv = pfs_os_times(times, burden, health)
     return {**rec, **{f"ctcae_{k}": v for k, v in ctc.items() if k != "grades"}, **surv}
