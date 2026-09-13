@@ -22,6 +22,9 @@ const sliderBox = $("sliders");
 const bars = $("drug-bars");
 const proteinBars = $("protein-bars");
 const manual = {};
+let lastEmb = null;
+let lastConn = {};
+let mujocoImg = null;
 
 function addSliderAndBar(id, label, barParent, protein) {
   manual[id] = 0;
@@ -84,17 +87,9 @@ $("legend-cancer").innerHTML = traces.cancer
   .map((tr) => `<span><i style="background:${tr.color}"></i>${tr.label}</span>`)
   .join("");
 
-function pushTraces(group, t, values) {
-  ts.push(t);
-  group.forEach((tr, i) => tr.ys.push(values[i]));
-  if (ts.length > MAX_POINTS) {
-    ts.shift();
-    Object.values(traces).forEach((g) => g.forEach((tr) => tr.ys.shift()));
-  }
-}
-
 function drawChart(canvasId, group, yMaxHint) {
   const canvas = $(canvasId);
+  if (!canvas) return;
   const parent = canvas.parentElement;
   const w = Math.max(200, parent.clientWidth - 8);
   const h = Number(canvas.getAttribute("height")) || 180;
@@ -102,13 +97,13 @@ function drawChart(canvasId, group, yMaxHint) {
   canvas.height = h;
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "#0c151d";
+  ctx.fillStyle = "#0c0c0e";
   ctx.fillRect(0, 0, w, h);
   const pad = { l: 36, r: 8, t: 8, b: 20 };
   const iw = w - pad.l - pad.r;
   const ih = h - pad.t - pad.b;
   const ymax = Math.max(yMaxHint, ...group.flatMap((tr) => tr.ys), 0.1);
-  ctx.strokeStyle = "#1b2733";
+  ctx.strokeStyle = "#1b1b22";
   ctx.lineWidth = 1;
   for (let i = 0; i <= 4; i++) {
     const y = pad.t + (ih * i) / 4;
@@ -117,7 +112,7 @@ function drawChart(canvasId, group, yMaxHint) {
     ctx.lineTo(w - pad.r, y);
     ctx.stroke();
   }
-  ctx.fillStyle = "#8d8476";
+  ctx.fillStyle = "#7a7468";
   ctx.font = "11px ui-sans-serif, system-ui, sans-serif";
   ctx.fillText(ymax.toFixed(2), 4, pad.t + 10);
   ctx.fillText("0", 4, pad.t + ih);
@@ -129,8 +124,7 @@ function drawChart(canvasId, group, yMaxHint) {
     if (tr.ys.length < 2) return;
     ctx.strokeStyle = tr.color;
     ctx.lineWidth = 1.6;
-    if (tr.dash.length) ctx.setLineDash(tr.dash);
-    else ctx.setLineDash([]);
+    ctx.setLineDash(tr.dash.length ? tr.dash : []);
     ctx.beginPath();
     tr.ys.forEach((y, i) => {
       const x = pad.l + (iw * i) / Math.max(1, tr.ys.length - 1);
@@ -145,19 +139,17 @@ function drawChart(canvasId, group, yMaxHint) {
 
 function paintHeat(rates) {
   const canvas = $("kc-heat");
+  if (!canvas) return;
   const ctx = canvas.getContext("2d");
   const w = canvas.width;
   const h = canvas.height;
-  ctx.fillStyle = "#0c151d";
+  ctx.fillStyle = "#0c0c0e";
   ctx.fillRect(0, 0, w, h);
   const n = rates.length || 1;
   const cw = w / n;
   rates.forEach((v, i) => {
     const t = Math.min(1, Math.max(0, v) * 1.4);
-    const r = Math.round(28 + 210 * t);
-    const g = Math.round(18 + 130 * t);
-    const b = Math.round(12 + 28 * t);
-    ctx.fillStyle = `rgb(${r},${g},${b})`;
+    ctx.fillStyle = `rgb(${Math.round(28 + 210 * t)},${Math.round(18 + 130 * t)},${Math.round(12 + 28 * t)})`;
     ctx.fillRect(i * cw, 0, cw + 0.5, h);
   });
 }
@@ -167,53 +159,182 @@ function redraw() {
   drawChart("chart-mbon", traces.mbon, 0.4);
   drawChart("chart-drugs", traces.drugs, 0.4);
   if ($("chart-emb")) drawChart("chart-emb", traces.emb, 0.3);
+  drawHero(lastEmb, lastConn);
+}
+
+function wld(heading, xpos, lx, ly, lz) {
+  const c = Math.cos(heading);
+  const s = Math.sin(heading);
+  return [xpos[0] + c * lx - s * ly, xpos[1] + s * lx + c * ly, lz];
+}
+
+function project(pt, cam, w, h) {
+  const vx = pt[0] - cam.eye[0];
+  const vy = pt[1] - cam.eye[1];
+  const vz = pt[2] - cam.eye[2];
+  const rx = vx * cam.r[0] + vy * cam.r[1] + vz * cam.r[2];
+  const ry = vx * cam.u[0] + vy * cam.u[1] + vz * cam.u[2];
+  const rz = -(vx * cam.f[0] + vy * cam.f[1] + vz * cam.f[2]);
+  const z = Math.max(-rz, 0.08);
+  const fl = 0.5 * h / Math.tan((32 * Math.PI) / 360);
+  return [w * 0.5 + (fl * rx) / z, h * 0.55 - (fl * ry) / z, z];
+}
+
+function makeCam(xpos) {
+  const eye = [0.22 + 0.55 * xpos[0], -0.52, 0.24];
+  const target = [0.02 + 0.85 * xpos[0], 0.015 * xpos[1], 0.08];
+  const f = [target[0] - eye[0], target[1] - eye[1], target[2] - eye[2]];
+  const fn = Math.hypot(f[0], f[1], f[2]) || 1;
+  f[0] /= fn; f[1] /= fn; f[2] /= fn;
+  const up = [0, 0, 1];
+  const r = [f[1] * up[2] - f[2] * up[1], f[2] * up[0] - f[0] * up[2], f[0] * up[1] - f[1] * up[0]];
+  const rn = Math.hypot(r[0], r[1], r[2]) || 1;
+  r[0] /= rn; r[1] /= rn; r[2] /= rn;
+  const u = [r[1] * f[2] - r[2] * f[1], r[2] * f[0] - r[0] * f[2], r[0] * f[1] - r[1] * f[0]];
+  return { eye, f, r, u };
+}
+
+function sphere(ctx, x, y, r, fill, rim) {
+  const g = ctx.createRadialGradient(x - r * 0.3, y - r * 0.35, r * 0.1, x, y, r);
+  g.addColorStop(0, fill);
+  g.addColorStop(0.75, fill);
+  g.addColorStop(1, rim || "#000");
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function limb(ctx, a, b, width, color) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(a[0], a[1]);
+  ctx.lineTo(b[0], b[1]);
+  ctx.stroke();
+}
+
+function drawHero(emb, conn) {
+  const canvas = $("hero");
+  if (!canvas) return;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  if (canvas.width !== w) canvas.width = w;
+  if (canvas.height !== h) canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#050506";
+  ctx.fillRect(0, 0, w, h);
+
+  if (mujocoImg && mujocoImg.complete && mujocoImg.naturalWidth) {
+    const iw = mujocoImg.naturalWidth;
+    const ih = mujocoImg.naturalHeight;
+    const scale = Math.max(w / iw, h / ih);
+    ctx.drawImage(mujocoImg, (w - iw * scale) / 2, (h - ih * scale) / 2, iw * scale, ih * scale);
+    drawSparks(ctx, w, h, conn, w * 0.5, h * 0.48);
+    return;
+  }
+
+  const heading = emb ? emb.heading || 0 : 0;
+  const xpos = (emb && emb.xpos) || [0, 0, 0.12];
+  const joints = (emb && emb.joints) || [];
+  const tFly = (emb && emb.t_fly) || 0;
+  const cam = makeCam(xpos);
+  const P = (lx, ly, lz) => project(wld(heading, xpos, lx, ly, lz), cam, w, h);
+
+  ctx.strokeStyle = "rgba(255,255,255,0.07)";
+  ctx.lineWidth = 1;
+  for (let i = -8; i <= 8; i++) {
+    const a = project([i * 0.18, -1.6, 0], cam, w, h);
+    const b = project([i * 0.18, 1.8, 0], cam, w, h);
+    ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+    const c = project([-1.6, i * 0.18, 0], cam, w, h);
+    const d = project([1.8, i * 0.18, 0], cam, w, h);
+    ctx.beginPath(); ctx.moveTo(c[0], c[1]); ctx.lineTo(d[0], d[1]); ctx.stroke();
+  }
+
+  const thorax = P(0.02, 0, 0.095);
+  const head = P(0.095, 0, 0.102);
+  const scale = 240 / Math.max(thorax[2], 0.12);
+
+  ctx.fillStyle = "rgba(0,0,0,0.35)";
+  ctx.beginPath();
+  ctx.ellipse(thorax[0], thorax[1] + 22, 36, 8, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  const wingZ = 0.148 + 0.008 * Math.sin(2.2 * tFly);
+  limb(ctx, P(0.00, 0.02, 0.128), P(-0.14, 0.10, wingZ), 7, "rgba(210,205,195,0.22)");
+  limb(ctx, P(0.00, -0.02, 0.128), P(-0.14, -0.10, wingZ + 0.004), 7, "rgba(210,205,195,0.22)");
+
+  const attach = [
+    [0.08, 0.03, 0.07], [0.01, 0.036, 0.065], [-0.06, 0.03, 0.06],
+    [0.08, -0.03, 0.07], [0.01, -0.036, 0.065], [-0.06, -0.03, 0.06],
+  ];
+  for (let i = 0; i < 6; i++) {
+    const side = i < 3 ? 1 : -1;
+    const coxa = joints[i * 3] || 0;
+    const femur = joints[i * 3 + 1] || 0;
+    const tibia = joints[i * 3 + 2] || 0;
+    const yaw = side * (0.85 + 0.45 * coxa);
+    const pitch = 0.35 + 0.55 * femur;
+    const a0 = wld(heading, xpos, attach[i][0], attach[i][1], attach[i][2]);
+    const step = (p, L, pit) => {
+      const d = [Math.cos(yaw) * L * Math.cos(pit), Math.sin(yaw) * L, -L * Math.sin(pit)];
+      const c = Math.cos(heading);
+      const s = Math.sin(heading);
+      return [p[0] + c * d[0] - s * d[1], p[1] + s * d[0] + c * d[1], p[2] + d[2]];
+    };
+    const a1 = step(a0, 0.055, pitch);
+    const a2 = step(a1, 0.085, pitch + 0.55 + 0.35 * tibia);
+    const a3 = step(a2, 0.075, pitch + 1.25);
+    a3[2] = Math.max(a3[2], 0.002);
+    const p0 = project(a0, cam, w, h);
+    const p1 = project(a1, cam, w, h);
+    const p2 = project(a2, cam, w, h);
+    const p3 = project(a3, cam, w, h);
+    limb(ctx, p0, p1, 5.2, "#96846c");
+    limb(ctx, p1, p2, 4.4, "#8a7860");
+    limb(ctx, p2, p3, 3.4, "#7a6a54");
+  }
+
+  [[-0.02, 0.20], [-0.07, 0.175], [-0.12, 0.14], [-0.16, 0.10]].forEach(([lx, r]) => {
+    const p = P(lx, 0, 0.088);
+    sphere(ctx, p[0], p[1], r * scale, "#c8b494", "#4a4032");
+  });
+  sphere(ctx, thorax[0], thorax[1], 0.22 * scale, "#d7c4a3", "#5a4c3a");
+  sphere(ctx, head[0], head[1], 0.155 * scale, "#d2c0a0", "#4a4032");
+  const eL = P(0.118, 0.020, 0.110);
+  const eR = P(0.118, -0.020, 0.110);
+  sphere(ctx, eL[0], eL[1], 0.055 * scale, "#c23030", "#3a0808");
+  sphere(ctx, eR[0], eR[1], 0.055 * scale, "#c23030", "#3a0808");
+  limb(ctx, P(0.175, 0.018, 0.125), P(0.205, 0.032, 0.155), 1.4, "#96846c");
+  limb(ctx, P(0.175, -0.018, 0.125), P(0.205, -0.032, 0.155), 1.4, "#96846c");
+
+  drawSparks(ctx, w, h, conn, thorax[0], thorax[1] - 8);
+}
+
+function drawSparks(ctx, w, h, conn, cx, cy) {
+  const mbon = (conn && conn.mbon_rates) || [];
+  const sec = (conn && conn.secretory_rates) || [];
+  const da = (conn && conn.da) || 0;
+  const rates = mbon.concat(sec);
+  const n = Math.min(36, 10 + rates.length);
+  for (let i = 0; i < n; i++) {
+    const amp = Math.abs(rates[i % Math.max(rates.length, 1)] || 0.15);
+    const ang = (i / n) * Math.PI * 2 + (da || 0);
+    const rad = 18 + 46 * amp;
+    const x = cx + Math.cos(ang) * rad;
+    const y = cy + Math.sin(ang) * rad * 0.55 - 8 * amp;
+    ctx.fillStyle = da >= 0 ? `rgba(212,160,84,${0.18 + 0.55 * amp})` : `rgba(62,207,192,${0.18 + 0.55 * amp})`;
+    ctx.beginPath();
+    ctx.arc(x, y, 1.4 + 2.2 * amp, 0, Math.PI * 2);
+    ctx.fill();
+  }
 }
 
 function drawFly(emb) {
-  const canvas = $("fly-pose");
-  if (!canvas) return;
-  const parent = canvas.parentElement;
-  const w = Math.max(200, parent.clientWidth - 8);
-  const h = 160;
-  if (canvas.width !== w) canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#0c151d";
-  ctx.fillRect(0, 0, w, h);
-  const cx = w * 0.5;
-  const cy = h * 0.5;
-  const heading = emb ? emb.heading || 0 : 0;
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(-heading);
-  ctx.strokeStyle = "#d4a054";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(-28, 0);
-  ctx.lineTo(32, 0);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.ellipse(8, 0, 18, 8, 0, 0, Math.PI * 2);
-  ctx.stroke();
-  const joints = (emb && emb.joints) || [];
-  const contacts = (emb && emb.contacts) || [];
-  for (let i = 0; i < 6; i++) {
-    const side = i < 3 ? -1 : 1;
-    const slot = i % 3;
-    const baseX = -6 + slot * 12;
-    const coxa = joints[i * 3] || 0;
-    const femur = joints[i * 3 + 1] || 0;
-    const reach = 22 + 16 * femur;
-    const ang = side * (0.7 + 0.55 * coxa);
-    const x2 = baseX + Math.cos(ang) * reach;
-    const y2 = Math.sin(ang) * reach;
-    ctx.strokeStyle = (contacts[i] || 0) > 0.5 ? "#3ecfc0" : "#8d8476";
-    ctx.beginPath();
-    ctx.moveTo(baseX, side * 4);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
-  }
-  ctx.restore();
+  lastEmb = emb;
+  drawHero(emb, lastConn);
 }
 
 function applyTraining(meta) {
@@ -249,24 +370,29 @@ function applyFrame(frame) {
   if (!ts.length) {
     Object.values(traces).forEach((g) => g.forEach((tr) => { tr.ys = []; }));
   }
-  // cancer group is independent of mbon/drugs length; push per-group
   traces.cancer.forEach((tr, i) => tr.ys.push([
     Y.tumor_burden, L.tumor_burden, Y.resistance_frequency,
     Y.lactate, Y.tgfb, Y.immune_competence_ratio, L.H,
   ][i]));
   const C = frame.connectome || {};
+  lastConn = C;
   const mbon = C.mbon_rates || [];
   const mbonMean = mbon.length ? mbon.reduce((a, b) => a + b, 0) / mbon.length : 0;
   traces.mbon[0].ys.push(mbonMean);
   traces.mbon[1].ys.push(C.da || 0);
   traces.drugs.forEach((tr, i) => tr.ys.push((frame.drugs.C || {})[EFFECTORS[i][0]] || 0));
   const E = frame.embodiment || {};
+  lastEmb = E;
   traces.emb[0].ys.push(E.action_rms || 0);
   traces.emb[1].ys.push(E.reward || 0);
   ts.push(t);
   if (ts.length > MAX_POINTS) {
     ts.shift();
     Object.values(traces).forEach((g) => g.forEach((tr) => tr.ys.shift()));
+  }
+  if (E.frame_jpeg) {
+    if (!mujocoImg) mujocoImg = new Image();
+    mujocoImg.src = `data:image/jpeg;base64,${E.frame_jpeg}`;
   }
   redraw();
   $("kc-sp").textContent = (C.kc_sparsity ?? 0).toFixed(3);
@@ -294,6 +420,14 @@ function applyFrame(frame) {
   if ($("protein-active")) {
     $("protein-active").textContent = `active: ${proteinActive.length ? proteinActive.join(", ") : "none"}`;
   }
+  if ($("hud-burden")) $("hud-burden").textContent = Number(L.tumor_burden).toFixed(2);
+  if ($("hud-resist")) $("hud-resist").textContent = Number(L.resistance_frequency).toFixed(2);
+  if ($("hud-da")) $("hud-da").textContent = Number(C.da || 0).toFixed(3);
+  if ($("hud-proteins")) {
+    $("hud-proteins").textContent = proteinActive.length
+      ? proteinActive.map((p) => p.replace("protein_", "")).join(" · ")
+      : "—";
+  }
   $("source").textContent = `source: ${frame.drugs.source} ${frame.drugs.notes || ""}`;
   if ($("emb-backend")) {
     $("emb-backend").textContent = `backend: ${E.backend || "—"} · ${E.task || ""} · dim ${E.action_dim || 0}  ${E.notes || ""}`;
@@ -301,7 +435,6 @@ function applyFrame(frame) {
     $("emb-rms").textContent = (E.action_rms ?? 0).toFixed(3);
     $("emb-rew").textContent = (E.reward ?? 0).toFixed(3);
     $("emb-hdg").textContent = (E.heading ?? 0).toFixed(2);
-    drawFly(E);
   }
   $("warn").classList.toggle("hidden", !Y.host_toxicity_warning);
   if (frame.terminal) {
@@ -319,6 +452,18 @@ function clearTraces() {
 function setModeClass(mode) {
   document.body.classList.remove("mode-cancer", "mode-embodiment", "mode-both");
   document.body.classList.add(`mode-${mode || "both"}`);
+  document.querySelectorAll("#mode-film [data-mode]").forEach((btn) => {
+    btn.classList.toggle("on", btn.getAttribute("data-mode") === mode);
+  });
+  if ($("mode")) $("mode").value = mode;
+}
+
+function toggleDrawer(open) {
+  const d = $("drawer");
+  if (!d) return;
+  if (open === undefined) open = d.hasAttribute("hidden");
+  if (open) d.removeAttribute("hidden");
+  else d.setAttribute("hidden", "");
 }
 
 ws.addEventListener("message", (ev) => {
@@ -400,10 +545,24 @@ $("mode").onchange = () => {
   send("set_mode", { mode: $("mode").value });
   setModeClass($("mode").value);
 };
+document.querySelectorAll("#mode-film [data-mode]").forEach((btn) => {
+  btn.onclick = () => {
+    const mode = btn.getAttribute("data-mode");
+    send("set_mode", { mode });
+    setModeClass(mode);
+  };
+});
+if ($("btn-drawer")) $("btn-drawer").onclick = () => toggleDrawer();
+if ($("btn-drawer-close")) $("btn-drawer-close").onclick = () => toggleDrawer(false);
 $("override").onchange = sendOverride;
 $("dt").oninput = () => {
   $("dt-val").textContent = $("dt").value;
   send("set_speed", { dt: Number($("dt").value), hz: 12 });
 };
 
+if (new URLSearchParams(location.search).get("cinema") === "1") {
+  document.body.classList.add("cinema-hide");
+}
+
 window.addEventListener("resize", redraw);
+drawHero(null, {});

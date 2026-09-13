@@ -108,6 +108,8 @@ class EmbodimentTelemetry:
     xpos: Tuple[float, float, float]
     heading: float
     notes: str = ""
+    wings: Tuple[float, float] = (0.0, 0.0)
+    frame_jpeg: Optional[str] = None
 
     def as_dict(self) -> Dict[str, Any]:
         joints = [float(v) for v in self.joints[:24]]
@@ -115,7 +117,7 @@ class EmbodimentTelemetry:
         if action_ds.size > 32:
             stride = action_ds.size // 32
             action_ds = action_ds[: stride * 32].reshape(32, stride).mean(axis=1)
-        return {
+        out = {
             "t_fly": float(self.t_fly),
             "backend": self.backend,
             "task": self.task,
@@ -131,7 +133,11 @@ class EmbodimentTelemetry:
             "xpos": [float(v) for v in self.xpos],
             "heading": float(self.heading),
             "notes": self.notes,
+            "wings": [float(self.wings[0]), float(self.wings[1])],
         }
+        if self.frame_jpeg:
+            out["frame_jpeg"] = self.frame_jpeg
+        return out
 
 
 class MotorMap:
@@ -221,6 +227,7 @@ class _KinematicStub:
             ],
             dtype=float,
         )
+        wing = 0.12 + 0.04 * np.sin(2.4 * self.t)
         return EmbodimentTelemetry(
             t_fly=self.t,
             backend="kinematic_stub",
@@ -236,6 +243,7 @@ class _KinematicStub:
             xpos=(float(self.xy[0]), float(self.xy[1]), 0.12),
             heading=float(self.heading),
             notes="Kinematic CPG stub — install flybody extra for MuJoCo physics.",
+            wings=(float(wing), float(wing + 0.02 * np.sin(2.4 * self.t + 0.3))),
         )
 
 
@@ -290,6 +298,7 @@ class FlybodyBridge:
         )
         self._stub = _KinematicStub(seed=seed)
         self.last: Optional[EmbodimentTelemetry] = None
+        self.render_enabled = self.backend == "flybody"
         if self._env is None and not self.notes:
             self.notes = (
                 "flybody not installed. "
@@ -333,6 +342,8 @@ class FlybodyBridge:
             reward = float(ts.reward or 0.0)
             discount = float(ts.discount if ts.discount is not None else 1.0)
             self.last = self._observe(action, reward, discount, bool(getattr(ts, "last", False)))
+            if self.render_enabled:
+                self.last.frame_jpeg = self.render_jpeg()
         except Exception as exc:
             self.last = self._stub.step(action)
             self.last.notes = f"real step failed ({exc}); stub fallback"
@@ -397,6 +408,32 @@ class FlybodyBridge:
             heading=heading,
             notes=self.notes,
         )
+
+    def render_jpeg(self, width: int = 320, height: int = 180) -> Optional[str]:
+        """JPEG (base64) from MuJoCo when flybody is live; None for the stub.
+
+        Headless: ``export MUJOCO_GL=osmesa`` (or ``egl``). This is a research
+        viewport, not a claim that the stub equals the physics mesh.
+        """
+        if self._env is None:
+            return None
+        try:
+            import base64
+            from io import BytesIO
+
+            pixels = self._env.physics.render(height=height, width=width, camera_id=1)
+            try:
+                from PIL import Image
+
+                buf = BytesIO()
+                Image.fromarray(np.asarray(pixels, dtype=np.uint8)).save(
+                    buf, format="JPEG", quality=52
+                )
+                return base64.b64encode(buf.getvalue()).decode("ascii")
+            except Exception:
+                return None
+        except Exception:
+            return None
 
     def mix_observation(self, y: Sequence[float], alpha: float = 0.25) -> np.ndarray:
         """Blend cancer Y with last proprio embedding for W_in."""

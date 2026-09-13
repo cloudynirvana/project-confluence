@@ -72,20 +72,21 @@ python -m confluence
 uvicorn confluence.telemetry.websocket_server:app --host 127.0.0.1 --port 8765
 ```
 
-Open **http://127.0.0.1:8765**. The browser UI streams:
+Open **http://127.0.0.1:8765**. The live session is a **dark-lab hero viewport**: the fly fills the frame; cancer burden / resistance, DA, active protein channels, and play/pause sit in a slim HUD. Controllers A–F, full-brain train modes, infusion sliders, and charts stay in the ☰ drawer.
 
-- latent and observed cancer state (burden, resistance / ctDNA-like, lactate, TGF-β, immune competence, host H)
-- connectome activity (KC sparsity heatmap, MBON rates, dopamine / plasticity norm)
-- current infusion `U(t)` and PK concentrations `C(t)`
-- archetype selector (Glioblastoma, PDAC/pancreatic, Melanoma persister)
-- play / pause / step, controller A–E, optional **manual drug override**
-- loop mode: Cancer ODE / Flybody embodiment / both, with fly pose + action RMS telemetry
+- loop mode is a film-style **Cancer / Flybody / Both** switch (not a form)
+- real `physics.render` JPEG stream when `.[flybody]` is installed; otherwise a cinematic CPG stub (beige Drosophila, not a stick figure)
+- append `?cinema=1` to hide chrome for recording
+
+[![Cinematic still](docs/demo/still_hero.png)](docs/demo/cinematic.mp4)
+
+Short share clip (≈12 s): [`docs/demo/cinematic.mp4`](docs/demo/cinematic.mp4). Re-render with MuJoCo locally via `python -m confluence.demo_cinematic --prefer-real` (see [`docs/demo/README.md`](docs/demo/README.md)).
 
 Interactive Kenyon-cell count defaults to **256** for real-time FPS (documented). Pass `n_kc=2048` in `MushroomBodyNetwork` / controllers for a more FlyWire-like expansion. Controller **F** is a separate sparse rate-based net that can be constructed at `n_neurons=166700` (see below); the UI default stays on the small demo.
 
 ```bash
 # package tests
-python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py tests/test_flybody_bridge.py tests/test_protein_channels.py tests/test_full_brain_scale.py tests/test_training_smoke.py -q
+python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py tests/test_flybody_bridge.py tests/test_protein_channels.py tests/test_full_brain_scale.py tests/test_training_smoke.py tests/test_cinematic_render.py -q
 
 # short controller bake-off (3 archetypes × A–E)
 python -m confluence --benchmark --trials 2 --horizon 40
@@ -121,7 +122,12 @@ python -m confluence.embodiment --task template --steps 20
 python -m confluence          # UI loop selector: Cancer ODE / Flybody / Both
 ```
 
-If flybody is missing, the UI still shows an embodiment panel driven by a **kinematic CPG stub** (not MuJoCo). The smoke test `tests/test_flybody_bridge.py` skips the real-env case when the extra is absent.
+If flybody is missing, the hero viewport uses a **cinematic kinematic CPG stub** (articulated beige fly on a dark grid — not a stick figure). The smoke test `tests/test_flybody_bridge.py` skips the real-env case when the extra is absent. Headless MuJoCo re-render of the share clip:
+
+```bash
+export MUJOCO_GL=osmesa
+python -m confluence.demo_cinematic --seconds 12 --prefer-real --out docs/demo/cinematic.mp4
+```
 
 Citation (please keep if you use the body model):
 

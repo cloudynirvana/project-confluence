@@ -3,25 +3,60 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Confluence v2 — live closed loop</title>
+  <title>Confluence v2</title>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
-<body>
-  <header class="mast">
-    <div>
-      <p class="kicker">Computational research · not a clinical system</p>
-      <h1>Confluence <span>v2</span></h1>
-      <p class="sub">Drosophila mushroom body steers therapy over a mechanistic cancer microenvironment.</p>
+<body class="lab mode-both">
+  <canvas id="hero" aria-label="Flybody viewport"></canvas>
+  <canvas id="fly-pose" class="sr-only" width="64" height="64"></canvas>
+  <div class="vignette"></div>
+
+  <header class="hud-top">
+    <div class="brand">
+      <button id="btn-drawer" type="button" class="ghost icon" aria-label="Open controls">☰</button>
+      <span class="wordmark">Confluence</span>
+      <span class="kicker">research · not clinical</span>
     </div>
     <div class="clock">
-      <div class="clock-label">t (days)</div>
-      <div id="t-days">0.00</div>
-      <div id="status-pill" class="pill idle">idle</div>
+      <span id="t-days">0.00</span><span class="unit">d</span>
+      <span id="status-pill" class="pill idle">idle</span>
     </div>
   </header>
 
-  <main class="grid">
-    <aside class="panel controls">
+  <aside class="hud-left">
+    <div class="stat"><span>burden</span><strong id="hud-burden">—</strong></div>
+    <div class="stat"><span>resist</span><strong id="hud-resist">—</strong></div>
+    <div class="stat"><span>DA</span><strong id="hud-da">—</strong></div>
+    <div class="stat"><span>proteins</span><strong id="hud-proteins">—</strong></div>
+  </aside>
+
+  <div class="hud-bottom">
+    <div class="transport">
+      <button id="btn-play" type="button">Play</button>
+      <button id="btn-pause" type="button" class="ghost">Pause</button>
+      <button id="btn-step" type="button" class="ghost">Step</button>
+      <button id="btn-reset" type="button" class="ghost">Reset</button>
+    </div>
+    <div class="mode-film" id="mode-film" role="tablist" aria-label="Loop">
+      <button type="button" data-mode="cancer">Cancer</button>
+      <button type="button" data-mode="embodiment">Flybody</button>
+      <button type="button" data-mode="both" class="on">Both</button>
+    </div>
+  </div>
+
+  <select id="mode" class="sr-only" aria-hidden="true">
+    <option value="both" selected>Both</option>
+    <option value="cancer">Cancer ODE</option>
+    <option value="embodiment">Flybody</option>
+  </select>
+
+  <aside class="drawer" id="drawer" hidden>
+    <div class="drawer-head">
+      <h2>Controls</h2>
+      <button id="btn-drawer-close" type="button" class="ghost">Close</button>
+    </div>
+
+    <section class="panel controls">
       <h2>Session</h2>
       <label>Archetype
         <select id="archetype">
@@ -47,19 +82,6 @@
           <option value="full">Full-brain 166,700 (may hitch UI)</option>
         </select>
       </label>
-      <label>Loop
-        <select id="mode">
-          <option value="both" selected>Both (cancer + flybody)</option>
-          <option value="cancer">Cancer ODE</option>
-          <option value="embodiment">Flybody embodiment</option>
-        </select>
-      </label>
-      <div class="btn-row">
-        <button id="btn-play" type="button">Play</button>
-        <button id="btn-pause" type="button">Pause</button>
-        <button id="btn-step" type="button">Step</button>
-        <button id="btn-reset" type="button" class="ghost">Reset</button>
-      </div>
       <label>Step size (days)
         <input id="dt" type="range" min="0.05" max="1.0" step="0.05" value="0.25" />
         <span id="dt-val">0.25</span>
@@ -89,11 +111,11 @@
       </label>
       <div id="sliders"></div>
       <p class="src" id="source">source: —</p>
-    </aside>
+    </section>
 
     <section class="panel" id="panel-cancer">
       <h2>Latent &amp; observed cancer state</h2>
-      <canvas id="chart-cancer" height="220"></canvas>
+      <canvas id="chart-cancer" height="180"></canvas>
       <div class="legend" id="legend-cancer"></div>
     </section>
 
@@ -106,12 +128,12 @@
         <div><span>graph</span><strong id="graph-src">stub</strong></div>
       </div>
       <canvas id="kc-heat" width="640" height="72"></canvas>
-      <canvas id="chart-mbon" height="140"></canvas>
+      <canvas id="chart-mbon" height="120"></canvas>
     </section>
 
     <section class="panel" id="panel-drugs">
       <h2>U(t) infusion &amp; PK concentrations</h2>
-      <canvas id="chart-drugs" height="220"></canvas>
+      <canvas id="chart-drugs" height="180"></canvas>
       <div class="bars" id="drug-bars"></div>
       <h3 class="subhead">Protein / biologic channels</h3>
       <p class="src" id="protein-active">active: —</p>
@@ -127,15 +149,13 @@
         <div><span>reward</span><strong id="emb-rew">—</strong></div>
         <div><span>heading</span><strong id="emb-hdg">—</strong></div>
       </div>
-      <canvas id="fly-pose" width="640" height="160"></canvas>
-      <canvas id="chart-emb" height="110"></canvas>
+      <canvas id="chart-emb" height="90"></canvas>
     </section>
-  </main>
+  </aside>
 
   <footer>
-    Closed loop: Y → net → small-molecule + protein effectors → PK/PD → 11-D ODE → Y′ and/or flybody actuators.
-    Host health H ≤ 0.2 is terminal toxicity. flybody: DeepMind/Janelia, Apache 2.0.
-    Simulation only — no claim of clinical benefit or cure.
+    Y → net → protein + drug U → ODE → Y′. Host H ≤ 0.2 terminal. flybody Apache 2.0.
+    Simulation only — no clinical claim.
     <span id="warn" class="warn hidden">HOST TOXICITY WARNING</span>
   </footer>
 
