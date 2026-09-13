@@ -14,6 +14,8 @@ Usage:
     # model.forward(t, z0)
 """
 
+from __future__ import annotations
+
 from typing import Tuple, Dict, Optional, List
 
 # Try importing torch and torchdiffeq
@@ -24,10 +26,12 @@ try:
     TORCHDIFFEQ_AVAILABLE = True
 except ImportError:
     TORCHDIFFEQ_AVAILABLE = False
-    
+    torch = None  # type: ignore[assignment]
+
     # Create dummy classes to prevent NameError syntax crashes
     class DummyModule:
         pass
+
     class nn:
         Module = DummyModule
 

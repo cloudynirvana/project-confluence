@@ -33,6 +33,289 @@ See `CITATION.cff`. DOI badge added below once Zenodo publishes.
 
 ---
 
+# Confluence v2 — fly mushroom body × cancer microenvironment
+
+> **Computational research / simulation only.** This is not a medical device, not a treatment planner, and it does not claim clinical admissibility or disease eradication. See [DISCLAIMER.md](DISCLAIMER.md). Merging this branch lands a **research codebase**, not a medical product. Feature-complete for the current in-silico scope → [awaiting external clinical validation](docs/AWAITING_CLINICAL_VALIDATION.md) (IRB / wet-lab / trials). [Merge readiness](docs/MERGE_READINESS.md).
+
+**Honesty — read this first**
+
+- Confluence is a **research closed-loop**: noisy observations → connectome-style controller → simulated infusion `U(t)` → PK/PD → 15-D cancer ODE (12-D TME/fusion + surveillance / antibody-readiness / dormancy gate). In-silico burden / resistance / fusion-AF / DA / “protein channel” scores are **research numbers**, not a clinical outcome and not a treatment recommendation.
+- Fusion proteins in biology arise from **chimeric mRNAs** at a gene junction. Our `T_f` clone, fusion allele fraction, and junction-neoantigen traces are **computational proxies**, not a clinical NGS / ctDNA assay and not a claim that we detected or treated a real fusion.
+- Therapeutic chimeric proteins (BiTE-class T-cell engager, IFN-γ, IL-2, anti-PD-1, TGF-β trap, surveillance IgG, fusion mAb) are **simulated infusion / expression rates** from controllers E/F. This is not ribosomal synthesis in Drosophila neurons and not a clinical immune-therapy demo.
+- Disease-class labels (`benign`, `malignant`, `occult`, `dormant`, `terminal`) are **state signatures** (distinct X and Y dynamics), not clinical stage or histopathology.
+- The hero viewport and `docs/demo/cinematic.mp4` must show the **TuragaLab/flybody** anatomical MuJoCo mesh (`fruitfly.xml`, Apache 2.0; Vaxenburg et al., *Nature* 2025). A CPG / bead-fly stub is **not** an acceptable product visual. If flybody is missing, the UI shows an install CTA instead of a fake fly.
+- Visual fidelity requires the flybody extra + headless GL (`MUJOCO_GL=osmesa` or `egl`). NeuroMechFly / FlyGym is an acceptable alternate digital twin only if flybody cannot be installed — document which body is on screen.
+
+Confluence v2 asks a concrete control-theoretic question: *can a Drosophila melanogaster mushroom-body-style associative circuit, driven by noisy cancer observations and a dopamine-like reward, generate adaptive multi-drug infusion policies on a mechanistic tumor microenvironment?*
+
+The closed loop is:
+
+```
+Y (noisy, partial) → sensory W_in → AL/LH projection → sparse Kenyon cells
+    → MBON rates → motor decode U = clip(W_out · rates, 0)
+    → PK  dC_k/dt = −(ln 2 / t½) C_k + U_k(t)
+    → 12-D ODE  X = (T_s, T_r, I_act, I_exh, S_fib, L, O, G, C_tgfb, C_ifng, H, T_f)
+    → Y′
+```
+
+`T_f` is a fusion-oncoprotein clone. Observed `Y` also carries a noisy chimeric-junction / fusion-AF pair (research simulation).
+
+Plasticity on KC→MBON synapses:
+
+```
+dW_ij/dt = η · DA(t) · KC_j · MBON_i − λ W_ij
+DA(t)    = −Δburden − α · Σ C_k − β · Δresistance − γ · Δfusion_AF
+```
+
+Host health `H ∈ [0, 1]`; `H ≤ 0.2` is terminal toxicity. Phenotypic switching `ε_switch(C_drugs, L)` is attenuated by HDAC occupancy. Immune kill is stroma-shielded. Exhaustion `γ_exh` rises with TGF-β, lactate, and unblocked PD-1.
+
+This sits beside the original 16-D Φ / BAC stack in `models/` — v2 does not replace v1; it adds a real-time connectome controller and an interactive session.
+
+## Run the interactive session
+
+```bash
+pip install -e ".[dev]"
+# or, at minimum:
+pip install numpy scipy pydantic fastapi "uvicorn[standard]"
+
+pytest -q -m "not slow"
+python -m confluence
+# equivalent:
+uvicorn confluence.telemetry.websocket_server:app --host 127.0.0.1 --port 8765
+```
+
+Open **http://127.0.0.1:8765**. The live session is a **dark-lab hero viewport**: the fly fills the frame; cancer burden / resistance, DA, active protein channels, and play/pause sit in a slim HUD. Controllers A–F, full-brain train modes, infusion sliders, and charts stay in the ☰ drawer.
+
+- loop mode is a film-style **Cancer / Flybody / Both** switch (not a form)
+- hero viewport streams **only** `env.physics.render` JPEGs from `fruitfly.xml`; no mesh → install CTA (CPG stub is hidden)
+- append `?cinema=1` to hide chrome for recording
+- append `?demo=immune` to auto-play the fly-brain immune + chimeric-protein demo (research visualization, not a clinical outcome)
+
+[![Cinematic still](docs/demo/still_hero.png)](docs/demo/cinematic.mp4)
+[![Immune chimeric still](docs/demo/still_immune_hero.png)](docs/demo/immune_chimeric.mp4)
+
+Share clip (≈12 s, real mesh): [`docs/demo/cinematic.mp4`](docs/demo/cinematic.mp4). Immune + chimeric-protein demo (controller F, I_act / engager HUD): [`docs/demo/immune_chimeric.mp4`](docs/demo/immune_chimeric.mp4) (`python -m confluence.demo_immune`). Both jobs **fail** if fruitfly.xml cannot render. Research scores, not a clinical outcome. See [`docs/demo/README.md`](docs/demo/README.md).
+
+Interactive Kenyon-cell count defaults to **256** for real-time FPS (documented). Pass `n_kc=2048` in `MushroomBodyNetwork` / controllers for a more FlyWire-like expansion. Controller **F** is a separate sparse rate-based net that can be constructed at `n_neurons=166700` (see below); the UI default stays on the small demo.
+
+```bash
+# package tests (skips 166k / slow; flybody tests skip unless extras are installed)
+pytest -q -m "not slow"
+
+# short controller bake-off (3 archetypes × A–E)
+python -m confluence --benchmark --trials 2 --horizon 40
+```
+
+Getting-started notebook: [`notebooks/confluence_v2_getting_started.ipynb`](notebooks/confluence_v2_getting_started.ipynb).
+
+## FlyWire stub vs real data
+
+The default graph is a **biologically structured stub**: ~7 PN axons per KC, cholinergic PN→KC, GABAergic APL feedback, dopaminergic DAN→KC/MBON, FlyWire_FAFB_v783 field names on `ConnectomeSubcircuit`. It is **not** a literal Dorkenwald / FlyWire dump.
+
+To ingest real FAFB later:
+
+1. Export `CAVE_TOKEN` (or `FLYWIRE_TOKEN`).
+2. Install `caveclient` / `fafbseg`.
+3. Implement the reserved path in `confluence/connectome/fafb_loader.py` (`_try_caveclient`) and compile with `CircuitExtractor`.
+
+Without credentials the client stays on the stub and the interactive session still runs.
+
+## Flybody embodiment (optional)
+
+Confluence can also close the loop through a **body**, using the DeepMind / HHMI Janelia [`flybody`](https://github.com/TuragaLab/flybody) MuJoCo Drosophila (Apache 2.0). MBON / `U` outputs map through a documented affine readout into the walking action space (59-D for `walk_imitation`); proprioception is pooled and mixed into sensory `Y` (`Y_mix = (1−α)Y + α Y_proprio`).
+
+This extra is **optional**. The core cancer closed-loop and controllers A–E install and run without MuJoCo.
+
+```bash
+# Keep Confluence on numpy 2.x: install flybody *without* its numpy==1.26.4 pin.
+sudo apt-get install -y libosmesa6 libosmesa6-dev   # or use EGL
+pip install mujoco dm_control h5py mediapy pillow
+pip install --no-deps "flybody @ git+https://github.com/TuragaLab/flybody.git@d015e9bfe441bd90ae431bac24c55cb74bdbce26"
+# equivalently: bash scripts/install_flybody.sh
+export MUJOCO_GL=osmesa
+python -m confluence.embodiment --task template --steps 20
+python -m confluence.demo_cinematic --seconds 12 --out docs/demo/cinematic.mp4
+python -m confluence
+```
+
+If flybody / OSMesa is missing, the **hero viewport shows an install CTA** (it does not substitute a stick figure). `python -m confluence.demo_cinematic` exits nonzero rather than writing fake footage. The CPG stub remains only for proprio unit tests (`prefer_real=False`).
+
+Citation (please keep if you use the body model):
+
+```bibtex
+@article{flybody,
+  title = {Whole-body physics simulation of fruit fly locomotion},
+  author = {Roman Vaxenburg and Igor Siwanowicz and Josh Merel and Alice A Robie and
+            Carmen Morrow and Guido Novati and Zinovia Stefanidi and Gert-Jan Both and
+            Gwyneth M Card and Michael B Reiser and Matthew M Botvinick and
+            Kristin M Branson and Yuval Tassa and Srinivas C Turaga},
+  journal = {Nature},
+  volume = {643},
+  pages = {1312--1320},
+  year = {2025},
+  doi = {https://doi.org/10.1038/s41586-025-09029-4}
+}
+```
+
+Clocks are independent: cancer time is days; flybody walking control is ~20 ms. Play/pause/step are shared. This remains computational research — not a claim about real fly nervous systems or clinical therapy.
+
+## Full-brain training (N = 166,700) and therapeutic proteins
+
+> **Research simulation only.** The 166,700 units are a **sparse, rate-based controller**, not a multicompartment LIF reconstruction of a fly brain, and **not ribosomes**. Nothing in this loop translates polypeptides or synthesizes drugs. “Proteins that manage therapy” means **simulated PK/PD channels** for antibody-like and cytokine effectors whose infusion / expression *rates* are read out from a dedicated secretory population (or MBON mix). There is no claim of clinical benefit, cellular translation inside Drosophila neurons, or a real FlyWire synapse dump at this scale.
+
+### Scale and memory
+
+The user-named size `FULL_BRAIN_NEURONS = 166700` is a FlyWire-class whole-brain order of magnitude (published adult FlyWire reconstructions are ~10⁵ neurons; this repo does **not** load a CAVEclient materialization unless you add credentials later). Topology here is a **structured sparse stub**: each hidden cell has fan-in 7 from a small PN layer, k-WTA sparsity ~5%, and a compact secretory readout. A dense 166700² float32 matrix would be ~111 GB and is never allocated.
+
+| Mode | `n_neurons` | Typical use | Rough cost |
+|------|-------------|-------------|------------|
+| Small-net demo (controller E) | 256 KC | Interactive UI, ~12 Hz | few MB |
+| Full-brain train (controller F) | 2,048 | UI train mode / smoke | ~few MB, CPU |
+| Full-brain 166,700 (controller F) | 166,700 | Headless `train_full_brain` | ~25–40 MB RAM, ~2–10 ms/step on CPU; GPU not required |
+
+Interactive FPS stays on the 256-KC mushroom body. Switching the UI to **Full-brain 166,700** will construct the sparse net in-process and may hitch the browser loop; prefer the CLI for long runs.
+
+### Effector layer (small molecules + biologics + fusion TKIs)
+
+Controllers A–D still emit the original 5-D `U` (`anti_pd1`, `tgfb_inhibitor`, `mct1`, `hdac`, `targeted_kinase`). Controllers **E** and **F** emit all 12 effectors. A documented immune / chimeric secretory prior lifts IFN-γ, IL-2, anti-PD-1, the BiTE-class engager, TGF-β trap, and fusion TKIs when immune competence is low or fusion AF is high. The closed-loop PK state is 12-D (5 small-molecule + 5 protein/biologic + 2 fusion TKI). This is simulated dosing, not a claim that fly neurons translate polypeptides.
+
+| Channel | Simulated class | Notes |
+|---------|-----------------|-------|
+| `protein_anti_pd1` | checkpoint antibody-like (anti-PD-1) | Complementary occupancy with the 5-D pembrolizumab-class slot |
+| `protein_tgfb_trap` | TGF-β neutralizing trap | Slower clearance than galunisertib |
+| `protein_ifng` | IFN-γ cytokine | Adds to `C_ifng` production |
+| `protein_il2` | IL-2 / fusion-adjacent cytokine | Boosts immune recruitment; higher `tox_weight` |
+| `protein_chimeric_engager` | BiTE-class chimeric T-cell engager | Multiplies immune kill; extra pressure on `T_f` (Topp et al. class) |
+| `protein_surveillance_igg` | Surveillance IgG-like antibody | Raises `I_surv` / readiness (rituximab-class PK) |
+| `protein_fusion_mab` | Fusion-directed monoclonal / bispecific | Extra kill on `T_f` (amivantamab-class) |
+| `tki_imatinib_like` | BCR–ABL / KIT / PDGFR-class TKI | Preferential kill on `T_f` (Druker et al. class reference) |
+| `tki_alk` | EML4–ALK / ROS1 / NTRK-class TKI | Preferential kill on `T_f` (Kwak et al. class reference) |
+
+Half-lives and organ weights are **simulation-scaled** class references (catalog DOIs), not a dosing protocol. Host-health toxicity uses a per-channel `tox_weight` so biologics do not share small-molecule marrow/cardiac profiles.
+
+### Chimeric fusion biology (research simulation)
+
+Fusion oncoproteins arise from **chimeric mRNAs** at a chromosomal junction (BCR–ABL, EML4–ALK, TMPRSS2–ERG, FGFR3–TACC3, NRG1/NTRK). Confluence adds:
+
+- latent clone `T_f` (12th ODE coordinate; `H` stays at index 10)
+- noisy `Y` channels `fusion_allele_fraction` (ctDNA-like) and `junction_neoantigen` (chimeric junction peptide / transcript proxy)
+- per-archetype research labels: GBM `fgfr3_tacc3_like`, PDAC `nrg1_ntrk_like`, melanoma `alk_braf_fusion_like`
+
+This is **not** a clinical fusion assay and not patient genotyping. Controllers E/F receive the junction channels in `Y` and can up-weight fusion TKIs when that signal rises; DA includes `−γ Δfusion_AF`.
+
+## Disease taxonomy + immune readiness
+
+Five **state-signature** classes (not cosmetic labels). Mapping: [`confluence/cancer_env/disease_classes.py`](confluence/cancer_env/disease_classes.py) `CLASS_PARAM_MAP`.
+
+| Class | Distinct latent dynamics | Distinct Y signature |
+|-------|--------------------------|----------------------|
+| `benign` | Low r, low K, high immune kill, low invasion | High-SNR, quiet burden / TGF-β |
+| `malignant` | Aggressive growth + evasion (GBM-like) | High bulk Y, low competence |
+| `occult` | Moderate growth; clinical visibility Hill is large | Bulk Y attenuated; junction / occult AF leak early |
+| `dormant` | Growth × `awake`; stochastic awakening | `dormancy_exit` rises on wake; burden stays low until then |
+| `terminal` | High burden, weak host recovery | High Y burden, H already near failure |
+
+Latent extras (indices 12–14): `I_surv` (surveillance priming), `A_ready` (antibody readiness), `awake` (dormancy gate). `H` stays at index 10; `T_f` stays at 11.
+
+Early-warning score (junction, competence drop, occult AF, dormancy-exit) lifts antibody channels on E/F **before** bulk `Y.tumor_burden` explodes. New biologics: `protein_surveillance_igg` (rituximab-class IgG PK), `protein_fusion_mab` (amivantamab-class). Antibodies still load `H` — they can fail the host.
+
+Computational validation (falsifiable, not clinical):
+
+```bash
+python -m confluence.benchmarks.validation_suite --out results/validation_taxonomy
+```
+
+Notebook: [`notebooks/computational_validation_taxonomy.ipynb`](notebooks/computational_validation_taxonomy.ipynb). Tests: `tests/test_disease_taxonomy.py`, `tests/test_immune_readiness.py`, `tests/test_validation_suite.py`.
+
+## In-silico endpoint mapping / computational–clinical translation layer
+
+**Title of this report:** IN SILICO ENDPOINT MAPPING / computational–clinical translation layer.
+
+This is **not** a clinical trial, **not** FDA/EMA readiness, and **not** a Phase II readout. Endpoints are mappings from the **real** Confluence closed loop (`CancerODE.rhs` / `step` / `ClosedLoopSimulator` + PK/PD + A / B / E / **F-256 proxy**). There is no parallel shadow ODE. PPO/C is excluded unless trained. Infusion `U` is **unitless** and normalized to `[0, 1]`, not a mg/kg regimen.
+
+`CancerODE.step` and the closed loop default to **LSODA** (RK45 remains optional). Host-death (`H−0.2`) and near-eradication events are `solve_ivp` events on that same RHS.
+
+Part 1 — computational stress tests:
+
+1. **Stiff solver** — LSODA / Radau / RK45; agreement uses **relative + absolute** tolerances (rtol=1e-3, atol=1e-4) and reports measured errors (no 0.25/0.35 green-pass).
+2. **Conservation** — pre-clip `X_i ≥ 0`; H ∈ [0, 1]; carrying; H ≤ 0.2 ⇒ terminal. Clip must not silently repair often.
+3. **Robustness** — LHS N≥100; r, σ_I, t½ ±25–40%; same patient noise on every arm; report the distribution.
+4. **Weights** — report ‖W‖_F(t) **plateau**. A hard clip at `w_max` is not called convergence.
+
+Part 2 — honest endpoint language:
+
+1. **RECIST 1.1-like** — true **CR only if burden ≈ 0** (detection floor); otherwise near-CR / PR. Confirmation gap ≥28 d when the horizon allows.
+2. **H-band surrogate / CTCAE-like** — G1[0.85,1], G2[0.70,0.85), G3[0.45,0.70), G4[0.20,0.45), G5<0.20. Not organ-system CTCAE.
+3. **Horizon** — default virtual trial **180 days** for OS/PFS language. Shorter runs are labeled **short-horizon virtual event time**.
+4. **Stats** — custom KM / log-rank / Cox, optional `lifelines` extra (`pip install -e '.[stats]'`) cross-check. CI crossing 1.0 is reported as no demonstrated difference.
+
+Blender scientific visualization (logged sims, not generative biology):
+
+```bash
+export MUJOCO_GL=osmesa
+python3 -m confluence.demo_blender --out docs/demo/blender
+```
+
+Writes PNG frames from `fruitfly.xml` plus `telemetry.json` / `.csv` synced to frame index. Local Blender 4.x: see [`docs/demo/blender/README.md`](docs/demo/blender/README.md). Every output is labeled **SIMULATION / RESEARCH**.
+
+**Viz complete (research):** scientific visualization is finished without Higgsfield — path [`docs/demo/blender/`](docs/demo/blender/README.md) (MuJoCo dump + sidecar + bpy HUD). Workstation: `blender --background --python docs/demo/blender/confluence_blender_hud.py -- --root docs/demo/blender`. Sample HUD still: [`docs/demo/blender/renders/blender_still.png`](docs/demo/blender/renders/blender_still.png) (stamped `SIMULATION / RESEARCH`). If Blender is missing, use [`docs/demo/blender/mujoco_preview.mp4`](docs/demo/blender/mujoco_preview.mp4).
+
+How to run (one command, fixed master seed 17):
+
+```bash
+python3 -m confluence.benchmarks.closed_loop_translation
+# writes results/validation_translation/{four_panel_endpoints.png,translation_report.json,IN_SILICO_ENDPOINT_MAPPING.txt}
+
+# laptop / CI short-horizon label
+python3 -m confluence.benchmarks.closed_loop_translation --quick
+```
+
+Notebook: [`notebooks/computational_clinical_translation.ipynb`](notebooks/computational_clinical_translation.ipynb). Tests: `tests/test_clinical_endpoints.py`.
+
+Closed loop:
+
+```
+Y (cancer ± proprio ± fusion AF / junction) → 166k-scale sparse net → U_small + U_protein + U_fusion
+    → first-order PK → 12-D ODE → Y′
+```
+
+### Training
+
+Inner loop: existing dopaminergic three-factor rule on the **secretory readout** only (`η · DA · secretory · U − λW`). Outer loop: optional (1+1)-ES weight proposals (`--outer da|es|both`). Checkpoints write `results/full_brain/ckpt.npz` (gitignored `*.npz`).
+
+```bash
+# downscaled smoke (CI / laptop)
+python -m confluence.train_full_brain --neurons 512 --episodes 2 --days 20
+
+# interactive-scale train
+python -m confluence.train_full_brain --neurons 2048 --episodes 8 --days 80
+
+# user-named full size (CPU, sparse rate-based; minutes scale with episodes × days)
+python -m confluence.train_full_brain --neurons 166700 --episodes 10 --days 80
+```
+
+The UI **Small-net demo / Full-brain train** switch plus **Train episode** runs the same loop on the live session (reward, DA, burden, toxicity, active protein channels).
+
+Provenance: Apache-2.0 flybody remains optional; FlyWire field names stay on the stub schema. Real FAFB ingestion is still the reserved `CAVE_TOKEN` path in `confluence/connectome/fafb_loader.py`. Until that lands, N = 166700 is a **configurable sparse stub**, not Dorkenwald / FlyWire connectivity.
+
+## Controllers (benchmark module)
+
+| ID | Policy | Notes |
+|----|--------|-------|
+| A | Standard-of-care MTD | Continuous archetype-specific mix |
+| B | Gatenby adaptive | Treat to 50% burden drop, halt, resume on recovery |
+| C | PPO | Thin trainable stub + optional `CONFLUENCE_PPO_CKPT`; full training is heavy |
+| D | Static MB reservoir | Frozen connectome + ridge readout |
+| E | Plastic mushroom body | Live DA plasticity (default interactive controller) |
+| F | Full-brain secretory | Sparse rate-based net → 5 small-molecule + 4 protein channels; default 2048, configurable 166700 |
+
+Metrics: simulated PFS, resistance emergence time, cumulative toxicity, pharmacological burden. These are **in-silico scores**, not clinical endpoints.
+
+Pharmacology lives in `confluence/pharmacology/drug_catalog.json` (≥10 entries: the original small-molecule / mAb catalog plus four simulated protein/biologic effectors). Half-lives use published DOIs where possible; IC50/MTD/`tox_weight` values are **simulation-scaled**. Controller commands `U∈[0,1]` are clearance-matched so `C_ss = U · MTD` (long-half-life mAbs do not wind up unboundedly).
+
+---
+
+
 # 🧬 Project Confluence
 
 > ⚠️ Status: Phase 1 computational validation only. No real patient data used.
@@ -204,8 +487,16 @@ graph TD
 git clone https://github.com/cloudynirvana/project-confluence.git
 cd project-confluence
 
-# Install dependencies
+# Install (v2 interactive extras are in pyproject.toml / requirements.txt)
+pip install -e ".[dev]"
 pip install -r requirements.txt
+
+# Package tests (skips 166k / slow jobs)
+pytest -q -m "not slow"
+
+# Interactive closed-loop session (primary v2 demo)
+python -m confluence
+```
 
 # Run complexity profiling
 python -c "
@@ -278,7 +569,19 @@ AutoResearchClaw runs 23 stages autonomously — literature review, hypothesis d
 
 ```
 project-confluence/
-├── models/                          # Core computational modules
+├── confluence/                      # v2 installable package
+│   ├── contracts.py                 # Pydantic: LatentCancerState, Observation, drugs, MB circuit
+│   ├── loop.py                      # Closed loop Y → controller → PK → ODE
+│   ├── connectome/                  # FlyWire stub + FAFB loader hook + circuit_extractor
+│   ├── neural_engine/               # Rate MB network + DA plasticity
+│   ├── cancer_env/                  # 12-D ODE (TME + fusion clone), observation layer, 3 archetypes
+│   ├── pharmacology/                # drug_catalog.json, PK/PD, toxicity
+│   ├── controllers/                 # A MTD · B Gatenby · C PPO stub · D reservoir · E plastic MB
+│   ├── benchmarks/                  # PFS / resistance / toxicity runner
+│   ├── telemetry/                   # FastAPI + WebSocket UI
+│   └── embodiment/                  # Optional flybody (MuJoCo) bridge + kinematic stub
+├── notebooks/                       # Getting-started notebook
+├── models/                          # Core computational modules (v1 Φ / BAC stack)
 │   ├── adaptive_controller.py       # Closed-loop adaptive therapy controller
 │   ├── clonal_dynamics.py           # Lotka-Volterra clonal competition engine
 │   ├── resistance_model.py          # Multi-mechanism resistance tracker
@@ -474,10 +777,10 @@ powershell -File scripts/pin_requirements.ps1
 
 ## Safety & Regulatory
 
-- All protocols constrained by `clinical_guardrails.json` (CTCAE v5.0)
-- Φ dimensions mapped to LOINC / SNOMED-CT codes
-- FDA MIDD (Model-Informed Drug Development) aligned
-- See [DISCLAIMER.md](DISCLAIMER.md) for medical use limitations
+- All protocols constrained by `clinical_guardrails.json` (research CTCAE-style notes, not adjudicated toxicity)
+- Φ dimensions mapped to LOINC / SNOMED-CT codes (research labels)
+- Mentions of FDA MIDD are bibliographic, not clearance or a medical-product claim
+- See [DISCLAIMER.md](DISCLAIMER.md) and [docs/AWAITING_CLINICAL_VALIDATION.md](docs/AWAITING_CLINICAL_VALIDATION.md)
 
 ## 🇳🇬 Nigeria Clinical Guidelines Integration
 
@@ -509,8 +812,8 @@ results = retriever.retrieve("first-line treatment for breast cancer in Nigeria"
 for r in results:
     print(f"[{r.score:.3f}] {r.chunk.condition_name}: {r.chunk.text[:100]}")
 
-# Structured clinical answer
-print(retriever.answer("What is the dosing for cisplatin in cervical cancer?"))
+# Structured lookup (research RAG — not a dosing engine, not a prescription)
+print(retriever.answer("What supportive-care topics exist for chemotherapy toxicity?"))
 
 # Direct protocol lookup
 protocol = retriever.get_treatment_protocol("BREAST CANCER")

@@ -1,0 +1,521 @@
+"""Optional bridge from Confluence motor decode to DeepMind/Janelia flybody.
+
+Real API (TuragaLab/flybody, Apache 2.0), verified from upstream source:
+
+    from flybody.fly_envs import walk_imitation, template_task, flight_imitation
+    env = walk_imitation()          # walking imitation, action dim 59
+    env = template_task()           # lightest no-op walking task (smoke tests)
+    timestep = env.step(action)     # dm_env TimeStep
+    pixels = env.physics.render(camera_id=1)
+
+This module never imports flybody at package import time.
+
+The **hero viewport and share clips must use real MuJoCo ``fruitfly.xml``
+frames**. The kinematic CPG stub is only for proprio / unit tests — it is
+not a product visual. If flybody is missing, ``render_rgb`` returns None
+and the UI shows an install CTA.
+
+Motor map (documented affine clip):
+    features = concat(U ∈ R^5, MBON rates)
+    features = features / (1 + |features|)
+    a = W @ features + b
+    action = clip(a, low, high)
+
+    W is (action_dim, n_features), seeded, not a trained policy.
+    This is a thin linear readout, not a biomechanical inverse model.
+
+Sensory map:
+    joints / touch / vestibular observables (or stub CPG angles) are pooled
+    into a 5-D vector that can be mixed into Y before W_in:
+
+    Y_mix = (1 − α) Y_cancer + α Y_proprio    (default α = 0.25)
+
+Clocks are independent: cancer steps in days; flybody walking control is
+~20 ms (``_WALK_CONTROL_TIMESTEP``). Play/pause/step are shared; physics time
+is not.
+"""
+
+from __future__ import annotations
+
+import os
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Sequence, Tuple
+
+import numpy as np
+
+# Must be set before the first dm_control / mujoco import on this process.
+os.environ.setdefault("MUJOCO_GL", "osmesa")
+
+FLYBODY_REPO = "https://github.com/TuragaLab/flybody"
+FLYBODY_COMMIT = "d015e9bfe441bd90ae431bac24c55cb74bdbce26"
+WALK_ACTION_DIM = 59  # official README walk_imitation example
+FLIGHT_ACTION_DIM = 22
+SENSORY_DIM = 5
+N_LEGS = 6
+JOINTS_PER_LEG = 3
+
+# Default walking action bounds used by the stub and as a fallback when
+# dm_env specs are unavailable. Real env bounds come from action_spec.
+DEFAULT_ACTION_LOW = -1.0
+DEFAULT_ACTION_HIGH = 1.0
+# Official fruitfly.xml cameras (composer prefixes walker/).
+HERO_CAMERAS = ("walker/hero", "walker/track1", 1)
+UI_RENDER_SIZE = (720, 405)  # width, height
+MESH_NAME = "TuragaLab/flybody fruitfly.xml (MuJoCo Drosophila)"
+
+
+def flybody_available() -> bool:
+    try:
+        import flybody.fly_envs  # noqa: F401
+        return True
+    except Exception:
+        return False
+
+
+def flybody_status() -> Dict[str, Any]:
+    ok = flybody_available()
+    return {
+        "available": ok,
+        "repo": FLYBODY_REPO,
+        "commit": FLYBODY_COMMIT,
+        "license": "Apache-2.0",
+        "citation": "Vaxenburg et al., Nature 643:1312–1320 (2025) doi:10.1038/s41586-025-09029-4",
+        "backend": "flybody" if ok else "unavailable",
+        "mesh": MESH_NAME if ok else None,
+        "render_ready": ok,
+        "install": (
+            "pip install mujoco dm_control h5py mediapy pillow && "
+            f"pip install --no-deps 'flybody @ git+{FLYBODY_REPO}.git@{FLYBODY_COMMIT}' "
+            "&& export MUJOCO_GL=osmesa"
+        ),
+    }
+
+
+def _flatten_obs(obj: Any, prefix: str = "") -> Dict[str, np.ndarray]:
+    out: Dict[str, np.ndarray] = {}
+    if isinstance(obj, dict):
+        for key, val in obj.items():
+            out.update(_flatten_obs(val, f"{prefix}{key}/"))
+        return out
+    arr = np.asarray(obj, dtype=float).ravel()
+    out[prefix.rstrip("/")] = arr
+    return out
+
+
+def _pick_vector(flat: Dict[str, np.ndarray], suffixes: Sequence[str]) -> Optional[np.ndarray]:
+    for name, vec in flat.items():
+        low = name.lower()
+        if any(low.endswith(s) or s in low for s in suffixes) and vec.size:
+            return vec
+    return None
+
+
+@dataclass
+class EmbodimentTelemetry:
+    t_fly: float
+    backend: str
+    task: str
+    action: np.ndarray
+    action_rms: float
+    reward: float
+    discount: float
+    last: bool
+    sensory: np.ndarray
+    joints: np.ndarray
+    contacts: np.ndarray
+    xpos: Tuple[float, float, float]
+    heading: float
+    notes: str = ""
+    wings: Tuple[float, float] = (0.0, 0.0)
+    frame_jpeg: Optional[str] = None
+
+    def as_dict(self) -> Dict[str, Any]:
+        joints = [float(v) for v in self.joints[:24]]
+        action_ds = self.action
+        if action_ds.size > 32:
+            stride = action_ds.size // 32
+            action_ds = action_ds[: stride * 32].reshape(32, stride).mean(axis=1)
+        out = {
+            "t_fly": float(self.t_fly),
+            "backend": self.backend,
+            "task": self.task,
+            "action_dim": int(self.action.size),
+            "action_rms": float(self.action_rms),
+            "action": [float(v) for v in action_ds],
+            "reward": float(self.reward),
+            "discount": float(self.discount),
+            "last": bool(self.last),
+            "sensory": [float(v) for v in self.sensory],
+            "joints": joints,
+            "contacts": [float(v) for v in self.contacts],
+            "xpos": [float(v) for v in self.xpos],
+            "heading": float(self.heading),
+            "notes": self.notes,
+            "wings": [float(self.wings[0]), float(self.wings[1])],
+        }
+        if self.frame_jpeg:
+            out["frame_jpeg"] = self.frame_jpeg
+        return out
+
+
+class MotorMap:
+    """Affine map from (U, MBON) → flybody action, clipped to env bounds."""
+
+    def __init__(
+        self,
+        action_dim: int,
+        n_u: int = 5,
+        n_mbon: int = 8,
+        seed: int = 11,
+        low: float = DEFAULT_ACTION_LOW,
+        high: float = DEFAULT_ACTION_HIGH,
+    ):
+        self.action_dim = int(action_dim)
+        self.n_u = int(n_u)
+        self.n_mbon = int(n_mbon)
+        self.low = float(low)
+        self.high = float(high)
+        rng = np.random.default_rng(seed)
+        n_in = self.n_u + self.n_mbon
+        # Structured tiles so each input channel fans out across legs/wings.
+        self.W = rng.normal(0.0, 0.15, size=(self.action_dim, n_in))
+        for i in range(n_in):
+            self.W[i :: max(n_in, 1), i] += 0.55
+        self.b = rng.normal(0.0, 0.02, size=self.action_dim)
+
+    def features(self, u: Sequence[float], mbon: Sequence[float]) -> np.ndarray:
+        u = np.asarray(u, dtype=float).ravel()
+        mbon = np.asarray(mbon, dtype=float).ravel()
+        u_p = np.zeros(self.n_u, dtype=float)
+        m_p = np.zeros(self.n_mbon, dtype=float)
+        u_p[: min(self.n_u, u.size)] = u[: self.n_u]
+        m_p[: min(self.n_mbon, mbon.size)] = mbon[: self.n_mbon]
+        feat = np.concatenate([u_p, m_p])
+        return feat / (1.0 + np.abs(feat))
+
+    def __call__(self, u: Sequence[float], mbon: Sequence[float]) -> np.ndarray:
+        a = self.W @ self.features(u, mbon) + self.b
+        return np.clip(a, self.low, self.high)
+
+
+class _KinematicStub:
+    """Six-leg CPG walker used when flybody/MuJoCo is not installed."""
+
+    def __init__(self, seed: int = 0):
+        self.action_dim = WALK_ACTION_DIM
+        self.t = 0.0
+        self.dt = 0.02
+        self.xy = np.zeros(2, dtype=float)
+        self.heading = 0.0
+        self.rng = np.random.default_rng(seed)
+        self.phases = np.linspace(0, 2 * np.pi, N_LEGS, endpoint=False)
+        # Tripod gait offset: even vs odd legs.
+        self.phases[1::2] += np.pi
+
+    def reset(self) -> None:
+        self.t = 0.0
+        self.xy[:] = 0.0
+        self.heading = 0.0
+
+    def step(self, action: np.ndarray) -> EmbodimentTelemetry:
+        drive = float(np.clip(np.mean(np.abs(action[:12])), 0.0, 1.0))
+        turn = float(np.clip(action[0] - action[1], -1.0, 1.0))
+        self.heading += 0.08 * turn
+        speed = 0.015 * (0.25 + drive)
+        self.xy += speed * np.array([np.cos(self.heading), np.sin(self.heading)])
+        self.t += self.dt
+        joints = []
+        contacts = []
+        for i in range(N_LEGS):
+            ph = self.phases[i] + 8.0 * self.t
+            coxa = 0.35 * np.sin(ph)
+            femur = 0.55 * np.sin(ph + 0.6)
+            tibia = 0.40 * np.sin(ph + 1.1)
+            joints.extend([coxa, femur, tibia])
+            contacts.append(1.0 if np.sin(ph) < 0.0 else 0.0)
+        joints_a = np.asarray(joints, dtype=float)
+        contacts_a = np.asarray(contacts, dtype=float)
+        sensory = np.array(
+            [
+                float(np.mean(np.abs(joints_a))),
+                float(np.mean(contacts_a)),
+                float(self.xy[0]),
+                float(self.heading),
+                drive,
+            ],
+            dtype=float,
+        )
+        wing = 0.12 + 0.04 * np.sin(2.4 * self.t)
+        return EmbodimentTelemetry(
+            t_fly=self.t,
+            backend="kinematic_stub",
+            task="cpg_walk",
+            action=np.asarray(action, dtype=float),
+            action_rms=float(np.sqrt(np.mean(np.square(action)))),
+            reward=float(drive),
+            discount=1.0,
+            last=False,
+            sensory=sensory,
+            joints=joints_a,
+            contacts=contacts_a,
+            xpos=(float(self.xy[0]), float(self.xy[1]), 0.12),
+            heading=float(self.heading),
+            notes="Kinematic CPG stub — install flybody extra for MuJoCo physics.",
+            wings=(float(wing), float(wing + 0.02 * np.sin(2.4 * self.t + 0.3))),
+        )
+
+
+class FlybodyBridge:
+    """Construct a flybody env if present, else a kinematic stub.
+
+    Parameters
+    ----------
+    task:
+        ``walk_imitation`` (default demo), ``template`` (lightest real env),
+        or ``flight_imitation``.
+    prefer_real:
+        If True and flybody imports, use the real composer Environment.
+    """
+
+    def __init__(
+        self,
+        task: str = "template",
+        prefer_real: bool = True,
+        seed: int = 7,
+        n_mbon: int = 8,
+        camera: str = "walker/hero",
+        render_size: Tuple[int, int] = UI_RENDER_SIZE,
+    ):
+        self.task_name = task
+        self.seed = seed
+        self.camera = camera
+        self.render_size = tuple(render_size)
+        self._env = None
+        self._timestep = None
+        self.backend = "kinematic_stub"
+        self.notes = ""
+        action_dim = WALK_ACTION_DIM if "flight" not in task else FLIGHT_ACTION_DIM
+        low, high = DEFAULT_ACTION_LOW, DEFAULT_ACTION_HIGH
+
+        if prefer_real and flybody_available():
+            try:
+                self._env = self._make_real_env(task, seed)
+                spec = self._env.action_spec()
+                action_dim = int(np.prod(spec.shape))
+                low = float(np.min(spec.minimum))
+                high = float(np.max(spec.maximum))
+                self._timestep = self._env.reset()
+                self.backend = "flybody"
+                self.notes = (
+                    f"TuragaLab/flybody@{FLYBODY_COMMIT[:7]} task={task} "
+                    f"action_dim={action_dim}"
+                )
+            except Exception as exc:
+                self._env = None
+                self.notes = f"flybody import succeeded but env failed ({exc}); using stub."
+
+        self.action_dim = action_dim
+        self.mapper = MotorMap(
+            action_dim=action_dim, n_mbon=n_mbon, seed=seed, low=low, high=high
+        )
+        self._stub = _KinematicStub(seed=seed)
+        self.last: Optional[EmbodimentTelemetry] = None
+        self.render_enabled = self.backend == "flybody"
+        if self._env is None and not self.notes:
+            self.notes = (
+                "flybody not installed. "
+                + flybody_status()["install"]
+            )
+
+    def _make_real_env(self, task: str, seed: int):
+        from flybody.fly_envs import flight_imitation, template_task, walk_imitation
+
+        rng = np.random.RandomState(seed)
+        if task in {"template", "template_task"}:
+            return template_task(random_state=rng)
+        if task in {"flight", "flight_imitation"}:
+            return flight_imitation(random_state=rng)
+        # Default: walking imitation in inference mode (no HDF5 dataset).
+        return walk_imitation(random_state=rng, terminal_com_dist=float("inf"))
+
+    def reset(self) -> EmbodimentTelemetry:
+        self._stub.reset()
+        if self._env is not None:
+            self._timestep = self._env.reset()
+        idle = np.zeros(self.action_dim, dtype=float)
+        self.last = self._observe(idle, reward=0.0, discount=1.0, last=False)
+        if self.render_enabled and self.last is not None:
+            self.last.frame_jpeg = self.render_jpeg()
+        return self.last
+
+    def step(
+        self,
+        u: Sequence[float],
+        mbon_rates: Optional[Sequence[float]] = None,
+    ) -> EmbodimentTelemetry:
+        action = self.mapper(u, [] if mbon_rates is None else mbon_rates)
+        if self._env is None:
+            self.last = self._stub.step(action)
+            return self.last
+        try:
+            self._timestep = self._env.step(action)
+            ts = self._timestep
+            if bool(getattr(ts, "last", False)):
+                self._timestep = self._env.reset()
+                ts = self._timestep
+            reward = float(ts.reward or 0.0)
+            discount = float(ts.discount if ts.discount is not None else 1.0)
+            self.last = self._observe(action, reward, discount, bool(getattr(ts, "last", False)))
+            if self.render_enabled:
+                self.last.frame_jpeg = self.render_jpeg()
+        except Exception as exc:
+            self.last = self._stub.step(action)
+            self.last.notes = f"real step failed ({exc}); stub fallback"
+        return self.last
+
+    def _observe(
+        self,
+        action: np.ndarray,
+        reward: float,
+        discount: float,
+        last: bool,
+    ) -> EmbodimentTelemetry:
+        joints = np.zeros(N_LEGS * JOINTS_PER_LEG)
+        contacts = np.zeros(N_LEGS)
+        sensory = np.zeros(SENSORY_DIM)
+        xpos = (0.0, 0.0, 0.12)
+        heading = 0.0
+        t_fly = float(self._stub.t)
+        if self._env is not None and self._timestep is not None:
+            flat = _flatten_obs(self._timestep.observation)
+            jp = _pick_vector(flat, ("joints_pos", "joints/pos", "qpos"))
+            touch = _pick_vector(flat, ("touch", "force", "contact"))
+            gyro = _pick_vector(flat, ("gyro", "velocimeter"))
+            if jp is not None:
+                joints = jp[: N_LEGS * JOINTS_PER_LEG]
+                if joints.size < N_LEGS * JOINTS_PER_LEG:
+                    joints = np.pad(joints, (0, N_LEGS * JOINTS_PER_LEG - joints.size))
+            if touch is not None:
+                contacts = np.clip(np.abs(touch[:N_LEGS]), 0.0, 1.0)
+            pool = []
+            for vec in (jp, touch, gyro):
+                if vec is not None and vec.size:
+                    pool.append(float(np.mean(vec)))
+                    pool.append(float(np.std(vec)))
+            if pool:
+                sensory = np.zeros(SENSORY_DIM)
+                sensory[: min(SENSORY_DIM, len(pool))] = pool[:SENSORY_DIM]
+            try:
+                physics = self._env.physics
+                t_fly = float(physics.data.time)
+                root = np.asarray(physics.data.qpos[:7], dtype=float)
+                xpos = (float(root[0]), float(root[1]), float(root[2]))
+                # qpos[3:7] is a unit quaternion (w, x, y, z); yaw from that.
+                if root.size >= 7:
+                    w, x, y, z = root[3:7]
+                    heading = float(np.arctan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z)))
+            except Exception:
+                pass
+        return EmbodimentTelemetry(
+            t_fly=t_fly,
+            backend=self.backend,
+            task=self.task_name,
+            action=np.asarray(action, dtype=float),
+            action_rms=float(np.sqrt(np.mean(np.square(action)))),
+            reward=reward,
+            discount=discount,
+            last=last,
+            sensory=sensory,
+            joints=np.asarray(joints, dtype=float),
+            contacts=np.asarray(contacts, dtype=float),
+            xpos=xpos,
+            heading=heading,
+            notes=self.notes,
+        )
+
+    def _camera_id(self):
+        names = []
+        try:
+            model = self._env.physics.model
+            names = [model.camera(i).name for i in range(model.ncam)]
+        except Exception:
+            names = []
+        for cand in (self.camera,) + HERO_CAMERAS:
+            if isinstance(cand, int):
+                return cand
+            if cand in names:
+                return cand
+        return 1
+
+    def export_pose(self) -> Optional[Dict[str, Any]]:
+        """Logged MuJoCo pose for a sidecar / Blender path. None if flybody is down."""
+        if self._env is None:
+            return None
+        try:
+            physics = self._env.physics
+            qpos = np.asarray(physics.data.qpos, dtype=float).copy()
+            qvel = np.asarray(physics.data.qvel, dtype=float).copy()
+            root = qpos[:7] if qpos.size >= 7 else qpos
+            xpos = (float(root[0]), float(root[1]), float(root[2])) if root.size >= 3 else (0.0, 0.0, 0.0)
+            heading = 0.0
+            if root.size >= 7:
+                w, x, y, z = root[3:7]
+                heading = float(np.arctan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z)))
+            return {
+                "backend": "flybody",
+                "mesh": MESH_NAME,
+                "t_fly": float(physics.data.time),
+                "nq": int(qpos.size),
+                "nv": int(qvel.size),
+                "qpos": [float(v) for v in qpos],
+                "qpos_root": [float(v) for v in root[:7]],
+                "xpos": [float(v) for v in xpos],
+                "heading": heading,
+            }
+        except Exception:
+            return None
+
+    def render_rgb(self, width: Optional[int] = None, height: Optional[int] = None) -> Optional[np.ndarray]:
+        """Anatomical MuJoCo RGB frame, or None if flybody is not live.
+
+        Never invents a CPG / bead-fly substitute.
+        """
+        if self._env is None:
+            return None
+        w, h = width or self.render_size[0], height or self.render_size[1]
+        try:
+            pixels = self._env.physics.render(height=int(h), width=int(w), camera_id=self._camera_id())
+            arr = np.asarray(pixels, dtype=np.uint8)
+            if arr.ndim != 3 or arr.shape[2] != 3:
+                return None
+            return arr
+        except Exception:
+            return None
+
+    def render_jpeg(self, width: Optional[int] = None, height: Optional[int] = None) -> Optional[str]:
+        """JPEG (base64) from real fruitfly.xml; None if MuJoCo is unavailable."""
+        pixels = self.render_rgb(width=width, height=height)
+        if pixels is None:
+            return None
+        try:
+            import base64
+            from io import BytesIO
+
+            from PIL import Image
+
+            buf = BytesIO()
+            Image.fromarray(pixels).save(buf, format="JPEG", quality=82)
+            return base64.b64encode(buf.getvalue()).decode("ascii")
+        except Exception:
+            return None
+
+    def mix_observation(self, y: Sequence[float], alpha: float = 0.25) -> np.ndarray:
+        """Blend cancer Y with last proprio embedding for W_in."""
+        y = np.asarray(y, dtype=float).ravel()
+        if self.last is None:
+            return y
+        proprio = self.last.sensory
+        n = min(y.size, proprio.size)
+        mixed = y.copy()
+        mixed[:n] = (1.0 - alpha) * y[:n] + alpha * proprio[:n]
+        return mixed

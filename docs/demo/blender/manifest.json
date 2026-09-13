@@ -1,0 +1,22 @@
+{
+  "label": "SIMULATION / RESEARCH",
+  "non_claim": "These frames and HUD series are logged from an in-silico closed loop (CancerODE + PK/PD + controller + optional fruitfly.xml). They are not a clinical trial, not a cure, not FDA/EMA readiness, and not generative fantasy biology.",
+  "clinical_trial": false,
+  "cure_claim": false,
+  "higgsfield": false,
+  "generative_biology": false,
+  "one_command": "python3 -m confluence.demo_blender --out docs/demo/blender",
+  "open_in_blender": "blender --background --python docs/demo/blender/confluence_blender_hud.py -- --root docs/demo/blender",
+  "sidecar_json": "telemetry.json",
+  "sidecar_csv": "telemetry.csv",
+  "pose_json": "pose.json",
+  "frames_dir": "frames",
+  "n_png": 24,
+  "still_mesh": "still_mesh.png",
+  "mujoco_preview_mp4": "mujoco_preview.mp4",
+  "bpy_script": "confluence_blender_hud.py",
+  "mesh": "TuragaLab/flybody fruitfly.xml (MuJoCo Drosophila)",
+  "mesh_live": true,
+  "n_frames": 24,
+  "solver": "LSODA"
+}

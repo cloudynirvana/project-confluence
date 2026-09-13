@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Confluence v2</title>
+  <link rel="stylesheet" href="/static/style.css?v=taxonomy1" />
+</head>
+<body class="lab mode-both">
+  <canvas id="hero" aria-label="Flybody viewport"></canvas>
+  <div class="vignette"></div>
+
+  <header class="hud-top">
+    <div class="brand">
+      <button id="btn-drawer" type="button" class="ghost icon" aria-label="Open controls">☰</button>
+      <span class="wordmark">Confluence</span>
+      <span class="kicker">research · not clinical</span>
+    </div>
+    <div class="clock">
+      <span id="t-days">0.00</span><span class="unit">d</span>
+      <span id="status-pill" class="pill idle">idle</span>
+    </div>
+  </header>
+
+  <aside class="hud-left">
+    <div class="stat"><span>burden</span><strong id="hud-burden">—</strong></div>
+    <div class="stat"><span>resist</span><strong id="hud-resist">—</strong></div>
+    <div class="stat"><span>DA</span><strong id="hud-da">—</strong></div>
+    <div class="stat"><span>proteins</span><strong id="hud-proteins">—</strong></div>
+    <div class="stat"><span>fusion AF</span><strong id="hud-fusion">—</strong></div>
+    <div class="stat"><span>immune</span><strong id="hud-immune">—</strong></div>
+    <div class="stat"><span>class</span><strong id="hud-class">—</strong></div>
+    <div class="stat"><span>surv</span><strong id="hud-surv">—</strong></div>
+    <div class="stat"><span>Ab ready</span><strong id="hud-ready">—</strong></div>
+  </aside>
+
+  <div class="hud-bottom">
+    <div class="transport">
+      <button id="btn-play" type="button">Play</button>
+      <button id="btn-pause" type="button" class="ghost">Pause</button>
+      <button id="btn-step" type="button" class="ghost">Step</button>
+      <button id="btn-reset" type="button" class="ghost">Reset</button>
+    </div>
+    <div class="mode-film" id="mode-film" role="tablist" aria-label="Loop">
+      <button type="button" data-mode="cancer">Cancer</button>
+      <button type="button" data-mode="embodiment">Flybody</button>
+      <button type="button" data-mode="both" class="on">Both</button>
+    </div>
+  </div>
+
+  <select id="mode" class="sr-only" aria-hidden="true">
+    <option value="both" selected>Both</option>
+    <option value="cancer">Cancer ODE</option>
+    <option value="embodiment">Flybody</option>
+  </select>
+
+  <aside class="drawer" id="drawer" hidden>
+    <div class="drawer-head">
+      <h2>Controls</h2>
+      <button id="btn-drawer-close" type="button" class="ghost">Close</button>
+    </div>
+
+    <section class="panel controls">
+      <h2>Session</h2>
+      <label>Archetype
+        <select id="archetype">
+          <option value="glioblastoma">Glioblastoma (malignant)</option>
+          <option value="pancreatic_pdac">PDAC / pancreatic (malignant)</option>
+          <option value="melanoma_persister">Melanoma (persister, malignant)</option>
+          <option value="benign">Benign (growth-limited)</option>
+          <option value="malignant">Malignant (aggressive)</option>
+          <option value="occult">Occult / hidden</option>
+          <option value="dormant">Dormant (stochastic wake)</option>
+          <option value="terminal">Terminal (host-failure)</option>
+        </select>
+      </label>
+      <label>Controller
+        <select id="controller">
+          <option value="E" selected>E · Plastic mushroom body</option>
+          <option value="D">D · Static reservoir</option>
+          <option value="C">C · PPO stub</option>
+          <option value="B">B · Gatenby adaptive</option>
+          <option value="A">A · MTD / SOC</option>
+          <option value="F">F · Full-brain secretory</option>
+        </select>
+      </label>
+      <label>Brain mode
+        <select id="brain-mode">
+          <option value="demo" selected>Small-net demo (256 KC)</option>
+          <option value="train">Full-brain train (2,048 rate-based)</option>
+          <option value="full">Full-brain 166,700 (may hitch UI)</option>
+        </select>
+      </label>
+      <label>Step size (days)
+        <input id="dt" type="range" min="0.05" max="1.0" step="0.05" value="0.25" />
+        <span id="dt-val">0.25</span>
+      </label>
+
+      <h2>Training</h2>
+      <p class="src" id="brain-meta">brain: demo · 256 neurons</p>
+      <div class="btn-row">
+        <button id="btn-train" type="button">Train episode</button>
+        <button id="btn-train-short" type="button" class="ghost">Short (20 d)</button>
+      </div>
+      <div class="metrics train-metrics">
+        <div><span>episodes</span><strong id="tr-ep">0</strong></div>
+        <div><span>reward</span><strong id="tr-rew">—</strong></div>
+        <div><span>DA</span><strong id="tr-da">—</strong></div>
+        <div><span>burden</span><strong id="tr-bur">—</strong></div>
+        <div><span>toxicity</span><strong id="tr-tox">—</strong></div>
+        <div><span>best R</span><strong id="tr-best">—</strong></div>
+      </div>
+      <p class="src" id="tr-proteins">proteins: —</p>
+      <p class="src">Simulated expression/dosing of biologics — not fly-neuron translation.</p>
+
+      <h2>Infusion</h2>
+      <label class="toggle">
+        <input id="override" type="checkbox" />
+        Manual override (vs automatic controller)
+      </label>
+      <div id="sliders"></div>
+      <p class="src" id="source">source: —</p>
+    </section>
+
+    <section class="panel" id="panel-cancer">
+      <h2>Latent &amp; observed cancer state</h2>
+      <canvas id="chart-cancer" height="180"></canvas>
+      <div class="legend" id="legend-cancer"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Connectome activity</h2>
+      <div class="metrics">
+        <div><span>KC sparsity</span><strong id="kc-sp">—</strong></div>
+        <div><span>DA / plasticity</span><strong id="da">—</strong></div>
+        <div><span>‖W<sub>KC→MBON</sub>‖</span><strong id="wnorm">—</strong></div>
+        <div><span>graph</span><strong id="graph-src">stub</strong></div>
+      </div>
+      <canvas id="kc-heat" width="640" height="72"></canvas>
+      <canvas id="chart-mbon" height="120"></canvas>
+    </section>
+
+    <section class="panel" id="panel-drugs">
+      <h2>U(t) infusion &amp; PK concentrations</h2>
+      <canvas id="chart-drugs" height="180"></canvas>
+      <div class="bars" id="drug-bars"></div>
+      <h3 class="subhead">Protein / biologic channels</h3>
+      <p class="src" id="protein-active">active: —</p>
+      <div class="bars" id="protein-bars"></div>
+      <h3 class="subhead">Fusion-directed TKI channels</h3>
+      <p class="src" id="fusion-active">active: — · chimeric junction / fusion AF is a research proxy, not a clinical assay</p>
+      <p class="src" id="fusion-class">fusion class: —</p>
+      <div class="bars" id="fusion-bars"></div>
+    </section>
+
+    <section class="panel" id="panel-embodiment">
+      <h2>Flybody embodiment</h2>
+      <p class="src" id="emb-backend">backend: —</p>
+      <div class="metrics">
+        <div><span>t_fly (s)</span><strong id="emb-t">—</strong></div>
+        <div><span>action RMS</span><strong id="emb-rms">—</strong></div>
+        <div><span>reward</span><strong id="emb-rew">—</strong></div>
+        <div><span>heading</span><strong id="emb-hdg">—</strong></div>
+      </div>
+      <canvas id="chart-emb" height="90"></canvas>
+    </section>
+  </aside>
+
+  <footer>
+    Y → net → protein + drug U → ODE → Y′. Host H ≤ 0.2 terminal. flybody Apache 2.0.
+    Simulation only — research scores, not a clinical outcome.
+    <span id="warn" class="warn hidden">HOST TOXICITY WARNING</span>
+  </footer>
+
+  <script src="/static/app.js?v=taxonomy1"></script>
+</body>
+</html>

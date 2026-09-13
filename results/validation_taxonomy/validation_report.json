@@ -1,0 +1,385 @@
+{
+  "research_only": true,
+  "clinical_admissibility": false,
+  "non_claim": "These metrics are computational research scores on an ODE + noisy Y. They are not a clinical validation, not a diagnostic panel, not a dosing protocol, and not a claim of disease eradication or clinical benefit.",
+  "disease_classes": [
+    "benign",
+    "malignant",
+    "occult",
+    "dormant",
+    "terminal"
+  ],
+  "q1_class_signatures": {
+    "question": "class_separable_state_and_Y",
+    "means": {
+      "benign": {
+        "x_burden": 0.007272155531831103,
+        "x_H": 0.9754731322226653,
+        "x_I_act": 0.5525906988402878,
+        "x_I_surv": 0.36744043371755686,
+        "x_A_ready": 0.48363068327796055,
+        "x_awake": 1.0,
+        "x_tgfb": 0.05191452765011657,
+        "y_burden": 0.019850353832234904,
+        "y_competence": 0.6282399605047732,
+        "y_junction": 0.023018539982629937,
+        "y_occult_af": 0.024144634968155217,
+        "y_dormancy_exit": 1.0042799096660837,
+        "y_surv": 0.37230389307462897,
+        "y_ready": 0.4992526904130393,
+        "early_warning": 0.33808781009977523
+      },
+      "malignant": {
+        "x_burden": 2.898663852478236,
+        "x_H": 0.421814871133356,
+        "x_I_act": 0.052842954384330496,
+        "x_I_surv": 0.784100056980497,
+        "x_A_ready": 0.5950741368547755,
+        "x_awake": 1.0,
+        "x_tgfb": 1.6079117806282128,
+        "y_burden": 2.7800436486236464,
+        "y_competence": 0.11510771071618348,
+        "y_junction": 0.6424603708125497,
+        "y_occult_af": 0.23580448763459547,
+        "y_dormancy_exit": 1.0042799096660837,
+        "y_surv": 0.788963516337569,
+        "y_ready": 0.6106961439898543,
+        "early_warning": 0.8032255941497275
+      },
+      "occult": {
+        "x_burden": 0.43734000102695797,
+        "x_H": 0.8623646053183404,
+        "x_I_act": 0.1889741624960144,
+        "x_I_surv": 0.6931083801131374,
+        "x_A_ready": 0.559088825771837,
+        "x_awake": 1.0,
+        "x_tgfb": 0.3459810935380487,
+        "y_burden": 0.11869464811622855,
+        "y_competence": 0.3342307687715486,
+        "y_junction": 0.4393161331436818,
+        "y_occult_af": 0.2845143830935285,
+        "y_dormancy_exit": 1.0042799096660837,
+        "y_surv": 0.6979718394702095,
+        "y_ready": 0.5747108329069158,
+        "early_warning": 0.7034266241365799
+      },
+      "dormant": {
+        "x_burden": 0.14732942691735318,
+        "x_H": 0.923243374161673,
+        "x_I_act": 0.24362162702626597,
+        "x_I_surv": 0.5610929629235538,
+        "x_A_ready": 0.5313569649906854,
+        "x_awake": 0.34561284397754555,
+        "x_tgfb": 0.3600746820597004,
+        "y_burden": 0.06079907962780848,
+        "y_competence": 0.3641782928520513,
+        "y_junction": 0.05927300163091462,
+        "y_occult_af": 0.1564398827816212,
+        "y_dormancy_exit": 0.3649540158644818,
+        "y_surv": 0.5659564222806259,
+        "y_ready": 0.5469789721257642,
+        "early_warning": 0.38872715833003196
+      },
+      "terminal": {
+        "x_burden": 4.8801567450764,
+        "x_H": 0.04199739246723229,
+        "x_I_act": 0.06226820433491076,
+        "x_I_surv": 0.8035241725188056,
+        "x_A_ready": 0.593357766718032,
+        "x_awake": 1.0,
+        "x_tgfb": 3.1942199281031964,
+        "y_burden": 4.797581444729491,
+        "y_competence": 0.1160633740319524,
+        "y_junction": 0.9767276079003594,
+        "y_occult_af": 0.2086601605241391,
+        "y_dormancy_exit": 1.0042799096660837,
+        "y_surv": 0.8083876318758777,
+        "y_ready": 0.6089797738531109,
+        "early_warning": 0.8441743781385639
+      }
+    },
+    "pairwise_l2": {
+      "benign": {
+        "benign": 0.0,
+        "malignant": 4.49849323753642,
+        "occult": 1.0539123524317355,
+        "dormant": 1.1054741191720578,
+        "terminal": 7.708700830272761
+      },
+      "malignant": {
+        "benign": 4.49849323753642,
+        "malignant": 0.0,
+        "occult": 3.8815901737952307,
+        "dormant": 4.281804783748249,
+        "terminal": 3.282134386978088
+      },
+      "occult": {
+        "benign": 1.0539123524317355,
+        "malignant": 3.8815901737952307,
+        "occult": 0.0,
+        "dormant": 1.1083646051210494,
+        "terminal": 7.128872801006185
+      },
+      "dormant": {
+        "benign": 1.1054741191720578,
+        "malignant": 4.281804783748249,
+        "occult": 1.1083646051210494,
+        "dormant": 0.0,
+        "terminal": 7.466877636783322
+      },
+      "terminal": {
+        "benign": 7.708700830272761,
+        "malignant": 3.282134386978088,
+        "occult": 7.128872801006185,
+        "dormant": 7.466877636783322,
+        "terminal": 0.0
+      }
+    },
+    "nearest_centroid_accuracy": 1.0,
+    "n_classes": 5,
+    "param_map": {
+      "benign": {
+        "r_s": 0.045,
+        "r_r": 0.02,
+        "r_f": 0.018,
+        "k_carry": 0.85,
+        "kappa_immune": 0.58,
+        "p_tgfb": 0.04,
+        "sigma_stroma": 0.04,
+        "invasion_factor": 0.35,
+        "immune_evasion": 0.3,
+        "clinical_visibility_k": 0.08,
+        "k_junction_shed": 0.25,
+        "growth_awake_gate": false,
+        "awaken_hazard": 0.0,
+        "kappa_burden": 0.012,
+        "notes": "Growth-limited, low invasion / immune evasion; Y is high-SNR and quiet."
+      },
+      "malignant": {
+        "r_s": 0.22,
+        "r_r": 0.14,
+        "r_f": 0.17,
+        "k_carry": 4.2,
+        "kappa_immune": 0.18,
+        "p_tgfb": 0.18,
+        "invasion_factor": 1.0,
+        "immune_evasion": 1.0,
+        "clinical_visibility_k": 0.12,
+        "k_junction_shed": 0.85,
+        "growth_awake_gate": false,
+        "awaken_hazard": 0.0,
+        "kappa_burden": 0.055,
+        "notes": "Aggressive bulk growth + immune evasion (GBM-like malignant mode)."
+      },
+      "occult": {
+        "r_s": 0.16,
+        "r_r": 0.1,
+        "r_f": 0.14,
+        "k_carry": 3.4,
+        "kappa_immune": 0.22,
+        "clinical_visibility_k": 1.35,
+        "k_junction_shed": 2.2,
+        "occult_af_leak": 0.55,
+        "invasion_factor": 0.85,
+        "immune_evasion": 0.9,
+        "growth_awake_gate": false,
+        "awaken_hazard": 0.0,
+        "notes": "Low bulk Y until late; junction / occult-AF leak while burden is hidden."
+      },
+      "dormant": {
+        "r_s": 0.18,
+        "r_r": 0.12,
+        "r_f": 0.15,
+        "k_carry": 3.6,
+        "growth_awake_gate": true,
+        "awaken_hazard": 0.07,
+        "awaken_jump": 0.5,
+        "clinical_visibility_k": 0.2,
+        "k_junction_shed": 1.1,
+        "invasion_factor": 0.9,
+        "immune_evasion": 0.8,
+        "notes": "Near-zero net growth while awake\u22480; stochastic awakening raises dormancy_exit."
+      },
+      "terminal": {
+        "r_s": 0.24,
+        "r_r": 0.16,
+        "r_f": 0.18,
+        "k_carry": 5.0,
+        "kappa_immune": 0.1,
+        "kappa_burden": 0.14,
+        "kappa_tox": 0.18,
+        "r_host": 0.015,
+        "invasion_factor": 1.15,
+        "immune_evasion": 1.2,
+        "clinical_visibility_k": 0.08,
+        "k_junction_shed": 0.9,
+        "growth_awake_gate": false,
+        "awaken_hazard": 0.0,
+        "notes": "High burden and/or H-failure dynamics from t=0."
+      }
+    },
+    "non_claim": "These metrics are computational research scores on an ODE + noisy Y. They are not a clinical validation, not a diagnostic panel, not a dosing protocol, and not a claim of disease eradication or clinical benefit."
+  },
+  "q2_lead_time_occult": {
+    "question": "dormancy_exit_or_occult_lead_time",
+    "archetype": "occult",
+    "t_early_warning": 0.35,
+    "t_bulk_y_burden": 21.00000000000001,
+    "lead_time_days": 20.65000000000001,
+    "early_thr": 0.18,
+    "burden_thr": 0.35,
+    "final_y_burden": 1.7898567596556316,
+    "final_latent_burden": 2.6895288932729207,
+    "non_claim": "These metrics are computational research scores on an ODE + noisy Y. They are not a clinical validation, not a diagnostic panel, not a dosing protocol, and not a claim of disease eradication or clinical benefit."
+  },
+  "q2_lead_time_dormant": {
+    "question": "dormancy_exit_or_occult_lead_time",
+    "archetype": "dormant",
+    "t_early_warning": 0.35,
+    "t_bulk_y_burden": null,
+    "lead_time_days": 39.55000000000008,
+    "early_thr": 0.12,
+    "burden_thr": 0.28,
+    "final_y_burden": 0.21703356754559877,
+    "final_latent_burden": 0.29638015681460583,
+    "non_claim": "These metrics are computational research scores on an ODE + noisy Y. They are not a clinical validation, not a diagnostic panel, not a dosing protocol, and not a claim of disease eradication or clinical benefit."
+  },
+  "q3_toxicity_failure": {
+    "question": "pkpd_can_harm_H",
+    "H0": 0.9,
+    "H_end": 0.1942850336637335,
+    "terminal_toxicity": true,
+    "t_hit_days": 6.5,
+    "forced_channels": [
+      "protein_anti_pd1",
+      "protein_tgfb_trap",
+      "protein_ifng",
+      "protein_il2",
+      "protein_chimeric_engager",
+      "protein_surveillance_igg",
+      "protein_fusion_mab"
+    ],
+    "non_claim": "These metrics are computational research scores on an ODE + noisy Y. They are not a clinical validation, not a diagnostic panel, not a dosing protocol, and not a claim of disease eradication or clinical benefit."
+  },
+  "q4_fusion_allocation": {
+    "question": "fusion_signal_changes_allocation",
+    "U_low_junction": {
+      "tki_alk": 0.2624264962485081,
+      "tki_imatinib_like": 0.0629379184897428,
+      "protein_fusion_mab": 0.08878567611872511,
+      "protein_chimeric_engager": 0.18224552453605672
+    },
+    "U_high_junction": {
+      "tki_alk": 0.2998494124421165,
+      "tki_imatinib_like": 0.4277143479051698,
+      "protein_fusion_mab": 0.16360273597140002,
+      "protein_chimeric_engager": 0.3029521763602568
+    },
+    "delta_sum": 0.5977230572859104,
+    "non_claim": "These metrics are computational research scores on an ODE + noisy Y. They are not a clinical validation, not a diagnostic panel, not a dosing protocol, and not a claim of disease eradication or clinical benefit."
+  },
+  "q5_ablations": {
+    "question": "ablations_drop_performance",
+    "protein_auc_full": 18.836268500147817,
+    "protein_auc_frozen_plasticity": 18.635643793654378,
+    "protein_auc_drop_fusion_Y": 15.496987666200722,
+    "protein_auc_drop_antibody_U": 0.0,
+    "drop_frozen": 0.20062470649343922,
+    "drop_fusion_Y": 3.339280833947095,
+    "drop_antibody_U": 18.836268500147817,
+    "non_claim": "These metrics are computational research scores on an ODE + noisy Y. They are not a clinical validation, not a diagnostic panel, not a dosing protocol, and not a claim of disease eradication or clinical benefit."
+  },
+  "q6_citations": {
+    "question": "citation_or_placeholder",
+    "class_knobs": {
+      "kappa_immune": {
+        "status": "citation-tied-class",
+        "doi": "10.1038/nri.2017.96",
+        "note": "Chen & Mellman, Nat Rev Immunol 2017 (cancer-immunity cycle). Used only to justify a nonzero immune-kill term, not a numeric clinical rate."
+      },
+      "p_tgfb": {
+        "status": "citation-tied-class",
+        "doi": "10.1038/nrc3603",
+        "note": "Pickup et al. / TGF-\u03b2 in TME reviews. Simulation-scaled production, not a measured pg/mL rate."
+      },
+      "awaken_hazard": {
+        "status": "placeholder",
+        "doi": "",
+        "note": "PLACEHOLDER: dormancy-exit hazard is a research knob (Aguirre-Ghiso-class intuition), not a fitted patient waiting time."
+      },
+      "clinical_visibility_k": {
+        "status": "placeholder",
+        "doi": "",
+        "note": "PLACEHOLDER: occult visibility Hill scale. Encodes 'hidden until late', not a LoD of a named assay."
+      },
+      "k_junction_shed": {
+        "status": "citation-tied-class",
+        "doi": "10.1038/nrc.2016.97",
+        "note": "Fusion / neoantigen shedding intuition (junction peptides). Coefficient is simulation-scaled."
+      },
+      "rho_surv": {
+        "status": "placeholder",
+        "doi": "",
+        "note": "PLACEHOLDER: surveillance priming rate. Not a measured vaccine or TIL expansion constant."
+      }
+    },
+    "catalog": [
+      {
+        "id": "protein_anti_pd1",
+        "doi": "10.1056/NEJMoa1200694",
+        "placeholder": false,
+        "note": "PK class borrowed from pembrolizumab popPK (see also 10.1007/s40262-016-0427-y). RESEARCH SIMULATION of a checkpoint-antibody effector, not a claim of expression by Drosophila neurons."
+      },
+      {
+        "id": "protein_tgfb_trap",
+        "doi": "10.1158/1078-0432.CCR-19-3314",
+        "placeholder": false,
+        "note": "Strauss et al., Clin Cancer Res 2020 (bintrafusp alfa / M7824 TGF-\u03b2 trap \u00d7 PD-L1). Used only as a PK/PD class reference for a neutralizing biologic, not as a prescribed regimen."
+      },
+      {
+        "id": "protein_ifng",
+        "doi": "10.1182/blood.V77.9.1855.1855",
+        "placeholder": false,
+        "note": "Kurzrock et al. / IFN-\u03b3 clinical PK class. RESEARCH SIMULATION of a cytokine infusion channel."
+      },
+      {
+        "id": "protein_il2",
+        "doi": "10.1200/JCO.1989.7.12.1863",
+        "placeholder": false,
+        "note": "Rosenberg et al., JCO 1989 (high-dose IL-2). Class reference for a cytokine/fusion-adjacent effector. Simulated dosing only."
+      },
+      {
+        "id": "protein_chimeric_engager",
+        "doi": "10.1056/NEJMoa1407228",
+        "placeholder": false,
+        "note": "Topp et al., NEJM 2014 (blinatumomab / BiTE). Class reference for a chimeric T-cell-engager protein channel. RESEARCH SIMULATION only."
+      },
+      {
+        "id": "protein_surveillance_igg",
+        "doi": "10.1200/JCO.1998.16.8.2825",
+        "placeholder": false,
+        "note": "McLaughlin et al., JCO 1998 (rituximab). Class reference for a long-t\u00bd IgG surveillance / readiness channel. RESEARCH SIMULATION only."
+      },
+      {
+        "id": "protein_fusion_mab",
+        "doi": "10.1200/JCO.20.03453",
+        "placeholder": false,
+        "note": "Park et al., JCO 2021 (amivantamab). Class reference for a fusion-adjacent monoclonal / bispecific channel. RESEARCH SIMULATION only."
+      },
+      {
+        "id": "tki_imatinib_like",
+        "doi": "10.1056/NEJM200104053441401",
+        "placeholder": false,
+        "note": "Druker et al., NEJM 2001 (imatinib in CML). Used only as a BCR\u2013ABL-class PK/PD reference for a fusion-kinase channel."
+      },
+      {
+        "id": "tki_alk",
+        "doi": "10.1056/NEJMoa1001270",
+        "placeholder": false,
+        "note": "Kwak et al., NEJM 2010 (crizotinib in ALK-rearranged NSCLC). Class reference for an ALK/NTRK-like fusion TKI channel."
+      }
+    ],
+    "non_claim": "These metrics are computational research scores on an ODE + noisy Y. They are not a clinical validation, not a diagnostic panel, not a dosing protocol, and not a claim of disease eradication or clinical benefit."
+  },
+  "q7_non_claim": "These metrics are computational research scores on an ODE + noisy Y. They are not a clinical validation, not a diagnostic panel, not a dosing protocol, and not a claim of disease eradication or clinical benefit."
+}

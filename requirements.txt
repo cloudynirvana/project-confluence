@@ -35,6 +35,11 @@ requests>=2.28.0       # cBioPortal REST API
 # Structural Biology (AlphaFold integration)
 biopython>=1.83        # PDB/mmCIF parsing for AlphaFold structures
 
+# Confluence v2 interactive session (FastAPI + WebSocket)
+pydantic>=2.0
+fastapi>=0.110
+uvicorn[standard]>=0.27
+
 # Testing
 pytest>=7.0.0
 pytest-cov>=4.0.0
