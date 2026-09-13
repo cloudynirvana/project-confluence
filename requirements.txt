@@ -27,7 +27,15 @@ seaborn>=0.12.0
 plotly>=5.15.0
 
 # Machine Learning (for bioinformatics miner)
-scikit-learn>=1.3.0
+scikit-learn>=1.3.0    # Also powers the TF-IDF fallback for guideline retrieval
+
+# Deep Learning (Neural ODE + Neural Therapy Brain simulation)
+# NOTE: On Linux, plain `pip install torch` pulls the large CUDA build.
+#       For a lean CPU-only install use the CPU wheel index, e.g.:
+#         pip install torch --index-url https://download.pytorch.org/whl/cpu
+#       (this is what .cursor/environment.json does for Cloud Agents).
+torch>=2.2.0           # Neural network backend (CPU is sufficient)
+torchdiffeq>=0.2.3     # Continuous-time Neural ODE solver
 
 # Bioinformatics APIs
 requests>=2.28.0       # cBioPortal REST API
@@ -44,8 +52,9 @@ uvicorn[standard]>=0.27
 pytest>=7.0.0
 pytest-cov>=4.0.0
 
-# Nigeria Guidelines RAG (optional — enables NSTG 2022 integration)
+# Nigeria Guidelines RAG (OPTIONAL — high-accuracy semantic retrieval)
+# The retriever works without these via a scikit-learn TF-IDF fallback, so
+# they are no longer installed by default (they pull ~2 GB of torch/CUDA +
+# transformers). To enable full semantic search, install the extra stack:
+#     pip install -r requirements-rag.txt
 # License: Dataset is CC-BY-4.0 (Federal Ministry of Health, Nigeria)
-sentence-transformers>=2.2.0    # Embedding model for semantic retrieval
-faiss-cpu>=1.7.0                # Vector similarity search index
-datasets>=2.14.0                # HuggingFace dataset loader

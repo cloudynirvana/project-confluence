@@ -39,6 +39,9 @@ data/derived_external/**
 !data/derived_external/**/
 !data/derived_external/**/.gitkeep
 
+# Guideline retriever runtime cache (FAISS index + embeddings)
+data/nigeria_guidelines_index/
+
 # Secrets
 .env
 *.key
