@@ -31,4 +31,15 @@ python -m confluence.demo_immune --seconds 8 --out docs/demo/immune_chimeric.mp4
 
 Live UI immune demo: open `http://127.0.0.1:8765/?demo=immune` (auto-resets to melanoma + controller F, then plays). Research visualization only — not a clinical immune-therapy demo.
 
+## Blender scientific path (data-driven)
+
+Logged closed-loop HUD + MuJoCo `fruitfly.xml` frames for local Blender 4.x. **SIMULATION / RESEARCH** — not generative biology.
+
+```bash
+export MUJOCO_GL=osmesa
+python3 -m confluence.demo_blender --out docs/demo/blender
+```
+
+See [`docs/demo/blender/README.md`](blender/README.md).
+
 Body on screen: TuragaLab/flybody `fruitfly.xml` (Apache 2.0). Not NeuroMechFly / FlyGym unless you change the bridge and document it.

@@ -99,7 +99,7 @@ Interactive Kenyon-cell count defaults to **256** for real-time FPS (documented)
 
 ```bash
 # package tests
-python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py tests/test_flybody_bridge.py tests/test_protein_channels.py tests/test_full_brain_scale.py tests/test_training_smoke.py tests/test_cinematic_render.py tests/test_fusion_biology.py tests/test_immune_chimeric_demo.py tests/test_disease_taxonomy.py tests/test_immune_readiness.py tests/test_validation_suite.py tests/test_clinical_endpoints.py -q
+python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py tests/test_flybody_bridge.py tests/test_protein_channels.py tests/test_full_brain_scale.py tests/test_training_smoke.py tests/test_cinematic_render.py tests/test_fusion_biology.py tests/test_immune_chimeric_demo.py tests/test_disease_taxonomy.py tests/test_immune_readiness.py tests/test_validation_suite.py tests/test_clinical_endpoints.py tests/test_blender_export.py -q
 
 # short controller bake-off (3 archetypes × A–E)
 python -m confluence --benchmark --trials 2 --horizon 40
@@ -247,6 +247,15 @@ Part 2 — honest endpoint language:
 2. **H-band surrogate / CTCAE-like** — G1[0.85,1], G2[0.70,0.85), G3[0.45,0.70), G4[0.20,0.45), G5<0.20. Not organ-system CTCAE.
 3. **Horizon** — default virtual trial **180 days** for OS/PFS language. Shorter runs are labeled **short-horizon virtual event time**.
 4. **Stats** — custom KM / log-rank / Cox, optional `lifelines` extra (`pip install -e '.[stats]'`) cross-check. CI crossing 1.0 is reported as no demonstrated difference.
+
+Blender scientific visualization (logged sims, not generative biology):
+
+```bash
+export MUJOCO_GL=osmesa
+python3 -m confluence.demo_blender --out docs/demo/blender
+```
+
+Writes PNG frames from `fruitfly.xml` plus `telemetry.json` / `.csv` synced to frame index. Local Blender 4.x: see [`docs/demo/blender/README.md`](docs/demo/blender/README.md). Every output is labeled **SIMULATION / RESEARCH**.
 
 How to run (one command, fixed master seed 17):
 

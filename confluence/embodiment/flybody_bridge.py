@@ -447,6 +447,34 @@ class FlybodyBridge:
                 return cand
         return 1
 
+    def export_pose(self) -> Optional[Dict[str, Any]]:
+        """Logged MuJoCo pose for a sidecar / Blender path. None if flybody is down."""
+        if self._env is None:
+            return None
+        try:
+            physics = self._env.physics
+            qpos = np.asarray(physics.data.qpos, dtype=float).copy()
+            qvel = np.asarray(physics.data.qvel, dtype=float).copy()
+            root = qpos[:7] if qpos.size >= 7 else qpos
+            xpos = (float(root[0]), float(root[1]), float(root[2])) if root.size >= 3 else (0.0, 0.0, 0.0)
+            heading = 0.0
+            if root.size >= 7:
+                w, x, y, z = root[3:7]
+                heading = float(np.arctan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z)))
+            return {
+                "backend": "flybody",
+                "mesh": MESH_NAME,
+                "t_fly": float(physics.data.time),
+                "nq": int(qpos.size),
+                "nv": int(qvel.size),
+                "qpos": [float(v) for v in qpos],
+                "qpos_root": [float(v) for v in root[:7]],
+                "xpos": [float(v) for v in xpos],
+                "heading": heading,
+            }
+        except Exception:
+            return None
+
     def render_rgb(self, width: Optional[int] = None, height: Optional[int] = None) -> Optional[np.ndarray]:
         """Anatomical MuJoCo RGB frame, or None if flybody is not live.
 
