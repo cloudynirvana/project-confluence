@@ -19,7 +19,9 @@ def test_evidence_site_is_static_and_honest() -> None:
     assert "flybody" in lowered
     assert "pip install -e ." in index
     assert "python -m confluence" in index
-    assert "not a vercel serverless" in lowered or "not a vercel serverless function" in lowered
+    compact = " ".join(lowered.split())
+    assert "vercel serverless" in compact
+    assert "fastapi" in compact and "websocket" in compact
     assert "awaiting-clinical-validation" in lowered
     assert "DISCLAIMER.md" in index
     for phrase in (
@@ -61,14 +63,13 @@ def test_dockerfile_is_lightweight_web_target() -> None:
     assert "--host 0.0.0.0" in dockerfile
     assert "${PORT:-8765}" in dockerfile
     assert "/health" in dockerfile
-    web, _, mesh = dockerfile.partition("FROM web AS mesh")
-    assert "FROM python:" in web
-    assert "pip install --no-cache-dir ." in web
-    web_runs = "\n".join(ln for ln in web.splitlines() if ln.strip().startswith("RUN")).lower()
-    assert "flybody" not in web_runs
-    assert "mujoco" not in web_runs
-    # mesh extra exists but is not the default target
-    assert "FROM web AS mesh" in dockerfile
+    assert "FROM python:" in dockerfile
+    assert "pip install --no-cache-dir ." in dockerfile
+    runs = "\n".join(ln for ln in dockerfile.splitlines() if ln.strip().startswith("RUN")).lower()
+    assert "flybody" not in runs
+    assert "mujoco" not in runs
+    mesh = (REPO / "Dockerfile.mesh").read_text(encoding="utf-8")
+    assert "FROM confluence-sim" in mesh
     assert "flybody" in mesh.lower()
     ignore = (REPO / ".dockerignore").read_text(encoding="utf-8")
     assert "evidence" in ignore

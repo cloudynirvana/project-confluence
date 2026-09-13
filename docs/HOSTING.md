@@ -38,8 +38,8 @@ origin (HTTPS → `wss`). Do not proxy `/ws/sim` through Vercel serverless.
 ## 2. Interactive sim on Railway
 
 1. New project → deploy from the GitHub repo.
-2. Railway detects `railway.toml` + `Dockerfile` (default target `web`:
-   numpy / scipy / fastapi — **no MuJoCo / flybody**).
+2. Railway detects `railway.toml` + `Dockerfile` (numpy / scipy / fastapi —
+   **no MuJoCo / flybody**). Mesh is `Dockerfile.mesh` only.
 3. Railway injects `PORT`. The image already runs
    `uvicorn … --host 0.0.0.0 --port ${PORT:-8765}`.
 4. Health check: `GET /health` (configured in `railway.toml`).
@@ -72,10 +72,13 @@ docker run --rm -p 8765:8765 -e PORT=8765 confluence-sim
 curl -fsS http://127.0.0.1:8765/health
 ```
 
-Optional fruitfly.xml viewport (heavier image; not required for the UI to boot):
+Optional fruitfly.xml viewport (heavier image; not required for the UI to boot).
+Kept in a **separate** `Dockerfile.mesh` so Railway / Fly never clone flybody
+on the default path:
 
 ```bash
-docker build --target mesh -t confluence-sim:mesh .
+docker build -t confluence-sim .
+docker build -f Dockerfile.mesh -t confluence-sim:mesh .
 ```
 
 `.dockerignore` keeps v1 `models/`, `docs/`, `evidence/`, and demo films out

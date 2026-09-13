@@ -21,6 +21,6 @@ python -m http.server 4173
 3. Framework Preset: **Other** (static). Leave build empty; `vercel.json` already sets `outputDirectory` to `.`.
 4. No environment secrets are required.
 
-See the README section **Deploy evidence to Vercel** and [docs/HOSTING.md](../docs/HOSTING.md) for the separate Railway / Fly sim.
+See the README section **Deploy evidence to Vercel** and [docs/HOSTING.md](../docs/HOSTING.md) for the separate Railway / Fly sim. Optional flybody mesh is `Dockerfile.mesh`, not the default image.
 
 Assets in `public/` are copies of `docs/demo/` and `docs/demo/blender/renders/`.
