@@ -371,6 +371,14 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     parser = argparse.ArgumentParser(description="Taxonomy / readiness computational validation")
     parser.add_argument("--out", default="results/validation_taxonomy")
+    parser.add_argument(
+        "--clinical",
+        action="store_true",
+        help="Also run the in-silico endpoint mapping layer on the real A/B/E/F loop",
+    )
+    parser.add_argument("--clinical-n", type=int, default=100)
+    parser.add_argument("--clinical-days", type=float, default=28.0)
+    parser.add_argument("--clinical-out", default="results/validation_translation")
     args = parser.parse_args(list(argv) if argv is not None else None)
     report = run_suite(Path(args.out))
     print(json.dumps({k: report[k] for k in ("research_only", "clinical_admissibility", "non_claim")}, indent=2))
@@ -379,6 +387,23 @@ def main(argv: Sequence[str] | None = None) -> int:
     print("q3 terminal", report["q3_toxicity_failure"]["terminal_toxicity"])
     print("q4 delta", report["q4_fusion_allocation"]["delta_sum"])
     print("wrote", args.out)
+    if args.clinical:
+        from confluence.benchmarks.closed_loop_translation import run_translation
+
+        trans = run_translation(
+            n=args.clinical_n,
+            out_dir=Path(args.clinical_out),
+            days=args.clinical_days,
+        )
+        print(
+            "clinical translation layer (not a trial):",
+            trans["layer"],
+            "stiff",
+            trans["part1_stiff_solver"]["agreed"],
+            "cohort",
+            trans["part2_cohort"]["n"],
+        )
+        print("wrote", args.clinical_out)
     return 0
 
 

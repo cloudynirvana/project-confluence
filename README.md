@@ -99,7 +99,7 @@ Interactive Kenyon-cell count defaults to **256** for real-time FPS (documented)
 
 ```bash
 # package tests
-python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py tests/test_flybody_bridge.py tests/test_protein_channels.py tests/test_full_brain_scale.py tests/test_training_smoke.py tests/test_cinematic_render.py tests/test_fusion_biology.py tests/test_immune_chimeric_demo.py tests/test_disease_taxonomy.py tests/test_immune_readiness.py tests/test_validation_suite.py -q
+python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py tests/test_flybody_bridge.py tests/test_protein_channels.py tests/test_full_brain_scale.py tests/test_training_smoke.py tests/test_cinematic_render.py tests/test_fusion_biology.py tests/test_immune_chimeric_demo.py tests/test_disease_taxonomy.py tests/test_immune_readiness.py tests/test_validation_suite.py tests/test_clinical_endpoints.py -q
 
 # short controller bake-off (3 archetypes × A–E)
 python -m confluence --benchmark --trials 2 --horizon 40
@@ -225,6 +225,38 @@ python -m confluence.benchmarks.validation_suite --out results/validation_taxono
 ```
 
 Notebook: [`notebooks/computational_validation_taxonomy.ipynb`](notebooks/computational_validation_taxonomy.ipynb). Tests: `tests/test_disease_taxonomy.py`, `tests/test_immune_readiness.py`, `tests/test_validation_suite.py`.
+
+## In-silico endpoint mapping / computational–clinical translation layer
+
+**Title of this report:** in silico endpoint mapping / computational–clinical translation layer.
+
+This is **not** a clinical trial, **not** FDA/EMA readiness, and **not** a Phase II readout. RECIST 1.1-*like* and CTCAE v5.0-*like* labels are mappings from the real Confluence closed loop (`CancerODE.ode_system` + observation layer + PK/PD + controllers A / B / E / F). Kaplan–Meier, Mantel–Haenszel log-rank, and univariate Cox HR + 95% CI are **computed**; they are never hardcoded. If the virtual cohort is underpowered, the suite reports the CI and marks the comparison **inconclusive**.
+
+Part 1 — computational stress tests (real `ode_system`, not a standalone Euler toy):
+
+1. **Stiff solver** — LSODA / Radau / RK45 via scipy; trajectory agreement across rtol/atol and effective Δt ∈ [0.001, 0.05]; no NaN/Inf.
+2. **Conservation** — X_i ≥ 0; H ∈ [0, 1]; carrying capacity not breached; H ≤ 0.2 ⇒ terminal.
+3. **Robustness** — Latin-hypercube virtual cohort N≥100; r, σ_I (κ_immune), t½ perturbed ±25–40%; each patient is run on A (SoC MTD), B (Gatenby adaptive), E and F; report the **distribution**, not one seed.
+4. **Weight convergence** — ||W_KC→MBON||_F (plasticity_norm) stays bounded / no runaway.
+
+Part 2 — oncology endpoint *language* mapped from the simulation:
+
+1. **RECIST 1.1-like** — CR / PR (≥30%↓) / SD / PD (≥20%↑ over nadir) from tumor-burden trajectories.
+2. **CTCAE v5.0-like** — G0–G5 from H(t) bands (G5 = H ≤ 0.2 terminal).
+3. **Kaplan–Meier OS/PFS** + log-rank + Cox HR when feasible, comparing E/F vs A vs B.
+4. **Clinical dosing discretization** — continuous U(t) → Q3W anti-PD-1-style pulses and daily TKI/HDAC with 5-on/2-off holidays. These are **simulated regimens**, not labeled schedules.
+
+How to run:
+
+```bash
+# translation layer on the real closed loop (N=100 patients × 4 arms)
+python3 -m confluence.benchmarks.closed_loop_translation --n 100 --out results/validation_translation
+
+# same layer via the validation-suite entrypoint
+python3 -m confluence.benchmarks.validation_suite --clinical --clinical-n 100 --clinical-out results/validation_translation
+```
+
+Writes `results/validation_translation/four_panel_endpoints.png` (KM, RECIST bars, CTCAE bars, example trajectory) and `translation_report.json`. Notebook: [`notebooks/computational_clinical_translation.ipynb`](notebooks/computational_clinical_translation.ipynb). Mapper: [`confluence/benchmarks/clinical_endpoint_mapper.py`](confluence/benchmarks/clinical_endpoint_mapper.py). Tests: `tests/test_clinical_endpoints.py`.
 
 Closed loop:
 

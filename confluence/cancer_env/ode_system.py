@@ -379,6 +379,8 @@ class CancerODE:
         u: np.ndarray,
         dt: float,
         method: str = "RK45",
+        rtol: float = 1e-6,
+        atol: float = 1e-8,
     ) -> Tuple[np.ndarray, np.ndarray]:
         """Advance one interval with scipy; fallback RK4 if the solver rejects."""
         z0 = self.pack(self.clip_state(x), np.maximum(c, 0.0))
@@ -393,8 +395,8 @@ class CancerODE:
                 (0.0, dt),
                 z0,
                 method=method,
-                rtol=1e-6,
-                atol=1e-8,
+                rtol=rtol,
+                atol=atol,
                 max_step=max(dt / 2.0, 1e-3),
             )
             if sol.success and np.all(np.isfinite(sol.y[:, -1])):
@@ -426,6 +428,10 @@ class CancerODE:
         u_of_t,
         t_span: Tuple[float, float],
         n_eval: int = 200,
+        method: str = "LSODA",
+        rtol: float = 1e-6,
+        atol: float = 1e-8,
+        max_step: Optional[float] = None,
     ) -> Dict[str, np.ndarray]:
         z0 = self.pack(self.clip_state(x0), np.maximum(c0, 0.0))
         t_eval = np.linspace(t_span[0], t_span[1], n_eval)
@@ -433,10 +439,20 @@ class CancerODE:
         def fun(t, z):
             return self.rhs(t, z, np.asarray(u_of_t(t), dtype=float))
 
-        sol = solve_ivp(fun, t_span, z0, t_eval=t_eval, method="LSODA", rtol=1e-6, atol=1e-8)
+        kwargs: Dict = {"t_eval": t_eval, "method": method, "rtol": rtol, "atol": atol}
+        if max_step is not None:
+            kwargs["max_step"] = float(max_step)
+        sol = solve_ivp(fun, t_span, z0, **kwargs)
         xs = np.array([self.clip_state(sol.y[:DIM, i]) for i in range(sol.y.shape[1])]).T
         cs = np.maximum(sol.y[DIM:, :], 0.0)
-        return {"t": sol.t, "x": xs, "c": cs, "success": bool(sol.success)}
+        return {
+            "t": sol.t,
+            "x": xs,
+            "c": cs,
+            "success": bool(sol.success),
+            "method": method,
+            "finite": bool(np.all(np.isfinite(sol.y))),
+        }
 
     def to_latent(self, x: np.ndarray, t: float = 0.0) -> LatentCancerState:
         state = LatentCancerState.from_vector(self.clip_state(x), t=t)
