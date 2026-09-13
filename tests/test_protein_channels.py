@@ -66,5 +66,5 @@ def test_closed_loop_protein_keys_present_for_controller_e():
     frame = sim.step()
     for pid in PROTEIN_CHANNEL_IDS:
         assert pid in frame.concentrations
-        # Default E does not drive biologics.
-        assert frame.action.infusion.get(pid, 0.0) == 0.0
+    # Immune secretory prior lets E lift chimeric / cytokine channels.
+    assert any(frame.action.infusion.get(pid, 0.0) > 0.0 for pid in PROTEIN_CHANNEL_IDS)

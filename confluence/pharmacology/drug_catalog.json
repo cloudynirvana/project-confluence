@@ -308,6 +308,35 @@
       }
     },
     {
+      "id": "protein_chimeric_engager",
+      "name": "Chimeric T-cell engager (BiTE-class)",
+      "drug_class": "chimeric_protein",
+      "mechanism": "Simulated CD3-engaging chimeric protein (BiTE/fusion-protein class). Multiplies immune kill and adds extra pressure on T_f. Not ribosomal synthesis in fly neurons; not a prescribed blinatumomab regimen.",
+      "half_life_hours": 2.5,
+      "ic50": 0.30,
+      "hill": 1.4,
+      "mtd": 1.0,
+      "organ_toxicity": {
+        "liver": 0.08,
+        "kidney": 0.04,
+        "heart": 0.06,
+        "marrow": 0.08,
+        "immune": 0.40,
+        "gut": 0.08,
+        "nerve": 0.10
+      },
+      "control_channel": "protein_chimeric_engager",
+      "clinical_half_life_hours": 2.5,
+      "clinical_ic50_note": "Blinatumomab-class t1/2 is hours-scale (continuous infusion). IC50 is simulation-scaled occupancy.",
+      "modality": "protein_biologic",
+      "tox_weight": 0.80,
+      "provenance": {
+        "doi": "10.1056/NEJMoa1407228",
+        "note": "Topp et al., NEJM 2014 (blinatumomab / BiTE). Class reference for a chimeric T-cell-engager protein channel. RESEARCH SIMULATION only.",
+        "placeholder": false
+      }
+    },
+    {
       "id": "tki_imatinib_like",
       "name": "Imatinib-like fusion TKI",
       "drug_class": "fusion_tki",

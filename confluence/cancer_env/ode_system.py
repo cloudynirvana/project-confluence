@@ -11,8 +11,9 @@ research state, not a sequenced patient fusion.
 Design:
     * logistic tumor growth with Lotka–Volterra competition (3 clones)
     * phenotypic switch ε_switch(C_drugs, L) attenuated by HDAC occupancy
-    * immune kill attenuated by stroma
-    * exhaustion γ_exh(TGF-β, L, PD1 occupancy)
+    * immune kill attenuated by stroma; chimeric engager multiplies kill
+    * exhaustion γ_exh(TGF-β, L, PD1 occupancy); IL-2 / engager / PD-1 can
+      reinvigorate a slice of I_exh → I_act (research term)
     * lactate production / MCT1-modulated clearance
     * stroma driven by TGF-β
     * host health H ∈ [0, 1]; H ≤ 0.2 is terminal toxicity
@@ -177,6 +178,7 @@ class CancerODE:
         e_kin = float(occ.get("targeted_kinase", 0.0))
         e_ifng_p = float(occ.get("protein_ifng", 0.0))
         e_il2 = float(occ.get("protein_il2", 0.0))
+        e_engager = float(occ.get("protein_chimeric_engager", 0.0))
         e_ima = float(occ.get("tki_imatinib_like", 0.0))
         e_alk = float(occ.get("tki_alk", 0.0))
         e_fusion = float(
@@ -191,7 +193,8 @@ class CancerODE:
 
         stroma_shield = 1.0 - 0.85 * S_fib
         ifng_boost = 1.0 + 0.6 * _sat(C_ifng, 0.4)
-        immune_kill = p.kappa_immune * I_act * stroma_shield * ifng_boost
+        engager_boost = 1.0 + 0.90 * e_engager
+        immune_kill = p.kappa_immune * I_act * stroma_shield * ifng_boost * engager_boost
 
         # Phenotypic switch: lactate + cytotoxic pressure, attenuated by HDAC.
         drug_pressure = 0.35 * e_kin + 0.15 * e_pd1
@@ -223,23 +226,37 @@ class CancerODE:
             - immune_kill * p.fusion_immune_factor * T_f
             - p.kappa_kinase * e_kin * p.fusion_kinase_factor * T_f
             - p.kappa_fusion * e_fusion * T_f
+            - 0.20 * p.kappa_immune * I_act * e_engager * T_f
             + p.eps_fusion * T_s
         )
 
-        # Exhaustion γ_exh(TGF-β, lactate, PD-1 occupancy)
+        # Exhaustion γ_exh(TGF-β, lactate, PD-1 occupancy).
+        # IL-2 occupancy modestly slows new exhaustion (support, not a cure).
         gamma_exh = (
             p.gamma0
             * (1.0 + 1.6 * _sat(C_tgfb, 0.35) * (1.0 - 0.75 * e_tgfbi))
             * (1.0 + 1.1 * _sat(L, 0.8))
             * (1.0 - 0.80 * e_pd1)
+            * (1.0 - 0.22 * e_il2)
         )
         room = max(0.0, 1.15 - I_act - I_exh)
+        # BiTE-class engager also recruits / redirects T cells (not only kill).
         dI_act = (
-            p.rho_immune * _sat(C_ifng, 0.3) * room * (1.0 + 1.2 * e_il2)
+            p.rho_immune
+            * _sat(C_ifng, 0.3)
+            * room
+            * (1.0 + 1.8 * e_il2)
+            * (1.0 + 0.45 * e_ifng_p)
+            * (1.0 + 0.70 * e_engager)
             - gamma_exh * I_act
             - p.delta_act * I_act
         )
         dI_exh = gamma_exh * I_act - p.delta_exh * I_exh
+        # Reinvigoration: checkpoint + fast cytokine/engager occupancy
+        # can return a slice of I_exh → I_act (research term, not a clinical PD-1 model).
+        rev = (0.12 * e_pd1 + 0.14 * e_il2 + 0.10 * e_engager) * I_exh
+        dI_act = dI_act + rev
+        dI_exh = dI_exh - rev
 
         # Stroma driven by TGF-β (reduced when TGF-β is inhibited)
         tgfb_drive = _sat(C_tgfb, 0.3) * (1.0 - 0.7 * e_tgfbi)
@@ -254,7 +271,7 @@ class CancerODE:
         dG = p.supply_glc - p.consume_glc * burden * G - 0.06 * G
 
         dTgf = p.p_tgfb * (0.4 * burden + 0.8 * S_fib) - p.cl_tgfb * (1.0 + 2.0 * e_tgfbi) * C_tgfb
-        dIfn = p.p_ifng * I_act + 0.10 * e_ifng_p - p.cl_ifng * C_ifng
+        dIfn = p.p_ifng * I_act + 0.28 * e_ifng_p - p.cl_ifng * C_ifng
 
         tox = max(0.0, tox_load)
         dH = p.r_host * (1.0 - H) - p.kappa_burden * burden * H - p.kappa_tox * tox * H

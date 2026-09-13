@@ -38,6 +38,7 @@ PROTEIN_CHANNEL_IDS = (
     "protein_tgfb_trap",
     "protein_ifng",
     "protein_il2",
+    "protein_chimeric_engager",
 )
 
 # Fusion-directed TKI class channels. Kill terms prefer the T_f clone.

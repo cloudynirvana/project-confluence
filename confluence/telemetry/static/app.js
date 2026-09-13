@@ -10,6 +10,7 @@ const PROTEINS = [
   ["protein_tgfb_trap", "TGF-β trap"],
   ["protein_ifng", "IFN-γ"],
   ["protein_il2", "IL-2"],
+  ["protein_chimeric_engager", "chimeric engager"],
 ];
 const FUSIONS = [
   ["tki_imatinib_like", "imatinib-like"],
@@ -18,6 +19,7 @@ const FUSIONS = [
 const EFFECTORS = DRUGS.concat(PROTEINS).concat(FUSIONS);
 
 const MAX_POINTS = 180;
+const DEMO_IMMUNE = new URLSearchParams(location.search).get("demo") === "immune";
 const wsProto = location.protocol === "https:" ? "wss" : "ws";
 const ws = new WebSocket(`${wsProto}://${location.host}/ws/sim`);
 
@@ -328,6 +330,9 @@ function applyFrame(frame) {
   if ($("hud-fusion")) {
     $("hud-fusion").textContent = Number(Y.fusion_allele_fraction ?? L.fusion_allele_fraction ?? 0).toFixed(3);
   }
+  if ($("hud-immune")) {
+    $("hud-immune").textContent = Number(L.I_act ?? 0).toFixed(3);
+  }
   $("source").textContent = `source: ${frame.drugs.source} ${frame.drugs.notes || ""}`;
   if ($("emb-backend")) {
     $("emb-backend").textContent = `backend: ${E.backend || "—"} · ${E.task || ""} · dim ${E.action_dim || 0}  ${E.notes || ""}`;
@@ -377,6 +382,16 @@ ws.addEventListener("message", (ev) => {
     if (msg.brain_mode && $("brain-mode")) $("brain-mode").value = msg.brain_mode;
     applyTraining(msg);
     applyFrame(msg.frame);
+    if (DEMO_IMMUNE) {
+      if ($("archetype")) $("archetype").value = "melanoma_persister";
+      if ($("controller")) $("controller").value = "F";
+      send("reset", { archetype: "melanoma_persister", controller: "F" });
+      send("play");
+      if ($("status-pill")) {
+        $("status-pill").textContent = "live";
+        $("status-pill").className = "pill run";
+      }
+    }
     return;
   }
   if (msg.type === "mode") {

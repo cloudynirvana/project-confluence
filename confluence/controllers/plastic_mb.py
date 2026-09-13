@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from confluence.contracts import CONTROL_DRUG_IDS, FUSION_CHANNEL_IDS, InterventionAction, ObservationRecord
+from confluence.contracts import ALL_EFFECTOR_IDS, InterventionAction, ObservationRecord
 from confluence.controllers.base import BaseController, ControllerContext
+from confluence.controllers.immune_prior import apply_immune_secretory_prior
 from confluence.neural_engine.network import MushroomBodyNetwork, NetworkConfig
 
 
@@ -13,7 +14,7 @@ class PlasticMushroomBodyController(BaseController):
     uses_connectome = True
 
     def __init__(self, n_kc: int = 256, seed: int = 7, **kwargs):
-        kwargs.setdefault("drug_ids", CONTROL_DRUG_IDS + FUSION_CHANNEL_IDS)
+        kwargs.setdefault("drug_ids", ALL_EFFECTOR_IDS)
         super().__init__(**kwargs)
         self.network = MushroomBodyNetwork(
             NetworkConfig(n_kc=n_kc, seed=seed, plastic=True, n_obs=7, n_out=len(self.drug_ids)),
@@ -29,9 +30,10 @@ class PlasticMushroomBodyController(BaseController):
     def decide(self, observation: ObservationRecord, context: ControllerContext) -> InterventionAction:
         conc_sum = sum(context.concentrations.values())
         u = self.network.step(observation, conc_sum, context.dt)
+        u = apply_immune_secretory_prior(u, self.drug_ids, observation)
         if observation.host_toxicity_warning:
             u = u * 0.45
-        return self._action(observation.t, u, source="E", notes="plastic MB + DA")
+        return self._action(observation.t, u, source="E", notes="plastic MB + immune/chimeric prior")
 
     def connectome_telemetry(self):
         return self.network.telemetry()

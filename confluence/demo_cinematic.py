@@ -102,6 +102,8 @@ def render_clip(
             float((last.connectome or {}).get("da") or 0.0),
             proteins,
             last.t,
+            immune=last.latent.I_act,
+            fusion_af=last.latent.fusion_allele_fraction,
         )
     return frames, last, sim
 

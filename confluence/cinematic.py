@@ -231,13 +231,24 @@ def overlay_hud(
     da: float,
     proteins: Iterable[str],
     t_days: float = 0.0,
+    immune: float = 0.0,
+    fusion_af: float = 0.0,
 ) -> np.ndarray:
     """Slim ticks on a real MuJoCo frame. Mutates and returns rgb."""
-    _hud(rgb, burden, resist, da, proteins, t_days)
+    _hud(rgb, burden, resist, da, proteins, t_days, immune=immune, fusion_af=fusion_af)
     return rgb
 
 
-def _hud(rgb: np.ndarray, burden: float, resist: float, da: float, proteins: Iterable[str], t_days: float) -> None:
+def _hud(
+    rgb: np.ndarray,
+    burden: float,
+    resist: float,
+    da: float,
+    proteins: Iterable[str],
+    t_days: float,
+    immune: float = 0.0,
+    fusion_af: float = 0.0,
+) -> None:
     """A few tracked-out labels — film UI, not a dashboard."""
     h, w, _ = rgb.shape
 
@@ -256,9 +267,11 @@ def _hud(rgb: np.ndarray, burden: float, resist: float, da: float, proteins: Ite
         rgb[y : y + 3, x : x + 90] = 28
         rgb[y : y + 3, x : x + max(length, 1)] = color.astype(np.uint8)
 
-    bar(28, h - 48, burden, ROSE)
-    bar(28, h - 38, resist, AMBER)
-    bar(28, h - 28, 0.5 + 0.5 * np.clip(da, -1, 1), TEAL)
+    bar(28, h - 58, burden, ROSE)
+    bar(28, h - 50, resist, AMBER)
+    bar(28, h - 42, immune, TEAL)
+    bar(28, h - 34, fusion_af, np.array([192, 132, 252], dtype=np.float32))
+    bar(28, h - 26, 0.5 + 0.5 * np.clip(da, -1, 1), TEAL * 0.55)
     # Protein pips.
     pips = list(proteins)[:4]
     for i, _ in enumerate(pips):

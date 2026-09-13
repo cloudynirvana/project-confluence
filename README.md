@@ -41,6 +41,7 @@ See `CITATION.cff`. DOI badge added below once Zenodo publishes.
 
 - Confluence is a **research closed-loop**: noisy observations → connectome-style controller → simulated infusion `U(t)` → PK/PD → 12-D cancer ODE (11-D TME + fusion clone `T_f`). In-silico burden / resistance / fusion-AF / DA / “protein channel” scores are **not** a computational cure for cancer and are not a treatment recommendation.
 - Fusion proteins in biology arise from **chimeric mRNAs** at a gene junction. Our `T_f` clone, fusion allele fraction, and junction-neoantigen traces are **computational proxies**, not a clinical NGS / ctDNA assay and not a claim that we detected or treated a real fusion.
+- Therapeutic chimeric proteins (BiTE-class T-cell engager, IFN-γ, IL-2, anti-PD-1, TGF-β trap) are **simulated infusion / expression rates** from controllers E/F. This is not ribosomal synthesis in Drosophila neurons and not a clinical immune-therapy demo.
 - The hero viewport and `docs/demo/cinematic.mp4` must show the **TuragaLab/flybody** anatomical MuJoCo mesh (`fruitfly.xml`, Apache 2.0; Vaxenburg et al., *Nature* 2025). A CPG / bead-fly stub is **not** an acceptable product visual. If flybody is missing, the UI shows an install CTA instead of a fake fly.
 - Visual fidelity requires the flybody extra + headless GL (`MUJOCO_GL=osmesa` or `egl`). NeuroMechFly / FlyGym is an acceptable alternate digital twin only if flybody cannot be installed — document which body is on screen.
 
@@ -86,16 +87,17 @@ Open **http://127.0.0.1:8765**. The live session is a **dark-lab hero viewport**
 - loop mode is a film-style **Cancer / Flybody / Both** switch (not a form)
 - hero viewport streams **only** `env.physics.render` JPEGs from `fruitfly.xml`; no mesh → install CTA (CPG stub is hidden)
 - append `?cinema=1` to hide chrome for recording
+- append `?demo=immune` to auto-play the fly-brain immune + chimeric-protein demo (research visualization, not a cure)
 
 [![Cinematic still](docs/demo/still_hero.png)](docs/demo/cinematic.mp4)
 
-Share clip (≈12 s, real mesh): [`docs/demo/cinematic.mp4`](docs/demo/cinematic.mp4). The cinematic job **fails** if fruitfly.xml cannot render — it will not ship stub footage. See [`docs/demo/README.md`](docs/demo/README.md).
+Share clip (≈12 s, real mesh): [`docs/demo/cinematic.mp4`](docs/demo/cinematic.mp4). Immune + chimeric-protein demo: [`docs/demo/immune_chimeric.mp4`](docs/demo/immune_chimeric.mp4) (`python -m confluence.demo_immune`). Both jobs **fail** if fruitfly.xml cannot render. See [`docs/demo/README.md`](docs/demo/README.md).
 
 Interactive Kenyon-cell count defaults to **256** for real-time FPS (documented). Pass `n_kc=2048` in `MushroomBodyNetwork` / controllers for a more FlyWire-like expansion. Controller **F** is a separate sparse rate-based net that can be constructed at `n_neurons=166700` (see below); the UI default stays on the small demo.
 
 ```bash
 # package tests
-python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py tests/test_flybody_bridge.py tests/test_protein_channels.py tests/test_full_brain_scale.py tests/test_training_smoke.py tests/test_cinematic_render.py tests/test_fusion_biology.py -q
+python -m pytest tests/test_ode_stability.py tests/test_plasticity_bounds.py tests/test_connectome_loader.py tests/test_flybody_bridge.py tests/test_protein_channels.py tests/test_full_brain_scale.py tests/test_training_smoke.py tests/test_cinematic_render.py tests/test_fusion_biology.py tests/test_immune_chimeric_demo.py -q
 
 # short controller bake-off (3 archetypes × A–E)
 python -m confluence --benchmark --trials 2 --horizon 40
@@ -172,7 +174,7 @@ Interactive FPS stays on the 256-KC mushroom body. Switching the UI to **Full-br
 
 ### Effector layer (small molecules + biologics + fusion TKIs)
 
-Controllers A–D still emit the original 5-D `U` (`anti_pd1`, `tgfb_inhibitor`, `mct1`, `hdac`, `targeted_kinase`). Controller **E** also emits two fusion-directed TKI channels. The closed-loop PK state is 11-D: those five plus four **protein/biologic** channels plus two **fusion TKIs**. Proteins default to 0 unless controller F (or a manual override) drives them.
+Controllers A–D still emit the original 5-D `U` (`anti_pd1`, `tgfb_inhibitor`, `mct1`, `hdac`, `targeted_kinase`). Controllers **E** and **F** emit all 12 effectors. A documented immune / chimeric secretory prior lifts IFN-γ, IL-2, anti-PD-1, the BiTE-class engager, TGF-β trap, and fusion TKIs when immune competence is low or fusion AF is high. The closed-loop PK state is 12-D (5 small-molecule + 5 protein/biologic + 2 fusion TKI). This is simulated dosing, not a claim that fly neurons translate polypeptides.
 
 | Channel | Simulated class | Notes |
 |---------|-----------------|-------|
@@ -180,6 +182,7 @@ Controllers A–D still emit the original 5-D `U` (`anti_pd1`, `tgfb_inhibitor`,
 | `protein_tgfb_trap` | TGF-β neutralizing trap | Slower clearance than galunisertib |
 | `protein_ifng` | IFN-γ cytokine | Adds to `C_ifng` production |
 | `protein_il2` | IL-2 / fusion-adjacent cytokine | Boosts immune recruitment; higher `tox_weight` |
+| `protein_chimeric_engager` | BiTE-class chimeric T-cell engager | Multiplies immune kill; extra pressure on `T_f` (Topp et al. class) |
 | `tki_imatinib_like` | BCR–ABL / KIT / PDGFR-class TKI | Preferential kill on `T_f` (Druker et al. class reference) |
 | `tki_alk` | EML4–ALK / ROS1 / NTRK-class TKI | Preferential kill on `T_f` (Kwak et al. class reference) |
 
@@ -494,7 +497,7 @@ project-confluence/
 │   ├── loop.py                      # Closed loop Y → controller → PK → ODE
 │   ├── connectome/                  # FlyWire stub + FAFB loader hook + circuit_extractor
 │   ├── neural_engine/               # Rate MB network + DA plasticity
-│   ├── cancer_env/                  # 11-D ODE, observation layer, 3 archetypes
+│   ├── cancer_env/                  # 12-D ODE (TME + fusion clone), observation layer, 3 archetypes
 │   ├── pharmacology/                # drug_catalog.json, PK/PD, toxicity
 │   ├── controllers/                 # A MTD · B Gatenby · C PPO stub · D reservoir · E plastic MB
 │   ├── benchmarks/                  # PFS / resistance / toxicity runner

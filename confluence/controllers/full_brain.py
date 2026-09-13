@@ -7,6 +7,7 @@ from typing import Optional, Sequence
 
 from confluence.contracts import ALL_EFFECTOR_IDS, INTERACTIVE_BRAIN_NEURONS, InterventionAction, ObservationRecord
 from confluence.controllers.base import BaseController, ControllerContext
+from confluence.controllers.immune_prior import apply_immune_secretory_prior
 from confluence.neural_engine.full_brain import FullBrainConfig, FullBrainNetwork
 
 
@@ -38,13 +39,14 @@ class FullBrainController(BaseController):
     def decide(self, observation: ObservationRecord, context: ControllerContext) -> InterventionAction:
         conc_sum = sum(context.concentrations.values())
         u = self.network.step(observation, conc_sum, context.dt)
+        u = apply_immune_secretory_prior(u, self.drug_ids, observation)
         if observation.host_toxicity_warning:
             u = u * 0.45
         return self._action(
             observation.t,
             u,
             source="F",
-            notes="sparse full-brain → protein+drug effectors (simulated)",
+            notes="sparse full-brain → immune + chimeric-protein effectors (simulated)",
         )
 
     def connectome_telemetry(self):
