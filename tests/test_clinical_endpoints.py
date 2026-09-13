@@ -94,10 +94,12 @@ def test_ctcae_h_band_edges():
     assert ctcae_grade_from_H(0.699) == 3
     assert ctcae_grade_from_H(0.45) == 3
     assert ctcae_grade_from_H(0.449) == 4
-    assert ctcae_grade_from_H(0.20) == 4
+    assert ctcae_grade_from_H(0.20) == 4  # point on the G4 band edge
     assert ctcae_grade_from_H(0.199) == 5
     worst = ctcae_like([0.90, 0.55, 0.18, 0.40])
     assert worst["worst_grade"] == 5
+    # Host-death H≤0.2 upgrades the trajectory to G5 (aligned with OS).
+    assert ctcae_like([0.90, 0.20])["worst_grade"] == 5
     assert "H-band surrogate" in worst["label"]
 
 

@@ -1,0 +1,33 @@
+IN SILICO ENDPOINT MAPPING
+computational–clinical translation layer — not a clinical trial
+not FDA/EMA readiness — not a Phase II result — not a cure claim
+
+master_seed=17  solver=LSODA
+n_patients=100  n_trials=400  days=180.0  OS/PFS-mapped virtual event time
+arms=A (MTD), B (Gatenby), E (plastic MB), F-256 proxy (not 166700)
+PPO/C excluded (untrained stub). U is unitless [0,1], not mg/kg.
+
+PART 1 — computational stress
+  stiff agreed=True  rtol=0.001  atol=0.0001
+  measured max abs vs tight LSODA: {'LSODA_rtol0.0001': 1.6104943995065568e-05, 'LSODA_rtol1e-08': 0.0, 'Radau_rtol0.0001': 9.714483949430086e-06, 'Radau_rtol1e-08': 3.855952557252351e-09, 'RK45_rtol0.0001': 3.78669967120715e-05, 'RK45_rtol1e-08': 4.127336361570144e-09}
+  conservation ok=True  preclip_nonneg=True  clip_repairs=0
+  weights plateau=True  sat_at_hard_clip=True  (clip is not called convergence)
+
+PART 2 — mapped endpoints (simulated)
+  RECIST: {'A': {'CR': 0, 'near-CR': 0, 'unconfirmed-CR': 0, 'unconfirmed-near-CR': 0, 'PR': 0, 'unconfirmed-PR': 0, 'SD': 0, 'PD': 100, 'NE': 0}, 'B': {'CR': 0, 'near-CR': 0, 'unconfirmed-CR': 0, 'unconfirmed-near-CR': 0, 'PR': 0, 'unconfirmed-PR': 0, 'SD': 0, 'PD': 100, 'NE': 0}, 'E': {'CR': 0, 'near-CR': 0, 'unconfirmed-CR': 0, 'unconfirmed-near-CR': 0, 'PR': 0, 'unconfirmed-PR': 4, 'SD': 0, 'PD': 96, 'NE': 0}, 'F': {'CR': 0, 'near-CR': 0, 'unconfirmed-CR': 0, 'unconfirmed-near-CR': 0, 'PR': 0, 'unconfirmed-PR': 26, 'SD': 0, 'PD': 74, 'NE': 0}}
+  CTCAE-like H-band: {'A': {'0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 100}, 'B': {'0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 100}, 'E': {'0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 100}, 'F': {'0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 100}}
+  pairwise (computed; CI-includes-1 reported honestly):
+    B_vs_A_os: {'stat': 0.0, 'z': 0.0, 'p': 1.0, 'n_events': 200, 'inconclusive': False, 'method': 'Mantel-Haenszel log-rank'}
+    B_vs_A_cox_os: {'hr': 1.0, 'ci95': [0.7579136195391594, 1.3194115717409043], 'beta': 0.0, 'se': 0.1414213562373095, 'n_events': 200, 'ci_includes_one': True, 'no_demonstrated_difference': True, 'inconclusive': False, 'method': 'univariate Cox PH (Breslow, Newton)'}
+    B_vs_A_pfs: {'stat': 0.0, 'z': 0.0, 'p': 1.0, 'n_events': 200, 'inconclusive': False, 'method': 'Mantel-Haenszel log-rank'}
+    E_vs_A_os: {'stat': 61.53514265245016, 'z': -7.844433864368426, 'p': 4.349110265110926e-15, 'n_events': 199, 'inconclusive': False, 'method': 'Mantel-Haenszel log-rank'}
+    E_vs_A_cox_os: {'hr': 0.3135725845664459, 'ci95': [0.214818946245253, 0.4577238996388275], 'beta': -1.1597244159904996, 'se': 0.19297719394152707, 'n_events': 200, 'ci_includes_one': False, 'no_demonstrated_difference': False, 'inconclusive': False, 'method': 'univariate Cox PH (Breslow, Newton)'}
+    E_vs_A_pfs: {'stat': 178.32894024233684, 'z': 13.353985930887333, 'p': 1.1227670747855215e-40, 'n_events': 200, 'inconclusive': False, 'method': 'Mantel-Haenszel log-rank'}
+    F_vs_A_os: {'stat': 109.73793028254691, 'z': -10.475587347855342, 'p': 1.1184116449720081e-25, 'n_events': 199, 'inconclusive': False, 'method': 'Mantel-Haenszel log-rank'}
+    F_vs_A_cox_os: {'hr': 0.17253994219547494, 'ci95': [0.11027942972612158, 0.26995090314441744], 'beta': -1.7571265203547703, 'se': 0.2283731345052102, 'n_events': 200, 'ci_includes_one': False, 'no_demonstrated_difference': False, 'inconclusive': False, 'method': 'univariate Cox PH (Breslow, Newton)'}
+    F_vs_A_pfs: {'stat': 121.23946356556439, 'z': 11.010879327536216, 'p': 3.3868187328645167e-28, 'n_events': 199, 'inconclusive': False, 'method': 'Mantel-Haenszel log-rank'}
+
+PART 3 — ablation endpoint deltas
+{'frozen_os_event': 0.0, 'frozen_final_burden': -0.0034789186853099174, 'masked_final_burden': 0.024768800654091372, 'zero_ab_final_burden': 0.5908687408132263, 'frozen_min_H': 3.075151148942967e-05, 'zero_ab_min_H': -0.01422441006343314}
+
+In-silico endpoint mapping / computational–clinical translation layer. H-band surrogate / CTCAE-like grades and RECIST 1.1-like labels are simulated mappings from ODE burden and host-health H. Kaplan–Meier / log-rank / Cox are computed on a virtual cohort. This is not a clinical trial, not FDA/EMA readiness, and not a Phase II result. Infusion U is unitless and normalized to [0, 1], not a mg/kg regimen.

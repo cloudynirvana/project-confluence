@@ -179,7 +179,9 @@ def ctcae_like(health: Sequence[float]) -> Dict[str, object]:
         return {"worst_grade": None, "grades": []}
     grades = [ctcae_grade_from_H(v) for v in h]
     worst = int(max(grades))
-    if np.any(h < 0.20):
+    # Band G5 is H<0.20; host-death in the ODE is H≤0.2. Map that event to G5
+    # so OS and grade 5 stay aligned (exact 0.20 is not left as G4).
+    if np.any(h <= 0.2):
         worst = max(worst, 5)
     return {
         "worst_grade": worst,
