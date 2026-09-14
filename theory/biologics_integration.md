@@ -64,3 +64,13 @@ Acquired resistance is defined as the emergence of a new stable attractor outsid
 ## 6. Implementation
 
 See `models/biologic_operator.py` for the full computational implementation including all 6 biologic classes, PK envelopes, synergy tensor, resistance geometry, and Phi-state classifier.
+
+---
+
+## 7. See also — where the complexity should live
+
+Biologics remain **open-loop operators**. They do not close a sensing loop on redox, burden, or clonal composition. The 4–6 dimensional control floor therefore cannot be covered by a smarter ligand alone.
+
+The companion note [`agent_complexity_and_temporal_control.md`](agent_complexity_and_temporal_control.md) argues that the missing complexity should sit in the **dosing schedule** (Controller B, Gatenby adaptive) wrapping a comparatively simple agent — not inside a 5–6 dimensional molecule. In-silico bake-off: resistant takeover **178/200 (89.0%)** under MTD vs **1/200 (0.5%)** under adaptive therapy.
+
+This is the Confluence therapeutic module: biologics as geometric operators, adaptive protocol as the closed-loop controller.
