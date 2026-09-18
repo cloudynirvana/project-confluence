@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "version": "2.0",
+    "note": "sliver of validation/gene_to_parameter_map.json for gate tests only"
+  },
+  "mappings": {
+    "LDHA": {
+      "parameter": "pyruvate_to_lactate",
+      "mutation_effect": 0.10,
+      "amplification_effect": 0.30,
+      "description": "Lactate dehydrogenase A — Warburg effect driver"
+    }
+  }
+}
