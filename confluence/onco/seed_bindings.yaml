@@ -1,0 +1,141 @@
+# v0.1 OnCo → CONFLUENCE bindings
+# Resolve onco_id slugs against https://onco.cc/api/v1 at ingest time.
+# Do not treat this file as a parameter table.
+
+attribution: "Data from OnCo (onco.cc), CC BY-NC 4.0; commercial use needs a licence."
+onco_api: "https://onco.cc/api/v1"
+confluence_state: [T_s, T_r, I_act, I_exh, S_fib, L, O, G, C_tgfb, C_ifng, H, T_f, I_surv, A_ready, awake]
+
+disease:
+  - name: triple-negative breast cancer
+    onco_kind: cancer
+    onco_id_hint: tnbc
+    confluence: {archetype: tnbc_candidate, disease_class: malignant}
+
+targets:
+  - name: LDHA
+    onco_kind: target
+    binds: {annotate: p_lactate, states: [L]}
+  - name: MCT1
+    onco_kind: target
+    onco_id_hint: slc16a1
+    binds: {u_slot: mct1, states: [L]}
+  - name: PD-1
+    onco_kind: target
+    onco_id_hint: pdcd1
+    binds: {u_slot: anti_pd1, states: [I_act, I_exh]}
+  - name: PD-L1
+    onco_kind: target
+    onco_id_hint: cd274
+    binds: {u_slot: anti_pd1, states: [I_act, I_exh]}
+  - name: TGF-β
+    onco_kind: target
+    onco_id_hint: tgfb1
+    binds: {u_slot: tgfb_inhibitor, states: [C_tgfb, S_fib, I_exh]}
+  - name: IFN-γ
+    onco_kind: target
+    onco_id_hint: ifng
+    binds: {u_slot: protein_ifng, states: [C_ifng, I_act]}
+  - name: HDAC
+    onco_kind: target
+    binds: {u_slot: hdac, states: [T_s, T_r]}
+  - name: HIF-1α
+    onco_kind: target
+    onco_id_hint: hif1a
+    binds: {annotate: warburg, states: [O, L]}
+  - name: HK2
+    onco_kind: target
+    binds: {layer: phi_v1, note: "v1 enzyme channel only; not a v2 state"}
+  - name: PKM2
+    onco_kind: target
+    binds: {layer: phi_v1}
+  - name: PDK1
+    onco_kind: target
+    binds: {layer: phi_v1}
+  - name: G6PD
+    onco_kind: target
+    binds: {layer: phi_v1}
+  - name: IDH1
+    onco_kind: target
+    binds: {layer: phi_v1}
+
+u_slots:
+  anti_pd1: {class: checkpoint_antibody, controllers: [A, B, C, D, E, F]}
+  tgfb_inhibitor: {class: tgf_beta_small_molecule, controllers: [A, B, C, D, E, F]}
+  mct1: {class: lactate_transport_inhibitor, controllers: [A, B, C, D, E, F]}
+  hdac: {class: hdac_inhibitor, controllers: [A, B, C, D, E, F]}
+  targeted_kinase: {class: generic_tki, controllers: [A, B, C, D, E, F]}
+  protein_anti_pd1: {class: checkpoint_antibody, controllers: [E, F]}
+  protein_tgfb_trap: {class: tgf_beta_trap, controllers: [E, F]}
+  protein_ifng: {class: cytokine, controllers: [E, F]}
+  protein_il2: {class: cytokine, controllers: [E, F]}
+  protein_chimeric_engager: {class: bite, controllers: [E, F]}
+  protein_surveillance_igg: {class: igg, controllers: [E, F]}
+  protein_fusion_mab: {class: fusion_mab, controllers: [E, F]}
+  tki_imatinib_like: {class: bcr_abl_kit_tki, controllers: [E, F]}
+  tki_alk: {class: alk_ros1_ntrk_tki, controllers: [E, F]}
+
+wired_claims:
+  - id: E-L-switch
+    claim: lactate increases sensitive-to-resistant phenotypic switch
+    states: [L, T_s, T_r]
+    rhs: eps_switch
+    status: wired
+    evidence_level: concept
+  - id: E-L-exh
+    claim: lactate increases immune exhaustion drive
+    states: [L, I_exh]
+    rhs: gamma_exh
+    status: wired
+    evidence_level: concept
+  - id: E-O-warburg
+    claim: hypoxia increases lactate production per tumour burden
+    states: [O, L]
+    rhs: warburg
+    status: wired
+    evidence_level: concept
+  - id: E-MCT1-clear
+    claim: MCT1 occupancy increases lactate clearance
+    states: [L]
+    intervention_slot: mct1
+    rhs: cl_lactate
+    status: wired
+    evidence_level: cell_line
+  - id: E-TGFB-stroma
+    claim: TGF-β drives fibrotic stroma
+    states: [C_tgfb, S_fib]
+    rhs: sigma_stroma
+    status: wired
+    evidence_level: concept
+  - id: E-stroma-shield
+    claim: stroma attenuates immune kill
+    states: [S_fib, I_act, T_s, T_r, T_f]
+    rhs: stroma_shield
+    status: wired
+    evidence_level: concept
+  - id: E-PD1-exh
+    claim: PD-1 occupancy reduction lowers exhaustion drive
+    states: [I_exh]
+    intervention_slot: anti_pd1
+    rhs: gamma_exh
+    status: wired
+    evidence_level: clinical
+  - id: E-IFNG-kill
+    claim: IFN-γ increases immune kill
+    states: [C_ifng, I_act]
+    rhs: ifng_boost
+    status: wired
+    evidence_level: concept
+  - id: E-HDAC-switch
+    claim: HDAC occupancy reduces phenotypic switch
+    states: [T_s, T_r]
+    intervention_slot: hdac
+    rhs: eps_switch
+    status: wired
+    evidence_level: concept
+  - id: E-H-tox
+    claim: drug occupancy loads host health downward
+    states: [H]
+    rhs: kappa_tox
+    status: wired
+    evidence_level: concept
