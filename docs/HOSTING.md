@@ -11,7 +11,7 @@ There are **three deployables**. Do not collapse the interactive sim onto Vercel
 | Deployable | Where | What it is |
 |------------|--------|------------|
 | Clinical briefing | **Vercel** (static) | 60-second mentor page. **Root Directory `clinical`** (production public face). |
-| Lab reel (optional) | **Vercel** (static, second project) | Flybody / cinematic HUD. Root Directory `evidence`. |
+| Lab reel + thesis evidence | **Vercel** (static + one serverless function) | Flybody / cinematic HUD, thinking lab, thesis evidence auditor. Root Directory `evidence`. |
 | Interactive sim | **Railway or Fly.io** (container / dyno) | Long-lived FastAPI + WebSockets. |
 
 The interactive session is `uvicorn confluence.telemetry.websocket_server:app`.
@@ -35,14 +35,26 @@ Dashboard (import this GitHub repo — no secrets):
 
 There is no in-repo Vercel preview URL until the owner connects the GitHub app and deploys. The first production URL will look like `https://confluence-clinical.vercel.app`.
 
-Optional cinematic **lab reel** (flybody / HUD): deploy a **second** project with Root Directory `evidence`. One-click: [Deploy lab reel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcloudynirvana%2Fproject-confluence&root-directory=evidence&project-name=confluence-evidence). `evidence/vercel.json` already sets `framework: null` and `outputDirectory: "."`.
+### Optional lab reel + thesis evidence (Root Directory `evidence`)
+
+Deploy a **second** project with Root Directory `evidence`. One-click: [Deploy lab reel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcloudynirvana%2Fproject-confluence&root-directory=evidence&project-name=confluence-evidence). `evidence/vercel.json` already sets `framework: null` and `outputDirectory: "."`.
+
+Static routes on that project:
+
+- `/` — cinematic lab reel
+- `/thinking` — disease-specific thinking lab
+- `/thesis` — thesis evidence page + ledger
+- `POST /api/grok-review` — server-side Grok auditor (`evidence/api/grok-review.js`)
+
+**Environment variable (evidence project only):** set `XAI_API_KEY` in the Vercel dashboard for Preview and Production. The key must never be committed, pasted into HTML, or shipped in client JavaScript. Without it, `/thesis` still renders; Audit returns HTTP 503 with a visible hint.
 
 Local preview:
 
 ```bash
 cd clinical && python -m http.server 4173
-# from repo root, optional lab reel:
+# from repo root, optional lab reel / thesis:
 cd evidence && python -m http.server 4174
+# Grok auditor requires `vercel dev` (or equivalent) plus XAI_API_KEY
 ```
 
 If you later add a “Try the live sim” button, point it at the Railway/Fly
@@ -110,7 +122,7 @@ of the build context so the default image stays small.
 
 ## Environment variables
 
-None are secrets. Do not put tokens in the repo.
+Do not put tokens in the repo.
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
@@ -119,6 +131,7 @@ None are secrets. Do not put tokens in the repo.
 | `CONFLUENCE_SKIP_WARMUP` | unset | Set `1` to skip building a session on process start (faster boot; first WebSocket constructs the loop). |
 | `MUJOCO_GL` | `osmesa` | Only relevant for the optional `mesh` image. |
 | `CONFLUENCE_PPO_CKPT` | unset | Optional torch checkpoint for controller C. Not needed for the demo. |
+| `XAI_API_KEY` | unset | **Evidence Vercel project only.** Server-side Grok auditor at `POST /api/grok-review`. Never expose to the browser. |
 
 No `CAVE_TOKEN` / `FLYWIRE_TOKEN` is required. The connectome stays on the
 structured stub unless you add credentials yourself (keep them in the host’s
@@ -155,6 +168,7 @@ Any hosted sim page already says “research · not clinical” in the HUD. Stil
   clinical briefing (already linked), the optional evidence lab reel, and the
   repo README.
 - Simulated burden / resistance / protein channels remain ODE research scores.
+- The thesis auditor classifies claims. It does not prescribe treatment.
 
 ## Local equivalent (no container)
 
