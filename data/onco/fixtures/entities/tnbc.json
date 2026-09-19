@@ -1,0 +1,10 @@
+{
+  "id": "tnbc",
+  "kind": "cancer",
+  "name": "Triple-negative breast cancer",
+  "tldr": "Breast cancer lacking ER, PR and HER2.",
+  "asOf": "2026-09-18",
+  "route": "/cancers/tnbc",
+  "targets": ["ldha", "pdcd1", "tgfb1"],
+  "links": ["https://onco.cc/cancers/tnbc"]
+}

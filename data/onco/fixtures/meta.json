@@ -1,0 +1,12 @@
+{
+  "buildDate": "2026-09-18",
+  "version": "fixture-0.1",
+  "counts": {
+    "cancers": 140,
+    "targets": 162,
+    "drugs": 1023,
+    "bottlenecks": 45,
+    "ideas": 1139
+  },
+  "attribution": "Data from OnCo (onco.cc), CC BY-NC 4.0; commercial use needs a licence."
+}

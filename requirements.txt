@@ -39,6 +39,7 @@ biopython>=1.83        # PDB/mmCIF parsing for AlphaFold structures
 pydantic>=2.0
 fastapi>=0.110
 uvicorn[standard]>=0.27
+PyYAML>=6.0            # OnCo seed bindings (adapter is read-only)
 
 # Testing
 pytest>=7.0.0

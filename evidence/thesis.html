@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CONFLUENCE thesis evidence — gated dynamical oncology modelling</title>
+  <meta name="description" content="Evidence-gated dynamical framework for oncology knowledge. Research only. Not a medical device." />
+  <link rel="stylesheet" href="thesis.css" />
+</head>
+<body>
+  <div class="stamp">Research evidence interface — not a medical device, not a cure claim, not a protocol</div>
+  <nav class="nav" aria-label="Primary">
+    <a class="wordmark" href="./">Confluence</a>
+    <div>
+      <a href="thinking.html">Thinking lab</a>
+      <a href="thesis.html" aria-current="page">Thesis evidence</a>
+      <a href="disclaimer.html">Disclaimer</a>
+      <a href="https://github.com/cloudynirvana/project-confluence/pull/9">PR #9</a>
+    </div>
+  </nav>
+  <article class="doc">
+    <p class="kicker">Working thesis chapter · 19 September 2026 · computational research</p>
+    <h1>CONFLUENCE: An Evidence-Gated Dynamical Framework for Integrating Oncology Knowledge, Molecular Observations and Adaptive Cancer-State Modeling</h1>
+    <p class="meta">Branch <code>feat/onco-adapter-p0</code> · <a href="https://github.com/cloudynirvana/project-confluence/pull/9">PR #9</a>. Page date 19 September 2026. Statistics keep their original estimate year.</p>
+    <div class="warn"><strong>Scope (Gate 0).</strong> CONFLUENCE is a computational research framework. Current results are computational unless an external experiment is cited. Not a clinical decision-support system. Not a universal cure. Simulated trajectories are not patient outcomes.</div>
+    <h2>Abstract</h2>
+    <p>Cancer research now produces knowledge graphs, multi-omic assays and dynamical simulators in parallel. The failure mode is collapsing those layers. This study asks whether a provenance-controlled pipeline can keep the layers apart while still allowing testable predictions. Scientific success is a staged chain — traceability, mathematical validity, identifiability, out-of-sample prediction, experimental falsification — not disease eradication. PR #9 is architectural evidence for the gates, not therapeutic efficacy.</p>
+    <h2>Why the study is necessary</h2>
+    <p>GLOBOCAN 2024 estimates, published 2026: about 20.6 million diagnoses and 9.8 million deaths (<a href="#EVID-001">EVID-001</a>). Breast cancer about 2.43 million new cases (<a href="#EVID-002">EVID-002</a>). WHO: many cancers can be cured if found early and treated well; access is uneven (<a href="#EVID-003">EVID-003</a>). Nigeria GLOBOCAN <em>2022</em> profile: 127,763 new cases, 79,542 deaths, breast 32,278 — 2022 estimates, not 2026 incidence (<a href="#EVID-004">EVID-004</a>).</p>
+    <p>Tumours evolve and adapt under therapy (<a href="#EVID-006">EVID-006</a>). Multi-omics increase resolution without automatically producing a causal model. Mathematical oncology supplies in-silico laboratories (<a href="#EVID-007">EVID-007</a>). Adaptive therapy treats treatment as a process under selection (<a href="#EVID-008">EVID-008</a>). The gap is connecting knowledge to dynamical hypotheses without dropping provenance.</p>
+    <h2>Evidence for the problem</h2>
+    <p>TNBC is a test case because NCI describes it as roughly 15% of breast cancers, typically faster-growing and more recurrent, and heterogeneous (<a href="#EVID-005">EVID-005</a>). That is not a CONFLUENCE parameter. This branch adds a read-only OnCo adapter with nine tests that refuse knowledge-as-parameter and do not edit CancerODE (<a href="#EVID-009">EVID-009</a>).</p>
+    <p class="neq">Knowledge ≠ Evidence ≠ Causal mechanism ≠ Parameter ≠ Prediction</p>
+    <p class="neq">legacy gene→parameter map ≠ identified parameter · structured representation ≠ biological observation</p>
+    <h2>Problem statement</h2>
+    <p>How can heterogeneous oncology knowledge and molecular observations be incorporated into a cancer dynamical model without collapsing evidence, mechanism, parameterisation and prediction into unsupported assumptions?</p>
+<pre class="ladder">Knowledge → Evidence → Hypothesis → Mechanism → Parameter → Prediction → Experiment → New evidence</pre>
+    <p>Every arrow is a failure point. A page may motivate a hypothesis; it must not become Theta.</p>
+    <h2>Significance of the study</h2>
+    <h3>Scientific</h3><p>Treat cancer as dynamic and adaptive rather than as independent targets (<a href="#EVID-006">EVID-006</a>).</p>
+    <h3>Methodological</h3><p>Evidence gates. OnCo confidence is not P(H). Idea maturity is not evidence level. Failed hypotheses stay visible.</p>
+    <h3>Computational</h3><p>Auditable objects. PR #9 is the current artifact (<a href="#EVID-009">EVID-009</a>).</p>
+    <h3>Translational potential — not demonstrated benefit</h3><p>Models can compare hypotheses before a wet experiment. This page does not claim patient benefit. Translation waits for Gates 6–8.</p>
+    <h3>Future research</h3><p>Attach genomic, single-cell, spatial, PK/PD and controllers around a frozen biological model.</p>
+    <h2>CONFLUENCE evidence architecture</h2>
+<pre class="arch">Oncology knowledge (OnCo, literature)
+        ↓ read-only adapter
+Evidence objects → genomic / molecular observation → cellular state
+        ↓
+Population dynamics — frozen confluence_v2_15d → controller → prediction → experiment → evidence</pre>
+    <p>Lineages frozen: tnbc_mod_3s (ROS audit pending), confluence_report_6s (paper), confluence_v2_15d (live ODE), confluence_v1_calibrator (legacy map, assumed / unidentified).</p>
+    <h2>Success protocol</h2>
+    <p>Not a universal cure. Sequential and falsifiable:</p>
+    <div class="gates">
+      <div class="gate"><b>Gate 0</b><span>Research-only scope.</span></div>
+      <div class="gate"><b>Gate 1</b><span>Provenance: source, URI, date, population.</span></div>
+      <div class="gate"><b>Gate 2</b><span>Evidence class named.</span></div>
+      <div class="gate"><b>Gate 3</b><span>Mechanism: intervention, state, sign, context, falsifier.</span></div>
+      <div class="gate"><b>Gate 4</b><span>Parameter: model id, symbol, units, estimator, uncertainty, identifiability. Unidentified ≠ established.</span></div>
+      <div class="gate"><b>Gate 5</b><span>Prediction labelled as computational.</span></div>
+      <div class="gate"><b>Gate 6</b><span>Held-out / external / baseline validation.</span></div>
+      <div class="gate"><b>Gate 7</b><span>An experiment that could show the prediction is wrong.</span></div>
+      <div class="gate"><b>Gate 8</b><span>Translation only after biological and clinical validation this repository does not claim.</span></div>
+    </div>
+    <p class="meta">Traceability → mathematical validity → identifiability → out-of-sample prediction → experimental falsification.</p>
+    <h3>Three-arm programme — hypotheses, not results</h3>
+    <p>validation/validation_protocol.md states H0 versus H1. Thresholds such as r > 0.5 are protocol criteria, not findings (<a href="#EVID-010">EVID-010</a>).</p>
+    <div class="arms">
+      <div class="arm"><div class="tag">Arm 1 · planned / ongoing hypothesis</div><h3>Separate validation</h3><p>Cancer and metabolic systems independently.</p></div>
+      <div class="arm"><div class="tag">Arm 2 · planned / ongoing hypothesis</div><h3>Conjoined validation</h3><p>Coupled versus independent models on comorbidity data.</p></div>
+      <div class="arm"><div class="tag">Arm 3 · planned / ongoing hypothesis</div><h3>Universality test</h3><p>Whether ΔΦ distributions match after labels are stripped — against nulls.</p></div>
+    </div>
+    <h2>Evidence ledger</h2>
+    <p class="meta">Each row keeps year and population. Audit is server-side; the API key never enters this page.</p>
+    <div id="ledger">Loading claims.json…</div>
+    <h2>Grok Evidence Auditor</h2>
+    <div class="box" id="auditor-box">
+      <p>Grok output is an <strong>evidence-audit aid</strong>. Not a truth score, not a parameter estimator, not expert review.</p>
+      <label for="custom-claim">Paste or edit a claim</label>
+      <textarea id="custom-claim">LDHA expression can be entered as the CONFLUENCE v2 parameter p_lactate because OnCo lists LDHA as a lactate-metabolism target.</textarea>
+      <p><button class="audit" type="button" id="audit-custom">Audit this claim</button></p>
+      <div id="custom-out"></div>
+    </div>
+    <h2>Limitations and falsifiers</h2>
+    <ul>
+      <li>No new wet-lab measurement on this page.</li>
+      <li>PR #9 does not identify p_lactate or any other Theta.</li>
+      <li>The 3-state ROS notebook remains unaudited.</li>
+      <li>The three-arm protocol can fail; that would still be a result.</li>
+      <li>OnCo counts move with buildDate.</li>
+      <li>Grok may miss sources; insufficient is preferred to invented citations.</li>
+      <li>Nigeria 2022 estimates are setting context only.</li>
+    </ul>
+    <h2>References</h2>
+    <ol class="refs">
+      <li>Sung H et al. Global cancer statistics 2024. <em>CA Cancer J Clin</em>. 2026. <a href="https://doi.org/10.3322/caac.70090">doi:10.3322/caac.70090</a></li>
+      <li>IARC. GLOBOCAN 2024 news. 8 July 2026. <a href="https://www.iarc.who.int/news-events/global-cancer-statistics-2024-globocan-estimates-of-incidence-and-mortality-worldwide-for-34-cancers-in-186-countries/">iarc.who.int</a></li>
+      <li>WHO. Cancer fact sheet. 2026. <a href="https://www.who.int/news-room/fact-sheets/detail/cancer">who.int</a></li>
+      <li>WHO. Global status report on cancer 2026. <a href="https://www.who.int/publications/i/item/9789240123977">9789240123977</a></li>
+      <li>IARC. Nigeria fact sheet (GLOBOCAN 2022). <a href="https://gco.iarc.who.int/media/globocan/factsheets/populations/566-nigeria-fact-sheet.pdf">gco.iarc.who.int</a></li>
+      <li>NCI. Triple-negative breast cancer. <a href="https://www.cancer.gov/types/breast/patient/triple-negative-brochure">cancer.gov</a></li>
+      <li>NCI. Tumour heterogeneity. <a href="https://www.cancer.gov/about-nci/organization/dcb/research-programs/tumor-heterogeneity">cancer.gov</a></li>
+      <li>Altrock PM, Liu LL, Michor F. The mathematics of cancer. <em>Nat Rev Cancer</em>. 2015. <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5663316/">PMC5663316</a></li>
+      <li>Gatenby RA et al. Adaptive therapy. <em>Cancer Res</em>. 2009. <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2676449/">PMC2676449</a></li>
+      <li>Gomila J et al. OnCo. <a href="https://onco.cc">onco.cc</a></li>
+      <li>Ogbonna K. Project Confluence PR #9. <a href="https://github.com/cloudynirvana/project-confluence/pull/9">pull/9</a></li>
+      <li>Validation protocol. <a href="https://github.com/cloudynirvana/project-confluence/blob/feat/onco-adapter-p0/validation/validation_protocol.md">validation_protocol.md</a></li>
+    </ol>
+    <p class="meta">OnCo data CC BY-NC 4.0 where cited. Not medical advice.</p>
+  </article>
+  <footer class="site">CONFLUENCE thesis evidence · feat/onco-adapter-p0 · research only</footer>
+  <script src="thesis.js"></script>
+</body>
+</html>

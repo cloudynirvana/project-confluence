@@ -1,0 +1,13 @@
+{
+  "id": "ldha",
+  "kind": "target",
+  "name": "LDHA",
+  "aka": ["lactate dehydrogenase A"],
+  "tldr": "Enzyme that converts pyruvate to lactate in glycolytic tumours.",
+  "summary": "Fixture only. Replace with live OnCo entity at ingest.",
+  "asOf": "2026-09-18",
+  "route": "/targets/ldha",
+  "cancers": ["tnbc"],
+  "drugs": [],
+  "links": ["https://onco.cc/targets/ldha"]
+}
