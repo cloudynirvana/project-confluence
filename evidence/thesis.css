@@ -1,0 +1,78 @@
+:root {
+  --bg: #f6f3ec;
+  --paper: #fffcf6;
+  --ink: #1b1a17;
+  --muted: #5c574e;
+  --line: #d9d1c3;
+  --navy: #1b3a4b;
+  --gold: #8a6a2f;
+  --rose: #8a3a32;
+  --teal: #1f6f66;
+  --max: 820px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 18px/1.6 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+a { color: var(--teal); }
+.stamp {
+  position: sticky; top: 0; z-index: 20; text-align: center;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  font: 700 11px/1.3 ui-sans-serif, system-ui, sans-serif;
+  color: #1a1208; background: #d4a054; padding: 8px 12px;
+}
+.nav {
+  display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  max-width: 960px; margin: 0 auto; padding: 16px 22px;
+  font: 12px/1.2 ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+.nav a { color: var(--muted); text-decoration: none; }
+.nav a:hover, .nav a[aria-current="page"] { color: var(--navy); }
+.wordmark { color: var(--navy); font-weight: 700; text-decoration: none; }
+.doc { max-width: var(--max); margin: 0 auto; padding: 12px 22px 80px; }
+.kicker {
+  font: 12px/1.3 ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold);
+}
+h1 { font-size: clamp(1.7rem, 4vw, 2.35rem); font-weight: 600; color: var(--navy); line-height: 1.25; }
+h2 { font-size: 1.35rem; color: var(--navy); margin: 2.2rem 0 0.6rem; border-bottom: 1px solid var(--line); padding-bottom: 0.3rem; }
+h3 { font-size: 1.05rem; margin: 1.4rem 0 0.4rem; }
+.meta { font: 14px/1.5 ui-sans-serif, system-ui, sans-serif; color: var(--muted); }
+.box, .warn, .claim {
+  background: var(--paper); border: 1px solid var(--line); padding: 14px 16px; margin: 12px 0 18px;
+}
+.warn { border-color: #c9a29c; background: #f8eeeb; }
+.neq { font: 15px/1.5 ui-sans-serif, system-ui, sans-serif; color: var(--rose); }
+.ladder, .arch {
+  font: 14px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: #1b1a17; color: #f3eee4; padding: 16px 18px; overflow-x: auto;
+}
+.gates { display: grid; gap: 8px; }
+.gate { display: grid; grid-template-columns: 90px 1fr; gap: 10px; border: 1px solid var(--line); padding: 10px 12px; background: var(--paper); }
+.gate b { font: 11px/1.2 ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); }
+.arms { display: grid; gap: 10px; }
+@media (min-width: 720px) { .arms { grid-template-columns: 1fr 1fr 1fr; } }
+.arm { border: 1px dashed var(--line); padding: 12px; background: var(--paper); }
+.arm .tag { font: 11px ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); }
+.claim h3 { margin-top: 0; }
+.claim .src { font-size: 0.92rem; }
+button.audit {
+  font: 12px ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.1em; text-transform: uppercase;
+  border: 1px solid var(--navy); background: var(--navy); color: #fff; padding: 8px 12px; cursor: pointer;
+}
+button.audit:disabled { opacity: 0.5; cursor: wait; }
+.audit-out { font-size: 0.95rem; margin-top: 10px; }
+.audit-out.supported { border-left: 3px solid var(--teal); padding-left: 10px; }
+.audit-out.partially_supported { border-left: 3px solid var(--gold); padding-left: 10px; }
+.audit-out.insufficient, .audit-out.contradicted { border-left: 3px solid var(--rose); padding-left: 10px; }
+.refs { font-size: 0.95rem; }
+.refs li { margin: 0 0 8px; }
+footer.site { border-top: 1px solid var(--line); padding: 22px; text-align: center; color: var(--muted); font: 12px ui-sans-serif, system-ui, sans-serif; }
+#auditor-box textarea {
+  width: 100%; min-height: 90px; font: inherit; padding: 10px; border: 1px solid var(--line); background: #fff;
+}
