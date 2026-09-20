@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!--
+    Fragment for Thesis #3. No evidence/sitemap.xml existed on main when
+    this file was added; see docs/SCHOLAR_THESIS_03.md. Replace the
+    github.com loc values with the evidence-site origin after that
+    Vercel project has a stable public URL.
+  -->
+  <url>
+    <loc>https://github.com/cloudynirvana/project-confluence/blob/main/evidence/thesis-03.html</loc>
+    <lastmod>2026-09-20</lastmod>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://raw.githubusercontent.com/cloudynirvana/project-confluence/main/docs/manuscript/thesis_03_disease_profile_method.pdf</loc>
+    <lastmod>2026-09-20</lastmod>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://github.com/cloudynirvana/project-confluence/blob/main/docs/manuscript/thesis_03_disease_profile_method.md</loc>
+    <lastmod>2026-09-20</lastmod>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://raw.githubusercontent.com/cloudynirvana/project-confluence/main/evidence/papers/thesis_03_disease_profile_method.pdf</loc>
+    <lastmod>2026-09-20</lastmod>
+    <changefreq>monthly</changefreq>
+  </url>
+</urlset>

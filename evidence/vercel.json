@@ -32,6 +32,7 @@
     { "source": "/disclaimer", "destination": "/disclaimer.html" },
     { "source": "/awaiting-clinical-validation", "destination": "/awaiting-clinical-validation.html" },
     { "source": "/thinking", "destination": "/thinking.html" },
-    { "source": "/thesis", "destination": "/thesis.html" }
+    { "source": "/thesis", "destination": "/thesis.html" },
+    { "source": "/thesis-03", "destination": "/thesis-03.html" }
   ]
 }

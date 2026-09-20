@@ -29,6 +29,11 @@ Dashboard:
 
 See the README section **Deploy the clinical briefing to Vercel** and [docs/HOSTING.md](../docs/HOSTING.md) for Railway / Fly.
 
+Thesis #3 scholar landing (Highwire `citation_*` meta + PDF) is
+[`thesis-03.html`](thesis-03.html) / `/thesis-03`, with a sitemap fragment at
+[`sitemap-thesis03.xml`](sitemap-thesis03.xml). See
+[`docs/SCHOLAR_THESIS_03.md`](../docs/SCHOLAR_THESIS_03.md).
+
 ## Local preview
 
 ```bash

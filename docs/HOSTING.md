@@ -45,7 +45,8 @@ Static routes on that project:
 - `/thinking` — disease-specific thinking lab (not a Scholar article URL)
 - `/thesis` — thesis evidence page + ledger (Highwire `citation_*` tags)
 - `/thesis.pdf` — citeable thesis PDF (same directory as `/thesis`; `Content-Type: application/pdf`)
-- `/robots.txt`, `/sitemap.xml` — allow Googlebot / Googlebot-Scholar on `/thesis` and `/thesis.pdf`
+- `/thesis-03` — Thesis #3 Disease Profile method paper (Highwire landing + PDF)
+- `/robots.txt`, `/sitemap.xml` — allow Googlebot / Googlebot-Scholar on `/thesis`, `/thesis.pdf`, and `/thesis-03`
 - `GET`/`POST /api/grok-review` — server-side Grok auditor (`evidence/api/grok-review.js`)
 
 Scholar owner checklist: [SCHOLAR_INDEXING.md](SCHOLAR_INDEXING.md).
