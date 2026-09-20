@@ -37,7 +37,8 @@ jobs:
             tests/test_blender_export.py \
             tests/test_merge_readiness.py \
             tests/test_deployables.py \
-            tests/test_scholar_indexing.py
+            tests/test_scholar_indexing.py \
+            tests/test_thesis_bibliography.py
         env:
           MUJOCO_GL: osmesa
 # flybody / 166k jobs stay skipif unless extras + CONFLUENCE_FULL_BRAIN=1

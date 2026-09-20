@@ -43,13 +43,15 @@ GITHUB = "https://github.com/cloudynirvana/project-confluence"
 
 ABSTRACT = (
     "Cancer research now produces knowledge graphs, multi-omic assays and "
-    "dynamical simulators in parallel. The failure mode is collapsing those "
-    "layers. This study asks whether a provenance-controlled pipeline can keep "
-    "the layers apart while still allowing testable predictions. Scientific "
+    "dynamical simulators in parallel [10,53,61]. The failure mode is collapsing "
+    "those layers. This study asks whether a provenance-controlled pipeline can "
+    "keep the layers apart while still allowing testable predictions. Scientific "
     "success is a staged chain — traceability, mathematical validity, "
     "identifiability, out-of-sample prediction, experimental falsification — "
-    "not disease eradication. PR #9 is architectural evidence for the gates, "
-    "not therapeutic efficacy."
+    "not disease eradication [43-52]. PR #9 is architectural evidence for the "
+    "gates, not therapeutic efficacy [11,56]. GLOBOCAN 2024 estimates, published "
+    "2026, report about 20.6 million diagnoses and 9.8 million deaths; that "
+    "statistic is context, not a CONFLUENCE parameter [1,2,64]."
 )
 
 DISCLAIMER = (
@@ -299,7 +301,7 @@ def parse_manuscript(raw: str) -> list[tuple[str, str]]:
                 continue
             blocks.append(("p", " — ".join(cells)))
             continue
-        if stripped in {"---", "***"}:
+        if stripped in {"---", "***"} or stripped.startswith("<!--"):
             flush()
             continue
         if not stripped:

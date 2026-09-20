@@ -12,7 +12,9 @@ claim of cure, diagnosis, or dosing. See [DISCLAIMER.md](../DISCLAIMER.md).
    numbered Vancouver citations [1] matching its reference list.
 2. **Do not fabricate DOIs.** Include a DOI only when it is verified
    (publisher, Crossref, or the issuing agency). Prefer a stable URL
-   (PMC, WHO, IARC, NCI, GitHub) when no DOI is on hand.
+   (PMC, WHO, IARC, NCI, GitHub) when no DOI is on hand. Thesis #1
+   Vancouver form, DOI verification, and software-citation pattern:
+   [CITATION_STYLE.md](CITATION_STYLE.md).
 3. **OnCo attribution.** OnCo data is CC BY-NC 4.0. Any OnCo-derived
    sentence keeps the line: *Data from OnCo (onco.cc), CC BY-NC 4.0;
    commercial use needs a licence.* Adapter code in this repository is MIT;
@@ -28,7 +30,8 @@ claim of cure, diagnosis, or dosing. See [DISCLAIMER.md](../DISCLAIMER.md).
 ## Where this applies
 
 - `docs/manuscript/ONCO_CONFLUENCE_THESIS_FINDINGS.md`
-- `evidence/thesis.html` and `evidence/claims.json`
+- `docs/manuscript/thesis_01_confluence_onco.md`
+- `evidence/thesis.html`, `evidence/thesis.pdf`, and `evidence/claims.json`
 - Disease Profile JSON from the thinking lab
 - `data/profiles/cases/` research case pack
 - README / HOSTING copy that restates burden statistics
