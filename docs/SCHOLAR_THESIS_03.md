@@ -38,13 +38,15 @@ Created `evidence/sitemap-thesis03.xml` instead of inventing a full-site sitemap
 If a general evidence sitemap is added later, merge these four `<url>` entries into it
 and point `loc` at the deployed Vercel origin (Root Directory `evidence`).
 
-## Independence
+## Independence / sit on latest main
 
+- [x] Branched / rebased onto `main` at `64ba76b` (PR #11 merged)
 - [x] No `CancerODE` / `ode_system.py` edits
-- [x] Manuscript is self-contained if pull request #11 (exporter) stays dirty
-- [x] Schema described as proposed contract `1.0.0`
+- [x] Cites shipped paths: `confluence/profiles/`, `data/profiles/cases/`, `schemas/disease_profile.schema.json`
+- [x] Does **not** propose a parallel schema contract
+- [x] Distinguishes `confluence.profiles.HypothesisObject` from `confluence.onco.schemas.HypothesisObject`
 - [x] CaseCards and P0 cited as repository documents / pull requests — no fabricated outcomes
-- [x] Worked examples are qualitative boards, not simulated patient benefit
+- [x] Worked examples are qualitative boards that point at pack JSON, not simulated patient benefit
 - [x] Disclaimer states: not personalized medicine as a clinical product
 
 ## Citation hygiene
@@ -65,7 +67,7 @@ Requires Google Chrome (`google-chrome --headless=new`). The script overwrites b
 
 ## Word count
 
-**9,554 words** in `docs/manuscript/thesis_03_disease_profile_method.md` (20 September 2026 render). PDF is 27 pages.
+**9,933 words** in `docs/manuscript/thesis_03_disease_profile_method.md` (20 September 2026, rebased onto `64ba76b`). PDF is 24 pages.
 
 Count the markdown source (abstract through disclaimer), not this checklist.
 

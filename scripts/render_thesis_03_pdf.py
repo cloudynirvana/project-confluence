@@ -204,7 +204,12 @@ def chrome_pdf(html_path: Path, pdf_path: Path) -> None:
         f"--print-to-pdf={pdf_path}",
         html_path.resolve().as_uri(),
     ]
-    subprocess.run(cmd, check=True, cwd=str(REPO), timeout=120)
+    try:
+        subprocess.run(cmd, check=True, cwd=str(REPO), timeout=45)
+    except subprocess.TimeoutExpired:
+        if not pdf_path.is_file() or pdf_path.stat().st_size < 1000:
+            raise
+        # Chrome sometimes hangs after writing the PDF.
 
 
 def main() -> None:

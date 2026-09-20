@@ -5,7 +5,7 @@
 **Affiliation:** Project Confluence (computational research)  
 **Date:** 20 September 2026  
 **Document type:** Thesis-format method paper (research / in-silico only)  
-**Status:** Specification of a research object and a gated export method. Not a clinical result. Not a patient-level product.  
+**Status:** Method paper on the shipped Disease Profile research object (`confluence/profiles/`, `data/profiles/cases/`, `schemas/disease_profile.schema.json` on `main` at `64ba76b`). Not a clinical result. Not a patient-level product.  
 **Citation style:** numbered Vancouver references matching the reference list.
 
 ---
@@ -20,11 +20,11 @@ Admission is gated. The invariant is
 
 > Knowledge ≠ Evidence ≠ Mechanism ≠ Parameter ≠ Prediction.
 
-No arrow may skip a box. OnCo knowledge records, OnCo `confidence.probability`, OnCo Idea maturity, and the legacy CONFLUENCE gene-to-parameter map must not enter the parameter vector Θ of any frozen model lineage. Profiles feed `HypothesisObject` records that name a public dataset, a required experimental rung, and a falsifier. They do not write coefficients.
+No arrow may skip a box. OnCo knowledge records, OnCo `confidence.probability`, OnCo Idea maturity, and the legacy CONFLUENCE gene-to-parameter map must not enter the parameter vector Θ of any frozen model lineage. Profiles feed `confluence.profiles.HypothesisObject` records that name a public dataset and a falsifier. They do not write coefficients.
 
-The method is situated against two already-specified artefacts and does not invent outcomes for them. CONFLUENCE pull request #9 shipped a read-only OnCo adapter (P0) that annotates slots and refuses knowledge-as-parameter without editing `CancerODE`. Complexity Science CaseCards (companion repository, draft CaseCard schema and seed pack) are YAML research templates for the same four complex pathologies, with qualitative Nigeria Standard Treatment Guidelines (NSTG) constraints that must never become numeric scales. A Disease Profile is the CONFLUENCE-side, thinking-lab-native research object; a CaseCard is the Complexity Science-side, contributor-native research object. Both refuse the same skip-level promotion.
+The method is situated against artefacts that now exist on `main` and does not invent outcomes for them. CONFLUENCE pull request #9 shipped a read-only OnCo adapter (P0) that annotates slots and refuses knowledge-as-parameter without editing `CancerODE`. Pull request #11 merged the Disease Profile exporter, JSON Schema `1.0.0`, a four-disease case pack under `data/profiles/cases/`, and a distinct profile-layer `HypothesisObject` (`64ba76b`). Complexity Science CaseCards (companion repository, draft CaseCard schema and seed pack) remain YAML research templates for the same four complex pathologies, with qualitative Nigeria Standard Treatment Guidelines (NSTG) constraints that must never become numeric scales. A Disease Profile is the CONFLUENCE-side, thinking-lab-native research object; a CaseCard is the Complexity Science-side, contributor-native research object. Both refuse the same skip-level promotion.
 
-Worked examples in this manuscript are **qualitative boards**, not simulated patient benefit and not virtual-cohort efficacy. The discussion treats efficiency as a research-operations question: how cheaply a laboratory can add a new complex disease without opening the ODE, without smuggling knowledge into Θ, and without converting a chart into a prescription. Limitations are stated as method limits, not as missing clinical performance. Future work is staged: freeze the profile contract, bind named public datasets, keep P0 read-only, and leave translation behind a gate this repository does not claim to have passed.
+Worked examples in this manuscript are **qualitative boards** that cite the shipped case-pack JSON. They are not simulated patient benefit and not virtual-cohort efficacy. The discussion treats efficiency as a research-operations question: how cheaply a laboratory can add a new complex disease without opening the ODE, without smuggling knowledge into Θ, and without converting a chart into a prescription. Limitations are stated as method limits, not as missing clinical performance. Future work is staged: keep the in-repo contract honest, bind named public datasets, keep P0 read-only, and leave translation behind a gate this repository does not claim to have passed.
 
 **This document is not personalized medicine as a clinical product.**
 
@@ -57,7 +57,7 @@ Each of those diseases has a public, cited knowledge graph entry on OnCo [27–2
 
 ### 1.3 Research objects, not charts
 
-Scientific reuse needs objects that travel: identified, versioned, cited, and honest about what they are not. The FAIR guiding principles ask that research artefacts be findable, accessible, interoperable, and reusable [34]. Workflow-centric research objects were proposed for the same reason — a paper plus a dump of files is not a laboratory memory [35]. A Disease Profile is proposed in that spirit. It is closer to a methods object than to a medical record.
+Scientific reuse needs objects that travel: identified, versioned, cited, and honest about what they are not. The FAIR guiding principles ask that research artefacts be findable, accessible, interoperable, and reusable [34]. Workflow-centric research objects were proposed for the same reason — a paper plus a dump of files is not a laboratory memory [35]. A Disease Profile is built in that spirit. It is closer to a methods object than to a medical record.
 
 A patient chart answers *who is this person, today, under a duty of care?* A Disease Profile answers *what did this laboratory admit about this disease-class as a system, under these questions, on this date, with these citations, and which promotions did it refuse?* The first object belongs in a clinic with a licence. The second belongs in a repository with a schema version.
 
@@ -66,9 +66,10 @@ A patient chart answers *who is this person, today, under a duty of care?* A Dis
 Two existing specifications already refuse skip-level promotion. This manuscript cites them as documents and pull requests. It does not invent experimental outcomes for them.
 
 1. **CONFLUENCE adapter P0 (pull request #9, merged).** A read-only OnCo client, cache envelope, bindings, and nine gates. `bind()` returns slot annotations. `refuse_knowledge_as_parameter` returns provenance `forbidden`. `CancerODE` is not edited [31,32,36,37].
-2. **Complexity Science CaseCards (companion repository, draft CaseCard pipeline).** A YAML `CaseCard` is data. Contributors add a case without opening an ODE. Seed cards exist for TNBC metabolic–immune exclusion, GBM invasive niche / hypoxia, PDAC stromal barrier, and dormant/occult disease. NSTG is a structured clinical-knowledge *constraint* layer and is never auto-translated into a coefficient [38–40]. Official NSTG 2022 is cited, not redistributed [41].
+2. **Disease Profile exporter and case pack (pull request #11, merged at `64ba76b`).** Pydantic models in `confluence/profiles/`, JSON Schema `schemas/disease_profile.schema.json`, thinking-lab JSON export, batch builder `scripts/build_disease_profile_pack.py`, and four gated JSON files under `data/profiles/cases/` [43,71–73,77].
+3. **Complexity Science CaseCards (companion repository, draft CaseCard pipeline).** A YAML `CaseCard` is data. Contributors add a case without opening an ODE. Seed cards exist for TNBC metabolic–immune exclusion, GBM invasive niche / hypoxia, PDAC stromal barrier, and dormant/occult disease. NSTG is a structured clinical-knowledge *constraint* layer and is never auto-translated into a coefficient [38–40]. Official NSTG 2022 is cited, not redistributed [41].
 
-Thesis #3 supplies the missing CONFLUENCE-native object that a thinking laboratory can export, version, and hand to a `HypothesisObject` without waiting for the CaseCard pipeline or the Disease Profile exporter pull request to merge. If the exporter in pull request #11 remains draft or dirty, this method paper still stands: the schema below is a **proposed contract**.
+Thesis #3 is the method paper for the CONFLUENCE-native object that a thinking laboratory already exports. It cites those paths. It does not propose a second, parallel contract.
 
 ### 1.5 What this thesis is not
 
@@ -81,12 +82,12 @@ This thesis is not a digital twin of a named person. It is not a CDS rule set. I
 The aims are methodological. Success is a usable contract and four honest boards, not a survival difference.
 
 1. **Define** the Disease Profile as a versioned research object for systemic personalized-medicine research, and state the negative definition: not a patient chart, not CDS, not personalized medicine as a clinical product.
-2. **Specify** a four-question thinking laboratory whose completed board is the only legal source of a profile export.
+2. **Specify** a four-question thinking laboratory whose completed board is the only legal source of a profile export (`evidence/thinking.html` → `disease-profile-<slug>.json`).
 3. **Formalize** the five-layer gate  
    `Knowledge ≠ Evidence ≠ Mechanism ≠ Parameter ≠ Prediction`  
-   as admission rules for hypotheses, with an explicit non-parameter list that includes OnCo knowledge, OnCo confidence, Idea maturity, and legacy gene-to-parameter maps.
-4. **Frame** a complex-case pack — TNBC metabolic–immune, GBM niche, PDAC stroma, dormancy/occult — as *research templates* aligned with Complexity Science CaseCards, not as fitted disease models.
-5. **Show** how an admitted profile feeds `HypothesisObject` records aimed at **named public datasets**, without writing OnCo knowledge into Θ and without editing `CancerODE`.
+   as the admission function implemented in `confluence.profiles.disease_profile.admit_hypotheses`, with an explicit non-parameter list that includes OnCo knowledge, OnCo confidence, Idea maturity, and legacy gene-to-parameter maps [71].
+4. **Frame** the shipped complex-case pack — `data/profiles/cases/{tnbc_metabolic_immune,gbm_invasive_niche,pdac_stromal_barrier,dormant_occult}.json` — as *research templates* aligned with Complexity Science CaseCards, not as fitted disease models [73].
+5. **Show** how an admitted profile feeds `confluence.profiles.HypothesisObject` records aimed at **named public datasets**, without writing OnCo knowledge into Θ and without editing `CancerODE` [74,75].
 6. **Situate** the profile relative to CONFLUENCE adapter P0 and Complexity Science CaseCards, citing repository documents only, with no fabricated outcomes.
 
 A non-aim, stated so it cannot be inferred: this thesis does not estimate a treatment effect, does not identify `p_lactate` or any other Θ symbol, and does not promote any CaseCard mechanism to a CONFLUENCE right-hand side.
@@ -101,8 +102,9 @@ A non-aim, stated so it cannot be inferred: this thesis does not estimate a trea
 
 **Materials.**
 
-- Project Confluence `main` at the P0 merge (`30bf94e`, pull request #9): OnCo adapter, ontology spec v0.3, findings chapter, thinking laboratory, thesis evidence page [30–32,36,37,42].
-- Proposed Disease Profile contract documented here (schema version `1.0.0`). An independent exporter implementation may exist on a draft branch (pull request #11) [43]; this paper does not depend on that branch merging.
+- Project Confluence `main` at the Disease Profile merge (`64ba76b`, pull request #11, on top of P0 / pull request #9): OnCo adapter, ontology spec v0.3, findings chapter, thinking laboratory, thesis evidence page, Disease Profile package [30–32,36,37,42,43,71–77].
+- Shipped Disease Profile contract: `confluence/profiles/disease_profile.py` (Pydantic; `SCHEMA_VERSION = "1.0.0"`), `schemas/disease_profile.schema.json`, case table `data/profiles/cases/cases.yaml`, gated JSON under `data/profiles/cases/`, builder `scripts/build_disease_profile_pack.py` [71–73,77].
+- Profile-layer `HypothesisObject` at `confluence/profiles/hypothesis_object.py`, distinct from `confluence.onco.schemas.HypothesisObject` (OnCo idea shelf) [37,74]. Committed example: `data/hypotheses/tnbc_lactate_immune_exclusion.yaml` [75].
 - Complexity Science repository documents and draft CaseCard schema / seed pack [38–40].
 - OnCo public site, Ideas shelf, and licence (data CC BY-NC 4.0; software MIT) [27–29,44].
 - Named public datasets listed in section 3.7 and in CONFLUENCE validation notes [45,46], including CCLE / DepMap releases [52–54,68].
@@ -121,11 +123,11 @@ A non-aim, stated so it cannot be inferred: this thesis does not estimate a trea
 
 ### 3.2 Disease Profile as a versioned research object
 
-A **Disease Profile** is a structured, versioned, citable export of a thinking-lab board for one disease-class (not one person).
+A **Disease Profile** is a structured, versioned, citable export of a thinking-lab board for one disease-class (not one person). On `main` it is the Pydantic model `confluence.profiles.DiseaseProfile` and the JSON Schema at `schemas/disease_profile.schema.json` [71,72].
 
 **Identity.** `{profile_id, disease_id, schema_version, created_at}`. `profile_id` is unique per export. `schema_version` is currently the constant `1.0.0`. Changing the contract increments the version; old profiles remain readable as historical objects.
 
-**Contents (proposed contract).**
+**Contents (shipped contract, schema version `1.0.0`).**
 
 | Field | Layer | Required | Role |
 |---|---|---|---|
@@ -241,9 +243,9 @@ Admission is not identification. An admitted hypothesis is allowed to exist as a
 
 **Parameter identification, if it ever happens, is a later paper.** Structural and practical identifiability are established methods in systems biology [50,51]. CONFLUENCE has a separate, unfinished identifiability manuscript against Cancer Cell Line Encyclopedia (CCLE) metabolomics [52–54]. That work is not this work. A Disease Profile must not cite an identifiability draft as if `p_lactate` were identified.
 
-### 3.5 Proposed schema contract (self-contained; exporter optional)
+### 3.5 Shipped schema contract (`schemas/disease_profile.schema.json`)
 
-Machine-readable intent of schema version `1.0.0` (normative field names; types are JSON):
+Machine-readable contract of schema version `1.0.0` as merged in pull request #11 [43,72]. Normative field names (JSON); `additionalProperties` is forbidden:
 
 ```
 DiseaseProfile {
@@ -277,28 +279,29 @@ DiseaseProfile {
 
 **Attribution rule.** Any sentence that uses OnCo data keeps: *Data from OnCo (onco.cc), CC BY-NC 4.0; commercial use needs a licence.* Adapter and profile code, if and when merged, remain MIT. Cached OnCo payloads remain OnCo data [29,31,55].
 
-**Independence rule.** If pull request #11 is dirty, reviewers should treat this section as the contract and the qualitative boards in section 4 as the compliance tests. Merging Thesis #3 must not require merging the exporter.
+**Implementation rule.** Tests in `tests/test_disease_profile.py` and `tests/test_profile_pack.py` validate exports against both the Pydantic model and, when `jsonschema` is present, Draft 2020-12. Thesis #3 cites those tests as existence of gates. It does not treat a green pytest as a biological result.
 
 ### 3.6 From profile to HypothesisObject (still not Θ)
 
-CONFLUENCE already defines a `HypothesisObject` on the P0 branch [37]:
+There are **two** HypothesisObject types in this repository. They must not be collapsed.
 
-- `id`, optional `onco_idea_id` / `onco_question` (shelf pointers, not parameters);
-- `mechanism`, `state[]`, optional `intervention_slot`;
-- `prediction` (a *stated* computational prediction, not a clinical advice line);
-- `experiment`, `required_rung`, `status`, `falsifier`;
-- OnCo attribution string.
+1. **`confluence.onco.schemas.HypothesisObject`** — OnCo idea-shelf companion from P0: optional `onco_idea_id` / `onco_question`, `mechanism`, `state[]`, `prediction`, `experiment`, `required_rung`, `status`, `falsifier` [37].
+2. **`confluence.profiles.HypothesisObject`** — profile-layer object from pull request #11: `id`, `disease_profile_ref`, `statement`, `evidence_class`, **required** `named_public_dataset`, `falsifier`, `status` (currently the constant `proposed`), `non_claims` (must refuse CDS / device), `citation_ids`, fixed `disclaimer` [74]. An empty dataset name is invalid.
 
-**Mapping (one-way).**
+Thesis #3 uses the **profile-layer** object when it says a profile feeds a HypothesisObject. The OnCo-shelf object remains a pointer type for Ideas. Neither writes Θ.
 
-| Profile field | HypothesisObject field | Constraint |
+**Mapping (one-way) to `confluence.profiles.HypothesisObject`.**
+
+| Profile / pack field | HypothesisObject field | Constraint |
 |---|---|---|
-| `admitted_hypotheses[].statement` | `mechanism` | Must not contain a Θ assignment |
+| `admitted_hypotheses[].statement` | `statement` | Must not contain a Θ assignment |
 | `admitted_hypotheses[].falsifier` | `falsifier` | Required |
-| `answers.cancer` / `disease_id` | `state` context / id prefix | Disease-class, not a person |
-| chosen public dataset (section 3.7) | `experiment` | Must name an accession or portal project |
-| intended assay depth | `required_rung` | One of `in_silico`, `cell_line`, `organoid`, `pdx`, `animal`, `clinical` |
-| OnCo idea id, if any | `onco_idea_id` | Optional shelf pointer only |
+| `admitted_hypotheses[].evidence_class` | `evidence_class` | Not `knowledge` / `onco_page` / `confidence` |
+| case `slug` or `profile_id` | `disease_profile_ref` | Disease-class pack id, not a person |
+| chosen public dataset (section 3.7) | `named_public_dataset` | Must name an accession or portal project |
+| pack / profile disclaimer | `disclaimer` | Fixed research-only string |
+
+Committed example (not a result): `data/hypotheses/tnbc_lactate_immune_exclusion.yaml` is `H-TNBC-LAC-EXCL-001`, `disease_profile_ref: tnbc_metabolic_immune`, `named_public_dataset` = TCGA-BRCA RNA-seq via GDC, status `proposed` [75]. The contrast is not run in this thesis.
 
 **Forbidden mapping.**
 
@@ -307,6 +310,7 @@ CONFLUENCE already defines a `HypothesisObject` on the P0 branch [37]:
 - CaseCard `nstg_touchpoints` ↛ `x_cap_scale` or `infection_risk_weight` [38,40]
 - Profile `asker_role` ↛ controller weight
 - Thinking-lab “success unit” prose ↛ a RECIST-like simulated endpoint treated as a trial
+- Pack row keys `p_lactate`, `write_theta`, `force_admit` ↛ a built profile (`RowRefused` in `confluence.profiles.pack`) [73,77]
 
 A HypothesisObject may later grow a `PredictionObject` when, and only when, a frozen model is run under declared parameters with uncertainty. That run is still computational. Gate 8 in the thesis evidence page — translation after biological and clinical validation — remains unclaimed [4,5].
 
@@ -344,7 +348,7 @@ A CaseCard is a YAML research template in the companion Complexity Science repos
 
 | | Disease Profile (this thesis) | CaseCard (Complexity Science) |
 |---|---|---|
-| Home | CONFLUENCE thinking lab / proposed JSON contract | `pathology_cases/cases/*.yaml` |
+| Home | `confluence/profiles/` + `data/profiles/cases/` | `pathology_cases/cases/*.yaml` |
 | Who fills it | Anyone completing the four questions | A contributor adding one YAML |
 | Native questions | Who / which disease / regime / stuck | Disease, systemic axes, observables, mechanisms, falsifiers, NSTG touchpoints |
 | Constraint layer | Non-parameter list + five-layer gates | NSTG themes as qualitative constraints; numeric leaves refused |
@@ -359,18 +363,21 @@ This thesis does not report PathwaySketch rankings, does not rerun the Complexit
 
 ### 3.10 Worked-example method (qualitative boards)
 
-Section 4 constructs one board per seed disease. Each board is filled as if a **researcher** completed the four questions in a **metastatic / relapsed** or otherwise declared regime, stuck at the bottleneck the template is about. Sources are:
+Section 4 constructs one board per seed disease. Each board is filled from the **shipped case-pack row** in `data/profiles/cases/cases.yaml` and the gated JSON beside it [73]. Those four answers are restated so the board can be replayed. Sources are:
 
-- the shipped thinking-lab copy for that disease [42];
+- `data/profiles/cases/{tnbc_metabolic_immune,gbm_invasive_niche,pdac_stromal_barrier,dormant_occult}.json` and `SUMMARY.md` [73];
+- the shipped thinking-lab copy and JSON download [42];
 - the matching Complexity Science CaseCard framing and citations [38];
 - CONFLUENCE disease-specific notes where they exist (PDAC rogue-closure *plan*, not result) [45,46];
 - the public-dataset names in section 3.7.
+
+`SUMMARY.md` records, as a pack census and **not** as a biological finding: each of the four files has one admitted hypothesis and two candidates (the second is the LDHA/OnCo audit trap); the `poison_ldha_as_theta` table row is refused for the forbidden key `p_lactate` [73].
 
 **Explicitly not done:** no ODE integration, no virtual cohort, no log-rank on simulated burden, no claim of patient benefit, no identification of Θ. If a sentence in section 4 can be misread as a trial result, it has failed the method and should be read as a hypothesis statement instead.
 
 ### 3.11 Scholar packaging (this thesis)
 
-The manuscript is filed at `docs/manuscript/thesis_03_disease_profile_method.md`. A PDF of the same text is committed at `docs/manuscript/thesis_03_disease_profile_method.pdf` and mirrored under `evidence/papers/` so the evidence-site root can serve Highwire `citation_*` metadata. The landing page is `evidence/thesis-03.html`. A sitemap fragment `evidence/sitemap-thesis03.xml` records the HTML and PDF locations because no general `evidence/sitemap.xml` existed on `main` at the time of writing. The checklist is `docs/SCHOLAR_THESIS_03.md`.
+The manuscript is filed at `docs/manuscript/thesis_03_disease_profile_method.md`. A PDF of the same text is committed at `docs/manuscript/thesis_03_disease_profile_method.pdf` and mirrored under `evidence/papers/` so the evidence-site root can serve Highwire `citation_*` metadata. The landing page is `evidence/thesis-03.html`. A sitemap fragment `evidence/sitemap-thesis03.xml` records the HTML and PDF locations because no general `evidence/sitemap.xml` existed on `main` at the time of writing. The checklist is `docs/SCHOLAR_THESIS_03.md`. Citation hygiene for pack JSON follows `docs/CITATION_POLICY.md` [76].
 
 ---
 
@@ -380,7 +387,9 @@ Each subsection is a research template. Headings keep the four questions visible
 
 ### 4.1 TNBC — metabolic–immune exclusion
 
-**Four answers (template).**  
+**Pack object.** `data/profiles/cases/tnbc_metabolic_immune.json` (`profile_id: dp-tnbc-metabolic-immune`) [73].
+
+**Four answers (from the pack).**  
 Q1 Researcher.  
 Q2 Triple-negative breast cancer.  
 Q3 Metastatic / relapsed (control, adaptation, residual clones — not a staging claim).  
@@ -410,8 +419,9 @@ Q4 Adaptation / persisters, with an unnamed or unseparated metabolic–immune lo
 
 **HypothesisObject against a named dataset (not a result).**
 
-- `H-TNBC-01`: In TCGA-BRCA [56,57] and, separately, CCLE metabolomics [53,54], a pre-registered lactate-associated expression or metabolite signature will *not* be written into Θ. The experiment is a correlation / enrichment test against immune-exclusion signatures, with a null that the coupling is absent. Required rung: `in_silico` on public matrices, then `cell_line` if a wet partner exists. Falsifier: no association after the pre-registered confounders, or a spatial assay showing nest-resident competent TILs despite the metabolite signature [38].
-- OnCo idea ids, if used, remain `onco_idea_id` shelf pointers [28,37].
+- Shipped: `H-TNBC-LAC-EXCL-001` in `data/hypotheses/tnbc_lactate_immune_exclusion.yaml` [75]. `disease_profile_ref: tnbc_metabolic_immune`. `named_public_dataset`: TCGA-BRCA RNA-seq via GDC [56,57]. Status `proposed`. Falsifier: a pre-registered TCGA-BRCA contrast that fails to support a lactate–exclusion association retires the hypothesis; OnCo `confidence.probability` still cannot become Θ. This thesis does **not** run that contrast.
+- Optional later object (not committed): CCLE metabolomics [53,54] as a second named dataset, still `forbidden_to_enter_theta`.
+- OnCo idea ids, if used, remain `onco_idea_id` shelf pointers on the *OnCo* HypothesisObject [28,37].
 
 **Trap this disease invites.** LDHA on OnCo is not `p_lactate`. The legacy map is assumed, not identified [31–33]. Atezolizumab plus nab-paclitaxel in advanced TNBC is Evidence of a trial, not a CONFLUENCE regimen and not a coefficient [11].
 
@@ -419,11 +429,13 @@ Q4 Adaptation / persisters, with an unnamed or unseparated metabolic–immune lo
 
 ### 4.2 GBM — invasive niche and hypoxia
 
-**Four answers (template).**  
+**Pack object.** `data/profiles/cases/gbm_invasive_niche.json` (`profile_id: dp-gbm-invasive-niche`) [73]. Extra non-parameters in the pack include fly-connectome stubs and hypoxia/invasion labels as ODE Θ.
+
+**Four answers (from the pack).**  
 Q1 Researcher.  
 Q2 Glioblastoma.  
-Q3 Localised / early is already the wrong comfort: GBM is infiltrative at presentation in the thinking-lab copy [42]. This template uses a **control-and-time** regime, not a clearance score.  
-Q4 Biology of the niche still unnamed *as a separated mechanism*, or preclinical models that do not carry the human organ.
+Q3 Localised / early in the thinking-lab sense — already the wrong comfort: GBM is infiltrative at presentation [42]. The pack uses this regime as *asker context*, not as a claim that a mass is confined. The honest score remains **control and time**, not clearance.  
+Q4 Target known, not reachable (delivery / organ constraint), with the niche mechanism still unnamed as a separated loop.
 
 **Success unit.** Control and time. One clearance is the wrong score [13,42].
 
@@ -455,10 +467,12 @@ Q4 Biology of the niche still unnamed *as a separated mechanism*, or preclinical
 
 ### 4.3 PDAC — stromal barrier
 
-**Four answers (template).**  
+**Pack object.** `data/profiles/cases/pdac_stromal_barrier.json` (`profile_id: dp-pdac-stromal-barrier`) [73]. Extra non-parameters: stage-at-diagnosis OnCo ideas; adding OnCo targets to the CancerODE RHS.
+
+**Four answers (from the pack).**  
 Q1 Researcher.  
 Q2 Pancreatic ductal adenocarcinoma.  
-Q3 Metastatic / relapsed or unresectable-local — usually control and interception [21,42].  
+Q3 Metastatic / relapsed — usually control and interception [21,42].  
 Q4 Found too late, *and* a stromal / delivery barrier once found [17–20,45].
 
 **Success unit.** Usually control and interception. Late diagnosis is the dominant systems failure [21,22,42].
@@ -492,10 +506,12 @@ Q4 Found too late, *and* a stromal / delivery barrier once found [17–20,45].
 
 ### 4.4 Dormancy / occult residual disease
 
-**Four answers (template).**  
+**Pack object.** `data/profiles/cases/dormant_occult.json` (`profile_id: dp-dormant-occult`, `disease_id: occult`) [73]. Extra non-parameters: MRD-style language as a clinical assay claim; dormancy as a CONFLUENCE disease-class diagnosis.
+
+**Four answers (from the pack).**  
 Q1 Researcher.  
-Q2 Dormant / occult residual cancer (disseminated tumour cells / measurable residual disease as *research labels*).  
-Q3 Prevention / interception or post-treatment surveillance as *regimes of asking*, not as a declaration that a person is disease-free.  
+Q2 Dormant / occult residual disease (research analogy — not a person-level MRD call).  
+Q3 Localised / early as *asker regime*, not as a declaration that a person is disease-free.  
 Q4 Biology still unnamed: which pause (cellular G0-like, angiogenic population, immune equilibrium) is load-bearing [23–26,38]?
 
 **Success unit.** This is a hypothesis space about latency. It is not a licence to treat, image, or declare anyone disease-free [38,42]. CONFLUENCE `occult` / `dormant` labels are state signatures; `awake` is a dormancy gate; the dormancy-exit hazard is a research knob, not a fitted patient waiting time [3,30].
@@ -548,9 +564,9 @@ Complexity Science already published the operational table this discussion exten
 | Task | What you edit | What you do not edit | Typical local cost |
 |---|---|---|---|
 | Add a CaseCard | one YAML | pipeline code, ODE | under 15 minutes if the citations are already in hand [39] |
-| Add a Disease Profile | four answers + citations + falsifiers | `CancerODE`, controller priors, OnCo corpus | one thinking-lab session + bibliography check |
-| Validate gates | nothing if the exporter exists; a checklist if it does not | nothing | seconds to an hour |
-| Turn OnCo or NSTG into a coefficient | refused | n/a | n/a |
+| Add a CONFLUENCE Disease Profile | one row in `data/profiles/cases/cases.yaml`, then `python3 scripts/build_disease_profile_pack.py` — or complete the four thinking-lab questions and download JSON [42,73,77] | `CancerODE`, controller priors, OnCo corpus | one thinking-lab session + bibliography check |
+| Validate gates | nothing (`pytest tests/test_disease_profile.py tests/test_profile_pack.py` plus `--dry-run`) | nothing | seconds |
+| Turn OnCo or NSTG into a coefficient | refused (`RowRefused` / `refuse_ldha_onco_as_parameter`) | n/a | n/a |
 | Fit an ODE from the profile | refused | n/a | n/a |
 | Claim patient benefit from the board | refused | n/a | n/a |
 
@@ -576,16 +592,17 @@ If a reader needs a single sentence: **this is a method for building reusable re
 
 ```
 OnCo page / Idea          →  OncoRef / OncoEvidenceCandidate     (P0, read-only)
-Thinking-lab 4Q           →  Disease Profile v1.0.0              (this thesis)
+Thinking-lab 4Q           →  Disease Profile v1.0.0              (confluence/profiles/)
+cases.yaml row            →  data/profiles/cases/*.json          (pack builder)
 CaseCard YAML             →  PathwaySketch                        (Complexity Science; not rerun here)
-Admitted hypothesis       →  HypothesisObject + named dataset
+Admitted hypothesis       →  confluence.profiles.HypothesisObject + named dataset
 Identified symbol (later) →  ParameterObject                      (not done here)
 Frozen model run (later)  →  PredictionObject                     (not done here)
 External experiment       →  new Evidence                         (not done here)
 Clinic                    →  not this repository                  [3–5]
 ```
 
-The only arrows this thesis claims to have walked are the first three on the CONFLUENCE side (OnCo read-only, four questions, profile contract) and the bibliographic alignment with CaseCards. PathwaySketch rankings, CCLE identifiability counts, and PDAC survival tests are *other* documents’ jobs [39,45,54].
+The only arrows this thesis claims to have walked are the CONFLUENCE-side objects that now exist on `main` (OnCo read-only, four questions, profile JSON, one committed HypothesisObject file) and the bibliographic alignment with CaseCards. PathwaySketch rankings, CCLE identifiability counts, and PDAC survival tests are *other* documents’ jobs [39,45,54].
 
 ### 5.5 What would count as a method success next
 
@@ -602,7 +619,7 @@ A method success, not a clinical success:
 ## 6. Limitations
 
 1. **No new measurement.** Boards reuse published descriptors, reviews, a small number of primary papers, and repository documents. They do not generate Evidence.
-2. **Exporter may be absent.** Pull request #11 is a separate, possibly dirty, implementation [43]. This paper’s contract can be checked by hand. Machine admission tests land only when an exporter merges.
+2. **Exporter is present; this paper still does not analyse public matrices.** Pull request #11 merged the schema, pack, and tests [43,71–77]. Green tests show refusal of Θ, not a TCGA result.
 3. **CaseCards are draft companion artefacts.** Complexity Science `main` at the time of writing was a seed README; the CaseCard pack lives on a draft pull request [38,39]. Citations to that pack are citations to a public draft, not to a completed validation.
 4. **P0 does not identify parameters.** Nine adapter tests show refusal, not recovery of Θ [32].
 5. **Public datasets are named, not analysed.** TCGA, CCLE, GEO, Ivy GAP, and DepMap bindings are experimental *design* clauses. Absence of a p-value here is intentional.
@@ -618,8 +635,8 @@ A method success, not a clinical success:
 
 ## 7. Future work
 
-1. **Freeze schema 1.0.0** in-repo (`schemas/disease_profile.schema.json`) when an exporter is clean enough to merge independently of this manuscript — or keep the contract here if that pull request stays dirty [43].
-2. **Export fixtures** for the four boards in section 4 as committed JSON with real citations, still `forbidden_to_enter_theta`.
+1. **Keep schema 1.0.0 honest.** The contract already lives at `schemas/disease_profile.schema.json` and `confluence/profiles/disease_profile.py` [71,72]. Version-bump on required-field changes; do not silently mutate committed JSON.
+2. **Grow HypothesisObjects beside the four pack files** the way `H-TNBC-LAC-EXCL-001` sits beside `tnbc_metabolic_immune.json` — still `proposed`, still `forbidden_to_enter_theta`, still named-dataset-only [75].
 3. **Keep P0 read-only.** Iterate the adapter, cache TTL, and ROS audit of `tnbc_mod_3s` without RHS edits [31,33].
 4. **Bind, then analyse, named datasets** under pre-registered HypothesisObjects (TCGA-BRCA, TCGA-GBM, TCGA-PAAD, GSE71729, Ivy GAP, CCLE metabolomics). Publish negative results. Do not back-write Θ from a p-value.
 5. **Align Profile ↔ CaseCard** with an explicit cross-walk file (profile_id ↔ case id) once both contracts are stable. Do not merge the repositories’ ODE policies; both already say “do not edit the ODE” [31,39].
@@ -675,7 +692,7 @@ None of the above is a promise of a product.
 40. Ogbonna K. pathology_cases/SCHEMA.md and docs/NSTG_PROVENANCE.md. Complexity Science (CaseCard branch). 2026. https://github.com/cloudynirvana/complexity-science
 41. Federal Ministry of Health, Nigeria. Nigeria Standard Treatment Guidelines. 3rd ed. Abuja: Federal Ministry of Health; 2022.
 42. Ogbonna K. Thinking lab — disease-specific cancer systems. Project Confluence evidence site. 2026. https://github.com/cloudynirvana/project-confluence/blob/main/evidence/thinking.html
-43. Ogbonna K. Disease Profile exporter + offline auditor + citation policy (pull request #11). Project Confluence. 20 September 2026. https://github.com/cloudynirvana/project-confluence/pull/11
+43. Ogbonna K. Disease Profile exporter + offline auditor + citation policy (pull request #11, merged as `64ba76b`). Project Confluence. 20 September 2026. https://github.com/cloudynirvana/project-confluence/pull/11
 44. OnCo. CONTRIBUTING.md and IdeaSchema (src/lib/schema.ts). https://github.com/judegomila/OnCo
 45. Project Confluence. validation/pdac_data_sources.md. https://github.com/cloudynirvana/project-confluence/blob/main/validation/pdac_data_sources.md
 46. Project Confluence. docs/pdac_rogue_closure.md. https://github.com/cloudynirvana/project-confluence/blob/main/docs/pdac_rogue_closure.md
@@ -703,6 +720,13 @@ None of the above is a promise of a product.
 68. Ghandi M, Huang FW, Jané-Valbuena J, Kryukov GV, Lo CC, McDonald ER 3rd, et al. Next-generation characterization of the Cancer Cell Line Encyclopedia. Nature. 2019;569(7757):503-508. doi:10.1038/s41586-019-1186-3
 69. Foulkes WD, Smith IE, Reis-Filho JS. Triple-negative breast cancer. N Engl J Med. 2010;363(20):1938-1948. doi:10.1056/NEJMra1001389
 70. Vander Heiden MG, Cantley LC, Thompson CB. Understanding the Warburg effect: the metabolic requirements of cell proliferation. Science. 2009;324(5930):1029-1033. doi:10.1126/science.1160809
+71. Project Confluence. confluence/profiles/disease_profile.py — DiseaseProfile, admit_hypotheses, refuse_ldha_onco_as_parameter, SCHEMA_VERSION 1.0.0. https://github.com/cloudynirvana/project-confluence/blob/main/confluence/profiles/disease_profile.py
+72. Project Confluence. schemas/disease_profile.schema.json. https://github.com/cloudynirvana/project-confluence/blob/main/schemas/disease_profile.schema.json
+73. Project Confluence. data/profiles/cases/ — cases.yaml, SUMMARY.md, tnbc_metabolic_immune.json, gbm_invasive_niche.json, pdac_stromal_barrier.json, dormant_occult.json. https://github.com/cloudynirvana/project-confluence/tree/main/data/profiles/cases
+74. Project Confluence. confluence/profiles/hypothesis_object.py — profile-layer HypothesisObject (named_public_dataset required). https://github.com/cloudynirvana/project-confluence/blob/main/confluence/profiles/hypothesis_object.py
+75. Project Confluence. data/hypotheses/tnbc_lactate_immune_exclusion.yaml — H-TNBC-LAC-EXCL-001 (proposed; TCGA-BRCA). https://github.com/cloudynirvana/project-confluence/blob/main/data/hypotheses/tnbc_lactate_immune_exclusion.yaml
+76. Project Confluence. docs/CITATION_POLICY.md. https://github.com/cloudynirvana/project-confluence/blob/main/docs/CITATION_POLICY.md
+77. Project Confluence. scripts/build_disease_profile_pack.py and confluence/profiles/pack.py. https://github.com/cloudynirvana/project-confluence/blob/main/scripts/build_disease_profile_pack.py
 
 ---
 
