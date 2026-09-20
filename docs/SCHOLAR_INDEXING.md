@@ -11,7 +11,7 @@ not OnCo-as-parameter.
 ## What the repo ships
 
 - Highwire `citation_*` on `evidence/thesis.html`: title, author **Kelechi Emeka Ogbonna**,
-  date `2026/09/19`, technical-report institution, absolute
+  date `2026/09/20`, technical-report institution, absolute
   `citation_fulltext_html_url` and `citation_pdf_url`.
 - Twelve `citation_reference` tags, one per numbered Vancouver item on the page.
   The only DOI in those tags is `10.3322/caac.70090` (already on the page and

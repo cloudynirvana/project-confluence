@@ -1,16 +1,17 @@
-# CONFLUENCE: An Evidence-Gated Dynamical Framework for Integrating Oncology Knowledge, Molecular Observations and Adaptive Cancer-State Modeling
+# CONFLUENCE × OnCo: An Evidence-Gated Dynamical Framework for Integrating Oncology Knowledge Graphs with Adaptive Cancer-State Models
 
-**Running title:** CONFLUENCE × OnCo: evidence-gated dynamical oncology modelling  
 **Document type:** Thesis #1 — working manuscript (computational research)  
 **Author:** Kelechi Emeka Ogbonna  
 **Affiliation:** Independent computational research / Project Confluence (GitHub cloudynirvana)  
 **Correspondence:** https://github.com/cloudynirvana/project-confluence  
-**Date:** 19 September 2026 (first public HTML: https://confluence-research.vercel.app/thesis)  
+**Date:** 20 September 2026  
+**Public HTML:** https://confluence-research.vercel.app/thesis  
+**Citeable PDF:** https://confluence-research.vercel.app/thesis.pdf  
 **Status:** Architectural and methodological findings. Not a clinical result.  
-**Citation style:** numbered Vancouver [n] matching the References list.  
+**Citation style:** numbered Vancouver [n] matching the References list and the public thesis page.  
 **DOI:** none registered for this document. Do not reuse the software Zenodo record.
 
-This manuscript expands `ONCO_CONFLUENCE_THESIS_FINDINGS.md` and the public thesis evidence page. It does not add wet-lab measurements, patient-level results, or invented identifiers.
+This manuscript expands `ONCO_CONFLUENCE_THESIS_FINDINGS.md`, `docs/ONCO_CONFLUENCE_ONTOLOGY_SPEC.md`, and `docs/ONCO_ADAPTER.md`. It does not add wet-lab measurements, patient-level results, or invented identifiers.
 
 ---
 
@@ -22,15 +23,19 @@ CONFLUENCE v2 is a frozen 15-dimensional computational cancer-state model with a
 
 This document records the gates, the P0 adapter, the LDHA / `p_lactate` refusal, and the honesty rule that OnCo confidence is not P(H). It does not claim a cure, a dose, a clinical decision-support system, or an identified Θ.
 
-**Keywords:** computational oncology; knowledge graphs; dynamical systems; evidence gates; identifiability; OnCo; CONFLUENCE; research-only
+---
+
+## Keywords
+
+computational oncology; knowledge graphs; dynamical systems; evidence gates; identifiability; OnCo; CONFLUENCE; research-only; not a medical device
 
 ---
 
 ## Introduction
 
-Oncology knowledge graphs name genes, diseases, ideas and citations [10]. Dynamical simulators ask how a state moves under control. Mixing the two without provenance treats a web page as an identified parameter. The public thesis page states the problem as: how can heterogeneous oncology knowledge and molecular observations be incorporated into a cancer dynamical model without collapsing evidence, mechanism, parameterisation and prediction into unsupported assumptions?
+Oncology knowledge graphs name genes, diseases, ideas and citations [10]. Dynamical simulators ask how a state moves under control. Mixing the two without provenance treats a web page as an identified parameter. The problem stated on the public thesis page, and restated here, is: how can heterogeneous oncology knowledge and molecular observations be incorporated into a cancer dynamical model without collapsing evidence, mechanism, parameterisation and prediction into unsupported assumptions?
 
-GLOBOCAN 2024 estimates, published 2026, report about 20.6 million diagnoses and 9.8 million deaths [1,2]. Female breast cancer accounted for about 2.43 million new cases in that estimate series [1,2]. WHO states that many cancers can be cured if detected early and treated effectively, while access remains uneven [3]. That sentence is a policy statement about staged, treatable disease — not a claim that CONFLUENCE or OnCo cures patients [3,10,11]. Nigeria GLOBOCAN *2022* estimates (127,763 new cases; 79,542 deaths; breast 32,278) are setting context only; they are not 2026 incidence [5].
+GLOBOCAN 2024 estimates, published 2026, report about 20.6 million diagnoses and 9.8 million deaths [1,2]. Female breast cancer accounted for about 2.43 million new cases in that estimate series [1,2]. WHO states that many cancers can be cured if detected early and treated effectively, while access remains uneven [3]. That sentence is a policy statement about staged, treatable disease — not a claim that CONFLUENCE or OnCo cures patients [3,10,11]. The WHO global status report on cancer is cited as context only [4]. Nigeria GLOBOCAN *2022* estimates (127,763 new cases; 79,542 deaths; breast 32,278) are setting context only; they are not 2026 incidence [5].
 
 Tumours evolve and adapt under therapy [7]. Multi-omics increase resolution without automatically producing a causal model. Mathematical oncology supplies in-silico laboratories [8]. Adaptive therapy treats treatment as a process under selection [9]. The gap this thesis addresses is connecting knowledge to dynamical hypotheses without dropping provenance.
 
@@ -52,24 +57,47 @@ TNBC is used as a test case because NCI describes it as roughly 15% of breast ca
 
 ### Two artefacts, two questions
 
-OnCo answers what is named, linked, dated and cited [10]. CONFLUENCE v2 answers how a frozen 15-D state moves under an in-silico controller [11]. Frozen lineages in this repository are:
+OnCo answers what is named, linked, dated and cited [10]. CONFLUENCE v2 answers how a frozen 15-D state moves under an in-silico controller [11]. The working hypothesis of the findings chapter is that those artefacts are complementary provided they are not collapsed into each other.
+
+Frozen lineages in this repository are:
 
 | ID | Role | Status |
 |---|---|---|
 | `tnbc_mod_3s` | TNBC-Metabolic-Strain-MOD notebooks | frozen; ROS audit pending |
-| `confluence_report_6s` | report architecture | paper only |
+| `confluence_report_6s` | report architecture X = [T, I, S, L, R, H] | paper only |
 | `confluence_v2_15d` | live 15-D CancerODE | adapter sits around it |
 | `confluence_v1_calibrator` | `gene_to_parameter_map.json` | executable, not identified |
 
+OnCo integration does not justify changing the dynamics.
+
 OnCo Ideas carry hypothesis, rationale, test and maturity fields. Bulk ingest into CONFLUENCE is forbidden. Idea maturity is not evidence level. OnCo `confidence.probability` is not P(H).
+
+### Layer objects (ontology spec v0.3)
+
+The ingestion spec keeps five objects. A record may point at the next layer. It may not collapse into it.
+
+| Layer | Object | Allowed question | Forbidden leap |
+|---|---|---|---|
+| Knowledge | `OncoRef` | What does OnCo name and link? | therefore k = … |
+| Evidence | `EvidenceObject` | What was measured, where, in what system? | therefore this term belongs in F |
+| Causal mechanism | `MechanismObject` | do(U) changes which state, in which context? | therefore identifiable from CCLE |
+| Parameter | `ParameterObject` | Which symbol in which frozen model? | silent write into rhs_cancer |
+| Prediction | `PredictionObject` | Frozen-model output under U, with uncertainty | clinical advice |
 
 ### Conversion ladder
 
 ```
-Knowledge → Evidence → Hypothesis → Mechanism → Parameter → Prediction → Experiment → New evidence
+OnCo knowledge
+  --cite--> Evidence          (source URI + rung required)
+    --interpret--> Hypothesis (falsifier required)
+      --propose--> Mechanism  (context + sign + do-operator)
+        --identify--> Parameter  (model_id + symbol + identifiability != unidentified)
+          --simulate--> Prediction
+            --test--> Experiment
+              --write--> Evidence
 ```
 
-Every arrow is a failure point. A page may motivate a hypothesis; it must not become Θ. The ontology spec (`docs/ONCO_CONFLUENCE_ONTOLOGY_SPEC.md`) forbids skip-level promotion.
+Every arrow is a failure point. A page may motivate a hypothesis; it must not become Θ. No arrow may skip a box. Wired RHS terms remain Parameters with provenance `assumed` until identified.
 
 legacy gene→parameter map ≠ identified parameter mapping. Alias trap: legacy `pyruvate_to_lactate` is not v2 `p_lactate` (default 0.22).
 
@@ -95,22 +123,26 @@ The public protocol is sequential and falsifiable. It is not a treatment path.
 
 Scientific success is: traceability → mathematical validity → identifiability → out-of-sample prediction → experimental falsification.
 
-### P0 adapter
+### Adapter P0
 
-`confluence/onco/` is a read-only client: cache envelope, bindings, schemas. `bind()` returns slot annotations. It never writes `p_lactate` or `pyruvate_to_lactate`. `refuse_knowledge_as_parameter` returns provenance `forbidden`. Tests live in `tests/test_onco_adapter.py`. Usage: `docs/ONCO_ADAPTER.md`.
+`confluence/onco/` is a read-only client: cache envelope, bindings, schemas. Commands documented in `docs/ONCO_ADAPTER.md` include fixture `meta`, `bind --id ldha`, and `wired`. `bind()` returns slot annotations. It never writes `p_lactate` or `pyruvate_to_lactate`. `refuse_knowledge_as_parameter` returns provenance `forbidden`. Tests live in `tests/test_onco_adapter.py`.
 
-OnCo data is CC BY-NC 4.0. Adapter code in this repository is MIT. Cached payloads are not vendored.
+OnCo data is CC BY-NC 4.0. Adapter code in this repository is MIT. Cached payloads are not vendored; live cache stays under `data/onco/cache/` (gitignored). Attribution on every export: Data from OnCo (onco.cc), CC BY-NC 4.0; commercial use needs a licence.
+
+P0 ships: read-only client + cache envelope + bindings + nine gates. P0 does not ship: RHS edits, controller edits, 3-state ROS import, 6-state expansion, automatic fitting, reverse writes to OnCo.
 
 ### Refusal rules
 
 1. Do not vendor the OnCo corpus.
-2. OnCo is not a parameter source.
+2. OnCo is not a parameter source. `refuse_knowledge_as_parameter(OncoRef("ldha"), "p_lactate")` returns provenance `forbidden`.
 3. OnCo is not a controller prior.
 4. Wired RHS terms remain Parameters with provenance `assumed` until identified.
 5. No reverse writes to OnCo.
 6. No ODE right-hand-side edits in the P0 / thesis-#1 scope.
+7. Public claims need a ledger id or a numbered reference (`docs/CITATION_POLICY.md`).
+8. Do not fabricate DOIs.
 
-Citation rules for public surfaces: `docs/CITATION_POLICY.md`. DOIs appear only when already verified in-repo. This manuscript uses the twelve Vancouver entries of the public thesis page.
+This manuscript uses the twelve Vancouver entries of the public thesis page. The only DOI in that list that is verified in-repo is `10.3322/caac.70090` [1].
 
 ### What was not done
 
@@ -120,11 +152,11 @@ No patient data. No ODE refit. No automatic fitting. No 3-state ROS import. No 6
 
 ## Results / architectural findings
 
-These are specification and software-architecture findings. They are not experimental oncology results.
+These are specification and software-architecture findings. They are not experimental oncology results and not patient outcomes.
 
 1. **Honesty ladder holds as an object model.** Knowledge, Evidence, Causal mechanism, Parameter and Prediction are separate types. A record may point at the next layer. It may not collapse into it.
 
-2. **LDHA is not `p_lactate`.** `refuse_knowledge_as_parameter(OncoRef("ldha"), "p_lactate")` is `forbidden` [11]. The auditor demo claim — that LDHA expression can be entered as `p_lactate` because OnCo lists LDHA as a lactate-metabolism target — is the claim the gate is built to reject.
+2. **LDHA is not `p_lactate` (refuse-as-parameter).** `refuse_knowledge_as_parameter(OncoRef("ldha"), "p_lactate")` is `forbidden` [11]. The auditor demo claim — that LDHA expression can be entered as `p_lactate` because OnCo lists LDHA as a lactate-metabolism target — is the claim the gate is built to reject.
 
 3. **Legacy map is assumed / unidentified.** `validation/gene_to_parameter_map.json` maps LDHA → `pyruvate_to_lactate` (+0.10 / +0.30). That row is a legacy numeric hint, not an identified v2 parameter.
 
@@ -136,7 +168,7 @@ These are specification and software-architecture findings. They are not experim
 
 7. **Public ledger keeps year and population.** Claims `EVID-001`–`EVID-010` on the thesis page cite [1–12] without promoting burden statistics into model parameters.
 
-No wet-lab measurement is reported here.
+No wet-lab measurement is reported here. No new parameter was identified.
 
 ---
 
@@ -144,9 +176,11 @@ No wet-lab measurement is reported here.
 
 Keeping OnCo and CONFLUENCE apart is the result. Integration is valuable only as a gated pipeline: cite → interpret → propose → identify → simulate → test. Collapsing any two boxes produces a confident but unidentifiable model.
 
-WHO language that many cancers can be cured if found early and treated well is retained as a health-system statement [3]. It is not transferred to CONFLUENCE as a product claim. Childhood-leukaemia survival figures that appear in related notes are external context, not a CONFLUENCE endpoint.
+WHO language that many cancers can be cured if found early and treated well is retained as a health-system statement [3]. It is not transferred to CONFLUENCE as a product claim.
 
-Disease profiles and the thinking lab are scaffolds for questions. They are not protocols and are not the Scholar landing page.
+Disease profiles and the thinking lab are scaffolds for questions. They are not protocols and are not the Scholar landing page. The Scholar article URL is `/thesis` with the same-directory PDF `/thesis.pdf`.
+
+Do not expand the state vector merely because OnCo lists more cell types. Cache has no TTL yet. Those are engineering limits, not clinical limits.
 
 ---
 

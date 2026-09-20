@@ -13,8 +13,8 @@ PDF_URL = ORIGIN + "/thesis.pdf"
 HTML_URL = ORIGIN + "/thesis"
 AUTHOR = "Kelechi Emeka Ogbonna"
 TITLE = (
-    "CONFLUENCE: An Evidence-Gated Dynamical Framework for Integrating "
-    "Oncology Knowledge, Molecular Observations and Adaptive Cancer-State Modeling"
+    "CONFLUENCE × OnCo: An Evidence-Gated Dynamical Framework for Integrating "
+    "Oncology Knowledge Graphs with Adaptive Cancer-State Models"
 )
 SUNG_DOI = "10.3322/caac.70090"
 FORBIDDEN_DOIS = (
@@ -54,7 +54,7 @@ def test_thesis_html_has_scholar_citation_tags() -> None:
     assert "citation_title" in tags
     assert tags["citation_title"] == [TITLE]
     assert tags["citation_author"] == [AUTHOR]
-    assert tags["citation_publication_date"] == ["2026/09/19"]
+    assert tags["citation_publication_date"] == ["2026/09/20"]
     assert tags["citation_pdf_url"] == [PDF_URL]
     assert tags["citation_fulltext_html_url"] == [HTML_URL]
     assert "/thinking" not in tags["citation_pdf_url"][0]
@@ -106,7 +106,27 @@ def test_citeable_pdf_is_present_and_honest() -> None:
     assert AUTHOR.encode("utf-8") in haystack or AUTHOR.encode("latin-1") in haystack
     lowered = haystack.lower()
     assert b"not a medical device" in lowered
-    assert (REPO / "docs" / "manuscript" / "thesis_01_confluence_onco.md").is_file()
+    manuscript = (REPO / "docs" / "manuscript" / "thesis_01_confluence_onco.md").read_text(
+        encoding="utf-8"
+    )
+    assert TITLE in manuscript
+    for heading in (
+        "## Abstract",
+        "## Keywords",
+        "## Introduction",
+        "## Specific aims",
+        "## Background",
+        "## Methods",
+        "## Results / architectural findings",
+        "## Discussion",
+        "## Limitations",
+        "## Future work",
+        "## References",
+        "## Disclaimer",
+    ):
+        assert heading in manuscript
+    assert "refuse_knowledge_as_parameter" in manuscript
+    assert "not a medical device" in manuscript.lower()
     vercel = (EVIDENCE / "vercel.json").read_text(encoding="utf-8")
     assert "/thesis.pdf" in vercel
     assert '"/thesis"' in vercel

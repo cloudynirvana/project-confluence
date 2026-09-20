@@ -28,11 +28,11 @@ MANUSCRIPT = REPO / "docs" / "manuscript" / "thesis_01_confluence_onco.md"
 OUTPUT = REPO / "evidence" / "thesis.pdf"
 
 TITLE = (
-    "CONFLUENCE: An Evidence-Gated Dynamical Framework for Integrating "
-    "Oncology Knowledge, Molecular Observations and Adaptive Cancer-State Modeling"
+    "CONFLUENCE × OnCo: An Evidence-Gated Dynamical Framework for Integrating "
+    "Oncology Knowledge Graphs with Adaptive Cancer-State Models"
 )
 AUTHOR = "Kelechi Emeka Ogbonna"
-DATE_DISPLAY = "19 September 2026"
+DATE_DISPLAY = "20 September 2026"
 INSTITUTION = (
     "Independent computational research / Project Confluence "
     "(GitHub cloudynirvana)"
