@@ -650,83 +650,85 @@ None of the above is a promise of a product.
 
 ## 8. References
 
-1. Hamburg MA, Collins FS. The path to personalized medicine. N Engl J Med. 2010;363(4):301-304. doi:10.1056/NEJMp1006304
-2. Jameson JL, Longo DL. Precision medicine — personalized, problematic, and promising. N Engl J Med. 2015;372(23):2229-2234. doi:10.1056/NEJMsb1503104
-3. Ogbonna K. DISCLAIMER.md. Project Confluence. 2026. https://github.com/cloudynirvana/project-confluence/blob/main/DISCLAIMER.md
-4. Ogbonna K. Awaiting external clinical validation. Project Confluence. 2026. https://github.com/cloudynirvana/project-confluence/blob/main/docs/AWAITING_CLINICAL_VALIDATION.md
-5. Ogbonna K. Merge readiness. Project Confluence. 2026. https://github.com/cloudynirvana/project-confluence/blob/main/docs/MERGE_READINESS.md
-6. Altrock PM, Liu LL, Michor F. The mathematics of cancer: integrating quantitative models. Nat Rev Cancer. 2015;15(12):730-745. doi:10.1038/nrc4029. https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5663316/
-7. Gatenby RA, Silva AS, Gillies RJ, Frieden BR. Adaptive therapy. Cancer Res. 2009;69(11):4894-4903. doi:10.1158/0008-5472.CAN-08-3658. https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2676449/
-8. Bianchini G, Balko JM, Mayer IA, Sanders ME, Gianni L. Triple-negative breast cancer: challenges and opportunities of a heterogeneous disease. Nat Rev Clin Oncol. 2016;13(11):674-690. doi:10.1038/nrclinonc.2016.66
-9. Li X, Wenes M, Romero P, Huang SC, Fendt SM, Ho PC. Navigating metabolic pathways to enhance antitumour immunity and immunotherapy. Nat Rev Clin Oncol. 2019;16(7):425-441. doi:10.1038/s41571-019-0203-7
-10. Joyce JA, Fearon DT. T cell exclusion, immune privilege, and the tumor microenvironment. Science. 2015;348(6230):74-80. doi:10.1126/science.aaa6204
-11. Schmid P, Adams S, Rugo HS, Schneeweiss A, Barrios CH, Iwata H, et al. Atezolizumab and nab-paclitaxel in advanced triple-negative breast cancer. N Engl J Med. 2018;379(22):2108-2121. doi:10.1056/NEJMoa1809615
-12. National Cancer Institute. Triple-negative breast cancer. Bethesda (MD): NCI. https://www.cancer.gov/types/breast/patient/triple-negative-brochure
-13. Hambardzumyan D, Bergers G. Glioblastoma: defining tumor niches. Trends Cancer. 2015;1(4):252-265. doi:10.1016/j.trecan.2015.10.009
-14. Brat DJ, Castellano-Sanchez AA, Hunter SB, Pecot M, Cohen C, Hammond EH, et al. Pseudopalisades in glioblastoma are hypoxic, express extracellular matrix proteases, and are formed by an actively migrating cell population. Cancer Res. 2004;64(3):920-927. doi:10.1158/0008-5472.CAN-03-2073
-15. Giese A, Bjerkvig R, Berens ME, Westphal M. Cost of migration: invasion of malignant gliomas and implications for treatment. J Clin Oncol. 2003;21(8):1624-1636. doi:10.1200/JCO.2003.05.063
-16. Semenza GL. Hypoxia-inducible factors in physiology and medicine. Cell. 2012;148(3):399-408. doi:10.1016/j.cell.2012.01.021
-17. Feig C, Gopinathan A, Neesse A, Chan DS, Cook N, Tuveson DA. The pancreas cancer microenvironment. Clin Cancer Res. 2012;18(16):4266-4276. doi:10.1158/1078-0432.CCR-11-3114
-18. Provenzano PP, Cuevas C, Chang AE, Goel VK, Von Hoff DD, Hingorani SR. Enzymatic targeting of the stroma ablates physical barriers to treatment of pancreatic ductal adenocarcinoma. Cancer Cell. 2012;21(3):418-429. doi:10.1016/j.ccr.2012.01.007
-19. Neesse A, Michl P, Frese KK, Feig C, Cook N, Jacobetz MA, et al. Stromal biology and therapy in pancreatic cancer. Gut. 2011;60(6):861-868. doi:10.1136/gut.2010.226092
-20. Olive KP, Jacobetz MA, Davidson CJ, Gopinathan A, McIntyre D, Honess D, et al. Inhibition of Hedgehog signaling enhances delivery of chemotherapy in a mouse model of pancreatic cancer. Science. 2009;324(5933):1457-1461. doi:10.1126/science.1171362
-21. Sung H, Ferlay J, Siegel RL, Laversanne M, Soerjomataram I, Jemal A, Bray F. Global cancer statistics 2020: GLOBOCAN estimates of incidence and mortality worldwide for 36 cancers in 185 countries. CA Cancer J Clin. 2021;71(3):209-249. doi:10.3322/caac.21660
-22. Sung H, Filho AM, Laversanne M, et al. Global cancer statistics 2024. CA Cancer J Clin. 2026. doi:10.3322/caac.70090. https://doi.org/10.3322/caac.70090
-23. Aguirre-Ghiso JA. Models, mechanisms and clinical evidence for cancer dormancy. Nat Rev Cancer. 2007;7(11):834-846. doi:10.1038/nrc2256
-24. Sosa MS, Bragado P, Aguirre-Ghiso JA. Mechanisms of disseminated cancer cell dormancy: an awakening field. Nat Rev Cancer. 2014;14(9):611-622. doi:10.1038/nrc3793
-25. Massagué J, Obenauf AC. Metastatic colonization by circulating tumour cells. Nature. 2016;529(7586):298-306. doi:10.1038/nature17038
-26. Giancotti FG. Mechanisms governing metastatic dormancy and reactivation. Cell. 2013;155(4):750-764. doi:10.1016/j.cell.2013.10.029
-27. Gomila J, OnCo contributors. OnCo: a public, cited knowledge graph of oncology. 2026. https://onco.cc
-28. OnCo. Ideas. https://onco.cc/ideas/ and https://onco.cc/api/v1/ideas.json
-29. Gomila J, OnCo contributors. OnCo source repository. GitHub. 2026. https://github.com/judegomila/OnCo (code MIT; data CC BY-NC 4.0).
-30. Ogbonna K. Project Confluence. https://github.com/cloudynirvana/project-confluence
-31. Ogbonna K. OnCo → CONFLUENCE ontology and evidence-ingestion spec (v0.3). 18 September 2026. https://github.com/cloudynirvana/project-confluence/blob/main/docs/ONCO_CONFLUENCE_ONTOLOGY_SPEC.md
-32. Ogbonna K. OnCo adapter (P0). 2026. https://github.com/cloudynirvana/project-confluence/blob/main/docs/ONCO_ADAPTER.md
-33. Ogbonna K. Knowledge gates for dynamical oncology models: findings from an OnCo × CONFLUENCE integration. 18 September 2026. https://github.com/cloudynirvana/project-confluence/blob/main/docs/manuscript/ONCO_CONFLUENCE_THESIS_FINDINGS.md
-34. Wilkinson MD, Dumontier M, Aalbersberg IJ, Appleton G, Axton M, Baak A, et al. The FAIR Guiding Principles for scientific data management and stewardship. Sci Data. 2016;3:160018. doi:10.1038/sdata.2016.18
-35. Bechhofer S, Buchan I, De Roure D, Missier P, Ainsworth J, Bhagat J, et al. Why linked data is not enough for scientists. Future Gener Comput Syst. 2013;29(2):599-611. doi:10.1016/j.future.2011.08.004
-36. Ogbonna K. feat/onco-adapter-p0 (pull request #9). 18 September 2026. https://github.com/cloudynirvana/project-confluence/pull/9
-37. Project Confluence. confluence/onco/schemas.py — OncoRef, EvidenceObject, HypothesisObject, ParameterObject, PredictionObject, refuse_knowledge_as_parameter. https://github.com/cloudynirvana/project-confluence/blob/main/confluence/onco/schemas.py
-38. Ogbonna K. CaseCard schema and NSTG-gated in-silico pathway explorer (pull request #2). Complexity Science. 20 September 2026. https://github.com/cloudynirvana/complexity-science/pull/2
-39. Ogbonna K. Complexity Science README (CaseCard branch). 2026. https://github.com/cloudynirvana/complexity-science
-40. Ogbonna K. pathology_cases/SCHEMA.md and docs/NSTG_PROVENANCE.md. Complexity Science (CaseCard branch). 2026. https://github.com/cloudynirvana/complexity-science
+Journal articles use ICMJE/Vancouver form (first six authors, then et al. if more; year;volume(issue):pages; Crossref-verified DOI; PMID when PubMed indexes the work). Internet and repository items use the Vancouver electronic format with a cited date. No DOI is invented. Bechhofer et al. [35] and Bellman and Åström [50] have verified DOIs but no PMID (not PubMed-indexed).
+
+1. Hamburg MA, Collins FS. The path to personalized medicine. N Engl J Med. 2010;363(4):301-304. doi:10.1056/NEJMp1006304. PMID: 20551152.
+2. Jameson JL, Longo DL. Precision medicine — personalized, problematic, and promising. N Engl J Med. 2015;372(23):2229-2234. doi:10.1056/NEJMsb1503104. PMID: 26014593.
+3. Ogbonna KE. DISCLAIMER.md [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/DISCLAIMER.md
+4. Ogbonna KE. Awaiting external clinical validation [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/docs/AWAITING_CLINICAL_VALIDATION.md
+5. Ogbonna KE. Merge readiness [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/docs/MERGE_READINESS.md
+6. Altrock PM, Liu LL, Michor F. The mathematics of cancer: integrating quantitative models. Nat Rev Cancer. 2015;15(12):730-745. doi:10.1038/nrc4029. PMID: 26597528. PMCID: PMC5663316.
+7. Gatenby RA, Silva AS, Gillies RJ, Frieden BR. Adaptive therapy. Cancer Res. 2009;69(11):4894-4903. doi:10.1158/0008-5472.CAN-08-3658. PMID: 19487300. PMCID: PMC2676449.
+8. Bianchini G, Balko JM, Mayer IA, Sanders ME, Gianni L. Triple-negative breast cancer: challenges and opportunities of a heterogeneous disease. Nat Rev Clin Oncol. 2016;13(11):674-690. doi:10.1038/nrclinonc.2016.66. PMID: 27184417.
+9. Li X, Wenes M, Romero P, Huang SC, Fendt SM, Ho PC. Navigating metabolic pathways to enhance antitumour immunity and immunotherapy. Nat Rev Clin Oncol. 2019;16(7):425-441. doi:10.1038/s41571-019-0203-7. PMID: 30914826.
+10. Joyce JA, Fearon DT. T cell exclusion, immune privilege, and the tumor microenvironment. Science. 2015;348(6230):74-80. doi:10.1126/science.aaa6204. PMID: 25838376.
+11. Schmid P, Adams S, Rugo HS, Schneeweiss A, Barrios CH, Iwata H, et al. Atezolizumab and nab-paclitaxel in advanced triple-negative breast cancer. N Engl J Med. 2018;379(22):2108-2121. doi:10.1056/NEJMoa1809615. PMID: 30345906.
+12. National Cancer Institute. Triple-negative breast cancer [Internet]. Bethesda (MD): NCI; [cited 2026 Sep 20]. Available from: https://www.cancer.gov/types/breast/patient/triple-negative-brochure
+13. Hambardzumyan D, Bergers G. Glioblastoma: defining tumor niches. Trends Cancer. 2015;1(4):252-265. doi:10.1016/j.trecan.2015.10.009. PMID: 27088132.
+14. Brat DJ, Castellano-Sanchez AA, Hunter SB, Pecot M, Cohen C, Hammond EH, et al. Pseudopalisades in glioblastoma are hypoxic, express extracellular matrix proteases, and are formed by an actively migrating cell population. Cancer Res. 2004;64(3):920-927. doi:10.1158/0008-5472.CAN-03-2073. PMID: 14871821.
+15. Giese A, Bjerkvig R, Berens ME, Westphal M. Cost of migration: invasion of malignant gliomas and implications for treatment. J Clin Oncol. 2003;21(8):1624-1636. doi:10.1200/JCO.2003.05.063. PMID: 12697889.
+16. Semenza GL. Hypoxia-inducible factors in physiology and medicine. Cell. 2012;148(3):399-408. doi:10.1016/j.cell.2012.01.021. PMID: 22304911.
+17. Feig C, Gopinathan A, Neesse A, Chan DS, Cook N, Tuveson DA. The pancreas cancer microenvironment. Clin Cancer Res. 2012;18(16):4266-4276. doi:10.1158/1078-0432.CCR-11-3114. PMID: 22896693.
+18. Provenzano PP, Cuevas C, Chang AE, Goel VK, Von Hoff DD, Hingorani SR. Enzymatic targeting of the stroma ablates physical barriers to treatment of pancreatic ductal adenocarcinoma. Cancer Cell. 2012;21(3):418-429. doi:10.1016/j.ccr.2012.01.007. PMID: 22439937.
+19. Neesse A, Michl P, Frese KK, Feig C, Cook N, Jacobetz MA, et al. Stromal biology and therapy in pancreatic cancer. Gut. 2011;60(6):861-868. doi:10.1136/gut.2010.226092. PMID: 20966025.
+20. Olive KP, Jacobetz MA, Davidson CJ, Gopinathan A, McIntyre D, Honess D, et al. Inhibition of Hedgehog signaling enhances delivery of chemotherapy in a mouse model of pancreatic cancer. Science. 2009;324(5933):1457-1461. doi:10.1126/science.1171362. PMID: 19460966.
+21. Sung H, Ferlay J, Siegel RL, Laversanne M, Soerjomataram I, Jemal A, et al. Global cancer statistics 2020: GLOBOCAN estimates of incidence and mortality worldwide for 36 cancers in 185 countries. CA Cancer J Clin. 2021;71(3):209-249. doi:10.3322/caac.21660. PMID: 33538338.
+22. Sung H, Filho AM, Laversanne M, Ferlay J, Siegel RL, Soerjomataram I, et al. Global cancer statistics 2024: GLOBOCAN estimates of incidence and mortality worldwide for 34 cancers in 186 countries. CA Cancer J Clin. 2026;76(4):e70090. doi:10.3322/caac.70090. PMID: 42417444.
+23. Aguirre-Ghiso JA. Models, mechanisms and clinical evidence for cancer dormancy. Nat Rev Cancer. 2007;7(11):834-846. doi:10.1038/nrc2256. PMID: 17957189.
+24. Sosa MS, Bragado P, Aguirre-Ghiso JA. Mechanisms of disseminated cancer cell dormancy: an awakening field. Nat Rev Cancer. 2014;14(9):611-622. doi:10.1038/nrc3793. PMID: 25118602.
+25. Massagué J, Obenauf AC. Metastatic colonization by circulating tumour cells. Nature. 2016;529(7586):298-306. doi:10.1038/nature17038. PMID: 26791720.
+26. Giancotti FG. Mechanisms governing metastatic dormancy and reactivation. Cell. 2013;155(4):750-764. doi:10.1016/j.cell.2013.10.029. PMID: 24209616.
+27. Gomila J, OnCo contributors. OnCo: a public, cited knowledge graph of oncology [Internet]. 2026 [cited 2026 Sep 20]. Available from: https://onco.cc
+28. Gomila J, OnCo contributors. OnCo Ideas [Internet]. 2026 [cited 2026 Sep 20]. Available from: https://onco.cc/ideas/
+29. Gomila J, OnCo contributors. OnCo source repository [Internet]. GitHub; 2026 [cited 2026 Sep 20]. Code MIT; data CC BY-NC 4.0. Available from: https://github.com/judegomila/OnCo
+30. Ogbonna KE. Project Confluence [Internet]. GitHub; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence
+31. Ogbonna KE. OnCo → CONFLUENCE ontology and evidence-ingestion spec (v0.3) [Internet]. Project Confluence; 2026 Sep 18 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/docs/ONCO_CONFLUENCE_ONTOLOGY_SPEC.md
+32. Ogbonna KE. OnCo adapter (P0) [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/docs/ONCO_ADAPTER.md
+33. Ogbonna KE. Knowledge gates for dynamical oncology models: findings from an OnCo × CONFLUENCE integration [Internet]. Project Confluence; 2026 Sep 18 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/docs/manuscript/ONCO_CONFLUENCE_THESIS_FINDINGS.md
+34. Wilkinson MD, Dumontier M, Aalbersberg IJ, Appleton G, Axton M, Baak A, et al. The FAIR Guiding Principles for scientific data management and stewardship. Sci Data. 2016;3(1):160018. doi:10.1038/sdata.2016.18. PMID: 26978244.
+35. Bechhofer S, Buchan I, De Roure D, Missier P, Ainsworth J, Bhagat J, et al. Why linked data is not enough for scientists. Future Gener Comput Syst. 2013;29(2):599-611. doi:10.1016/j.future.2011.08.004.
+36. Ogbonna KE. feat/onco-adapter-p0 (pull request #9) [Internet]. Project Confluence; 2026 Sep 18 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/pull/9
+37. Ogbonna KE. confluence/onco/schemas.py [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/confluence/onco/schemas.py
+38. Ogbonna KE. CaseCard schema and NSTG-gated in-silico pathway explorer (pull request #2) [Internet]. Complexity Science; 2026 Sep 20 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/complexity-science/pull/2
+39. Ogbonna KE. Complexity Science README [Internet]. GitHub; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/complexity-science
+40. Ogbonna KE. pathology_cases/SCHEMA.md [Internet]. Complexity Science (draft pull request #2, commit d2e881b); 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/complexity-science/blob/d2e881bd13c2fc067b1b33e2498f9eab09b79a3b/pathology_cases/SCHEMA.md
 41. Federal Ministry of Health, Nigeria. Nigeria Standard Treatment Guidelines. 3rd ed. Abuja: Federal Ministry of Health; 2022.
-42. Ogbonna K. Thinking lab — disease-specific cancer systems. Project Confluence evidence site. 2026. https://github.com/cloudynirvana/project-confluence/blob/main/evidence/thinking.html
-43. Ogbonna K. Disease Profile exporter + offline auditor + citation policy (pull request #11, merged as `64ba76b`). Project Confluence. 20 September 2026. https://github.com/cloudynirvana/project-confluence/pull/11
-44. OnCo. CONTRIBUTING.md and IdeaSchema (src/lib/schema.ts). https://github.com/judegomila/OnCo
-45. Project Confluence. validation/pdac_data_sources.md. https://github.com/cloudynirvana/project-confluence/blob/main/validation/pdac_data_sources.md
-46. Project Confluence. docs/pdac_rogue_closure.md. https://github.com/cloudynirvana/project-confluence/blob/main/docs/pdac_rogue_closure.md
-47. World Health Organization. Cancer fact sheet. 2026. https://www.who.int/news-room/fact-sheets/detail/cancer
-48. Federal Ministry of Health, Nigeria. Nigeria National Cancer Control Plan 2018–2022. Abuja: Federal Ministry of Health; 2018.
-49. Federal Ministry of Health, Nigeria. Nigeria Essential Medicines List. 7th ed. Abuja: Federal Ministry of Health; 2020.
-50. Bellman R, Åström KJ. On structural identifiability. Math Biosci. 1970;7(3-4):329-339. doi:10.1016/0025-5564(70)90132-X
-51. Raue A, Kreutz C, Maiwald T, Bachmann J, Schilling M, Klingmüller U, Timmer J. Structural and practical identifiability analysis of partially observed dynamical models by exploiting the profile likelihood. Bioinformatics. 2009;25(15):1923-1929. doi:10.1093/bioinformatics/btp358
-52. Barretina J, Caponigro G, Stransky N, Venkatesan K, Margolin AA, Kim S, et al. The Cancer Cell Line Encyclopedia enables predictive modelling of anticancer drug sensitivity. Nature. 2012;483(7391):603-607. doi:10.1038/nature11003
-53. Li H, Ning S, Ghandi M, Kryukov GV, Gopal S, Deik A, et al. The landscape of cancer cell line metabolism. Nat Med. 2019;25(5):850-860. doi:10.1038/s41591-019-0404-8
-54. Ogbonna K. Structural identifiability of a real-CCLE-calibrated metabolic ODE model (manuscript draft). Project Confluence. https://github.com/cloudynirvana/project-confluence/blob/main/docs/manuscript/structural_identifiability_ccle_manuscript.md
-55. Project Confluence. Citation policy (draft on Disease Profile branch; rules also restated in this thesis). See also DISCLAIMER.md [3] and the OnCo attribution line [29].
-56. Weinstein JN, Collisson EA, Mills GB, Shaw KR, Ozenberger BA, Ellrott K, et al. The Cancer Genome Atlas Pan-Cancer analysis project. Nat Genet. 2013;45(10):1113-1120. doi:10.1038/ng.2764
-57. Cancer Genome Atlas Network. Comprehensive molecular portraits of human breast tumours. Nature. 2012;490(7418):61-70. doi:10.1038/nature11412
-58. Cancer Genome Atlas Research Network. Comprehensive genomic characterization defines human glioblastoma genes and core pathways. Nature. 2008;455(7216):1061-1068. doi:10.1038/nature07385
-59. National Cancer Institute. Genomic Data Commons — TCGA-GBM. https://portal.gdc.cancer.gov/projects/TCGA-GBM
-60. Puchalski RB, Shah N, Miller J, Dalley R, Nomura SR, Yoon JG, et al. An anatomic transcriptional atlas of human glioblastoma. Science. 2018;360(6389):660-663. doi:10.1126/science.aan6814
-61. Cancer Genome Atlas Research Network. Integrated genomic characterization of pancreatic ductal adenocarcinoma. Cancer Cell. 2017;32(2):185-203.e13. doi:10.1016/j.ccell.2017.07.007
-62. Cerami E, Gao J, Dogrusoz U, Gross BE, Sumer SO, Aksoy BA, et al. The cBio cancer genomics portal: an open platform for exploring multidimensional cancer genomics data. Cancer Discov. 2012;2(5):401-404. doi:10.1158/2159-8290.CD-12-0095. Study: https://www.cbioportal.org/study/summary?id=paad_tcga_pan_can_atlas_2018
-63. Moffitt RA, Marayati R, Flate EL, Volmar KE, Loeza SG, Hoadley KA, et al. Virtual microdissection identifies distinct tumor- and stroma-specific subtypes of pancreatic ductal adenocarcinoma. Nat Genet. 2015;47(10):1168-1178. doi:10.1038/ng.3398. GEO: GSE71729. https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE71729
-64. Yang S, He P, Wang J, Schetter A, Tang W, Funamizu N, et al. A novel MIF signaling pathway drives the malignant character of pancreatic cancer by targeting NR3C2. Cancer Res. 2016;76(13):3838-3850. doi:10.1158/0008-5472.CAN-15-2841. GEO: GSE62452. https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE62452
-65. Zhang G, Schetter A, He P, Funamizu N, Gaedcke J, Ghadimi BM, et al. DPEP1 inhibits tumor cell invasiveness, enhances chemosensitivity and predicts clinical outcome in pancreatic ductal adenocarcinoma. PLoS One. 2012;7(2):e31507. doi:10.1371/journal.pone.0031507. GEO: GSE28735. https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE28735
-66. Ogbonna K. Call for longitudinal pathology and omics data. Project Confluence. 2026. https://github.com/cloudynirvana/project-confluence/blob/main/CALL_FOR_DATA.md
-67. IARC. Global cancer statistics 2024 news release. 8 July 2026. https://www.iarc.who.int/news-events/global-cancer-statistics-2024-globocan-estimates-of-incidence-and-mortality-worldwide-for-34-cancers-in-186-countries/
-68. Ghandi M, Huang FW, Jané-Valbuena J, Kryukov GV, Lo CC, McDonald ER 3rd, et al. Next-generation characterization of the Cancer Cell Line Encyclopedia. Nature. 2019;569(7757):503-508. doi:10.1038/s41586-019-1186-3
-69. Foulkes WD, Smith IE, Reis-Filho JS. Triple-negative breast cancer. N Engl J Med. 2010;363(20):1938-1948. doi:10.1056/NEJMra1001389
-70. Vander Heiden MG, Cantley LC, Thompson CB. Understanding the Warburg effect: the metabolic requirements of cell proliferation. Science. 2009;324(5930):1029-1033. doi:10.1126/science.1160809
-71. Project Confluence. confluence/profiles/disease_profile.py — DiseaseProfile, admit_hypotheses, refuse_ldha_onco_as_parameter, SCHEMA_VERSION 1.0.0. https://github.com/cloudynirvana/project-confluence/blob/main/confluence/profiles/disease_profile.py
-72. Project Confluence. schemas/disease_profile.schema.json. https://github.com/cloudynirvana/project-confluence/blob/main/schemas/disease_profile.schema.json
-73. Project Confluence. data/profiles/cases/ — cases.yaml, SUMMARY.md, tnbc_metabolic_immune.json, gbm_invasive_niche.json, pdac_stromal_barrier.json, dormant_occult.json. https://github.com/cloudynirvana/project-confluence/tree/main/data/profiles/cases
-74. Project Confluence. confluence/profiles/hypothesis_object.py — profile-layer HypothesisObject (named_public_dataset required). https://github.com/cloudynirvana/project-confluence/blob/main/confluence/profiles/hypothesis_object.py
-75. Project Confluence. data/hypotheses/tnbc_lactate_immune_exclusion.yaml — H-TNBC-LAC-EXCL-001 (proposed; TCGA-BRCA). https://github.com/cloudynirvana/project-confluence/blob/main/data/hypotheses/tnbc_lactate_immune_exclusion.yaml
-76. Project Confluence. docs/CITATION_POLICY.md. https://github.com/cloudynirvana/project-confluence/blob/main/docs/CITATION_POLICY.md
-77. Project Confluence. scripts/build_disease_profile_pack.py and confluence/profiles/pack.py. https://github.com/cloudynirvana/project-confluence/blob/main/scripts/build_disease_profile_pack.py
+42. Ogbonna KE. Thinking lab — disease-specific cancer systems [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/evidence/thinking.html
+43. Ogbonna KE. Disease Profile exporter + offline auditor + citation policy (pull request #11, merged as 64ba76b) [Internet]. Project Confluence; 2026 Sep 20 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/pull/11
+44. Gomila J, OnCo contributors. CONTRIBUTING.md and IdeaSchema (src/lib/schema.ts) [Internet]. OnCo; 2026 [cited 2026 Sep 20]. Available from: https://github.com/judegomila/OnCo
+45. Ogbonna KE. validation/pdac_data_sources.md [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/validation/pdac_data_sources.md
+46. Ogbonna KE. PDAC rogue closure [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/docs/pdac_rogue_closure.md
+47. World Health Organization. Cancer [Internet]. Geneva: WHO; 2026 [cited 2026 Sep 20]. Available from: https://www.who.int/news-room/fact-sheets/detail/cancer
+48. Federal Ministry of Health, Nigeria. Nigeria National Cancer Control Plan 2018–2022 [Internet]. Abuja: Federal Ministry of Health; 2018 [cited 2026 Sep 20]. Available from: https://www.iccp-portal.org/sites/default/files/plans/NCCP_Final%20%5B1%5D.pdf
+49. Federal Ministry of Health, Nigeria. Nigeria Essential Medicines List. 7th ed [Internet]. Abuja: Federal Ministry of Health; 2020 [cited 2026 Sep 20]. Available from: https://www.who.int/publications/m/item/nigeria--essential-medicines-list-2020-(english)
+50. Bellman R, Åström KJ. On structural identifiability. Math Biosci. 1970;7(3-4):329-339. doi:10.1016/0025-5564(70)90132-X.
+51. Raue A, Kreutz C, Maiwald T, Bachmann J, Schilling M, Klingmüller U, et al. Structural and practical identifiability analysis of partially observed dynamical models by exploiting the profile likelihood. Bioinformatics. 2009;25(15):1923-1929. doi:10.1093/bioinformatics/btp358. PMID: 19505944.
+52. Barretina J, Caponigro G, Stransky N, Venkatesan K, Margolin AA, Kim S, et al. The Cancer Cell Line Encyclopedia enables predictive modelling of anticancer drug sensitivity. Nature. 2012;483(7391):603-607. doi:10.1038/nature11003. PMID: 22460905.
+53. Li H, Ning S, Ghandi M, Kryukov GV, Gopal S, Deik A, et al. The landscape of cancer cell line metabolism. Nat Med. 2019;25(5):850-860. doi:10.1038/s41591-019-0404-8. PMID: 31068703.
+54. Ogbonna KE. Structural identifiability of a real-CCLE-calibrated metabolic ODE model (manuscript draft) [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/docs/manuscript/structural_identifiability_ccle_manuscript.md
+55. Ogbonna KE. Citation policy [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/docs/CITATION_POLICY.md
+56. Weinstein JN, Collisson EA, Mills GB, Shaw KR, Ozenberger BA, Ellrott K, et al. The Cancer Genome Atlas Pan-Cancer analysis project. Nat Genet. 2013;45(10):1113-1120. doi:10.1038/ng.2764. PMID: 24071849.
+57. Cancer Genome Atlas Network. Comprehensive molecular portraits of human breast tumours. Nature. 2012;490(7418):61-70. doi:10.1038/nature11412. PMID: 23000897.
+58. Cancer Genome Atlas Research Network. Comprehensive genomic characterization defines human glioblastoma genes and core pathways. Nature. 2008;455(7216):1061-1068. doi:10.1038/nature07385. PMID: 18772890.
+59. National Cancer Institute. Genomic Data Commons: TCGA-GBM [Internet]. Bethesda (MD): NCI; [cited 2026 Sep 20]. Available from: https://portal.gdc.cancer.gov/projects/TCGA-GBM
+60. Puchalski RB, Shah N, Miller J, Dalley R, Nomura SR, Yoon JG, et al. An anatomic transcriptional atlas of human glioblastoma. Science. 2018;360(6389):660-663. doi:10.1126/science.aaf2666. PMID: 29748285. PMCID: PMC6414061.
+61. Cancer Genome Atlas Research Network. Integrated genomic characterization of pancreatic ductal adenocarcinoma. Cancer Cell. 2017;32(2):185-203.e13. doi:10.1016/j.ccell.2017.07.007. PMID: 28810144.
+62. Cerami E, Gao J, Dogrusoz U, Gross BE, Sumer SO, Aksoy BA, et al. The cBio cancer genomics portal: an open platform for exploring multidimensional cancer genomics data. Cancer Discov. 2012;2(5):401-404. doi:10.1158/2159-8290.CD-12-0095. PMID: 22588877.
+63. Moffitt RA, Marayati R, Flate EL, Volmar KE, Loeza SG, Hoadley KA, et al. Virtual microdissection identifies distinct tumor- and stroma-specific subtypes of pancreatic ductal adenocarcinoma. Nat Genet. 2015;47(10):1168-1178. doi:10.1038/ng.3398. PMID: 26343385. GEO: GSE71729.
+64. Yang S, He P, Wang J, Schetter A, Tang W, Funamizu N, et al. A novel MIF signaling pathway drives the malignant character of pancreatic cancer by targeting NR3C2. Cancer Res. 2016;76(13):3838-3850. doi:10.1158/0008-5472.CAN-15-2841. PMID: 27197190. GEO: GSE62452.
+65. Zhang G, Schetter A, He P, Funamizu N, Gaedcke J, Ghadimi BM, et al. DPEP1 inhibits tumor cell invasiveness, enhances chemosensitivity and predicts clinical outcome in pancreatic ductal adenocarcinoma. PLoS One. 2012;7(2):e31507. doi:10.1371/journal.pone.0031507. PMID: 22363658. GEO: GSE28735.
+66. Ogbonna KE. Call for longitudinal pathology and omics data [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/CALL_FOR_DATA.md
+67. International Agency for Research on Cancer. Global cancer statistics 2024: GLOBOCAN estimates of incidence and mortality worldwide for 34 cancers in 186 countries [Internet]. Lyon: IARC; 2026 Jul 8 [cited 2026 Sep 20]. Available from: https://www.iarc.who.int/news-events/global-cancer-statistics-2024-globocan-estimates-of-incidence-and-mortality-worldwide-for-34-cancers-in-186-countries/
+68. Ghandi M, Huang FW, Jané-Valbuena J, Kryukov GV, Lo CC, McDonald ER 3rd, et al. Next-generation characterization of the Cancer Cell Line Encyclopedia. Nature. 2019;569(7757):503-508. doi:10.1038/s41586-019-1186-3. PMID: 31068700.
+69. Foulkes WD, Smith IE, Reis-Filho JS. Triple-negative breast cancer. N Engl J Med. 2010;363(20):1938-1948. doi:10.1056/NEJMra1001389. PMID: 21067385.
+70. Vander Heiden MG, Cantley LC, Thompson CB. Understanding the Warburg effect: the metabolic requirements of cell proliferation. Science. 2009;324(5930):1029-1033. doi:10.1126/science.1160809. PMID: 19460998.
+71. Ogbonna KE. confluence/profiles/disease_profile.py [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/confluence/profiles/disease_profile.py
+72. Ogbonna KE. schemas/disease_profile.schema.json [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/schemas/disease_profile.schema.json
+73. Ogbonna KE. Disease Profile case pack (data/profiles/cases/) [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/tree/main/data/profiles/cases
+74. Ogbonna KE. confluence/profiles/hypothesis_object.py [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/confluence/profiles/hypothesis_object.py
+75. Ogbonna KE. H-TNBC-LAC-EXCL-001 (data/hypotheses/tnbc_lactate_immune_exclusion.yaml) [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/data/hypotheses/tnbc_lactate_immune_exclusion.yaml
+76. Ogbonna KE. docs/CITATION_POLICY.md [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/docs/CITATION_POLICY.md
+77. Ogbonna KE. scripts/build_disease_profile_pack.py [Internet]. Project Confluence; 2026 [cited 2026 Sep 20]. Available from: https://github.com/cloudynirvana/project-confluence/blob/main/scripts/build_disease_profile_pack.py
 
 ---
 

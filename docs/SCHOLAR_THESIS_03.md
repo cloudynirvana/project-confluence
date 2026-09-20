@@ -29,6 +29,8 @@
 - [x] `citation_abstract`
 - [x] `citation_keywords`
 - [x] `citation_technical_report_institution` — Project Confluence
+- [x] `citation_reference` — 77 Highwire metas, one per bibliography entry (authors / journal / year / volume / issue / pages / DOI / PMID when they exist)
+- [x] human-visible numbered Vancouver list on the landing page (`#ref-1` … `#ref-77`)
 - [x] human-visible PDF link (`evidence/papers/…`)
 
 ## Sitemap note
@@ -51,11 +53,18 @@ and point `loc` at the deployed Vercel origin (Root Directory `evidence`).
 
 ## Citation hygiene
 
-- [x] Numbered Vancouver list in the manuscript
-- [x] DOIs only when verified (publisher / PubMed / PMC / Crossref)
+- [x] Numbered Vancouver list in the manuscript — **77** references
+- [x] In-text `[n]` numbers and bibliography entries are bijective (1–77; no gaps, no orphans)
+- [x] Journal form: authors (first six + et al.); year;volume(issue):pages; DOI; PMID when PubMed indexes the work
+- [x] **40** journal DOIs verified on Crossref (2026-09-20). None invented.
+- [x] Ivy GAP is Puchalski et al., Science 2018;360(6389):660-663, doi:10.1126/science.aaf2666, PMID 29748285 — not the unrelated `aan6814` DOI
+- [x] GLOBOCAN 2024 is Sung et al., CA Cancer J Clin. 2026;76(4):e70090, doi:10.3322/caac.70090, PMID 42417444
+- [x] Bechhofer 2013 and Bellman 1970 have verified DOIs and no PMID (not PubMed-indexed)
+- [x] Internet / repository items use Vancouver electronic form with `[cited 2026 Sep 20]`
 - [x] No placeholder DOIs
 - [x] OnCo attribution line present
 - [x] GLOBOCAN / Nigeria figures keep their estimate year when cited
+- [x] Not a clinical CDS / personalized-medicine product claim
 
 ## Rebuild PDF
 
@@ -67,7 +76,7 @@ Requires Google Chrome (`google-chrome --headless=new`). The script overwrites b
 
 ## Word count
 
-**9,933 words** in `docs/manuscript/thesis_03_disease_profile_method.md` (20 September 2026, rebased onto `64ba76b`). PDF is 24 pages.
+**10,363 words** in `docs/manuscript/thesis_03_disease_profile_method.md` (20 September 2026, Vancouver-complete bibliography, 77 references). Regenerated PDF is 24 pages.
 
 Count the markdown source (abstract through disclaimer), not this checklist.
 
