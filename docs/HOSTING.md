@@ -42,9 +42,13 @@ Deploy a **second** project with Root Directory `evidence`. One-click: [Deploy l
 Static routes on that project:
 
 - `/` — cinematic lab reel
-- `/thinking` — disease-specific thinking lab
-- `/thesis` — thesis evidence page + ledger
+- `/thinking` — disease-specific thinking lab (not a Scholar article URL)
+- `/thesis` — thesis evidence page + ledger (Highwire `citation_*` tags)
+- `/thesis.pdf` — citeable thesis PDF (same directory as `/thesis`; `Content-Type: application/pdf`)
+- `/robots.txt`, `/sitemap.xml` — allow Googlebot / Googlebot-Scholar on `/thesis` and `/thesis.pdf`
 - `GET`/`POST /api/grok-review` — server-side Grok auditor (`evidence/api/grok-review.js`)
+
+Scholar owner checklist: [SCHOLAR_INDEXING.md](SCHOLAR_INDEXING.md).
 
 **Environment variable (evidence project only):** set `XAI_API_KEY` in the Vercel dashboard for Preview and Production. The key must never be committed, pasted into HTML, or shipped in client JavaScript. Without it, `/thesis` still renders the ledger. The auditor **soft-fails** with `{ ok:false, reason:"auditor_offline", message }` and the page shows *Evidence auditor offline (no API key) — citations still load from ledger* instead of a dead audit button. Do not add an xAI key to the repository.
 

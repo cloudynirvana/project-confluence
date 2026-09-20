@@ -11,6 +11,9 @@ The **default public face** for teaching-hospital mentors is
 [`clinical/`](../clinical/). Point production **Root Directory** at `clinical`.
 Keep this reel only if you want a second Vercel project for the films.
 
+Public thesis evidence (Google Scholar): `/thesis` and `/thesis.pdf`.
+Owner checklist: [docs/SCHOLAR_INDEXING.md](../docs/SCHOLAR_INDEXING.md).
+
 ## Deploy as a second Vercel project
 
 One-click:

@@ -1,0 +1,20 @@
+# Google Scholar uses the same robots.txt as Google Search.
+# Allow crawlers on the public thesis HTML and the citeable PDF.
+# See https://scholar.google.com/intl/en/scholar/inclusion.html
+
+User-agent: Googlebot
+Allow: /thesis
+Allow: /thesis.pdf
+Allow: /
+
+User-agent: Googlebot-Scholar
+Allow: /thesis
+Allow: /thesis.pdf
+Allow: /
+
+User-agent: *
+Allow: /thesis
+Allow: /thesis.pdf
+Allow: /
+
+Sitemap: https://confluence-research.vercel.app/sitemap.xml
