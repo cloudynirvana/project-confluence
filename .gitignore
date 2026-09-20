@@ -39,6 +39,10 @@ data/derived_external/**
 !data/derived_external/**/
 !data/derived_external/**/.gitkeep
 
+# OnCo live cache (CC BY-NC 4.0 payloads; do not vendor the corpus)
+data/onco/cache/**
+!data/onco/cache/.gitkeep
+
 # Secrets
 .env
 *.key

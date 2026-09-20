@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Thinking lab — disease-specific cancer systems · Project Confluence</title>
+  <meta name="description" content="Question-led walkthrough of the OnCo × CONFLUENCE thesis. Not a medical device. Not a cure engine." />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .lab-hero{min-height:auto;place-items:start;margin:0 14px 22px}
+    .lab-hero .hero-copy{padding:36px 28px 28px}
+    .qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin:12px 0 8px}
+    button.choice{text-align:left;cursor:pointer;background:#0c0d10;color:var(--ink);border:1px solid var(--line);padding:14px 14px 12px;font:inherit}
+    button.choice:hover,button.choice[aria-pressed="true"]{border-color:var(--teal);color:var(--teal)}
+    button.choice small{display:block;color:var(--muted);font:12px/1.4 ui-sans-serif,system-ui,sans-serif;margin-top:6px}
+    .progress{font:11px/1.3 ui-sans-serif,system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin:0 0 8px}
+    .neq{font:13px/1.5 ui-sans-serif,system-ui,sans-serif;color:var(--rose);margin:0 0 16px}
+    .ask{border-left:3px solid var(--amber);padding:4px 0 4px 14px;margin:10px 0;color:#d8d0c4}
+    .layers{display:grid;gap:8px;margin:14px 0 22px}
+    .layer{display:grid;grid-template-columns:140px 1fr;gap:12px;border:1px solid var(--line);padding:12px 14px;background:#0c0d10}
+    .layer b{font:11px/1.2 ui-sans-serif,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
+    @media(max-width:700px){.layer{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="stamp">Research thinking lab — not medical advice, not a treatment path, not a cure engine</div>
+  <nav class="nav" aria-label="Primary">
+    <a class="wordmark" href="./">Confluence</a>
+    <div class="nav-links">
+      <a href="./">Lab reel</a>
+      <a href="thinking.html">Thinking lab</a>
+      <a href="thesis.html">Thesis evidence</a>
+      <a href="disclaimer.html">Disclaimer</a>
+    </div>
+  </nav>
+  <header class="hero lab-hero"><div class="hero-copy">
+    <p class="kicker">OnCo × CONFLUENCE · thesis as questions</p>
+    <h1>How to think about one cancer as a system</h1>
+    <p class="lede">Four questions. Then the systemic work for <em>that</em> disease — not “cancer.” Knowledge is not a parameter. This page is not a clinic.</p>
+  </div></header>
+  <main class="wrap">
+    <section class="disclaimer"><h2>Read this first</h2>
+      <p>Project Confluence is a computational research instrument. It does not diagnose, treat, or cure. Answers are thinking scaffolds from the findings chapter, not personalised medicine.</p>
+    </section>
+    <section class="honesty" id="ask">
+      <p class="progress" id="progress">Question 1 of 4</p>
+      <h2 id="qtitle">Who is asking?</h2>
+      <p class="muted" id="qhelp">The same cancer needs different next questions depending on who holds the problem.</p>
+      <div class="qgrid" id="choices"></div>
+      <p class="muted" id="backrow" hidden><button class="btn" id="back" type="button">Back</button> <button class="btn" id="reset" type="button">Start over</button></p>
+    </section>
+    <section class="honesty" id="board" hidden>
+      <p class="progress">Board · from your four answers · not a protocol</p>
+      <h2 id="board-title">System map</h2>
+      <p class="neq">Knowledge ≠ Evidence ≠ Causal mechanism ≠ Parameter ≠ Prediction</p>
+      <div id="board-body"></div>
+      <p class="buttons" style="margin-top:18px">
+        <a class="btn primary" href="thesis.html">Thesis evidence page</a>
+        <a class="btn" href="https://onco.cc/cancers/">OnCo cancers</a>
+        <a class="btn" href="https://onco.cc/ideas/">OnCo ideas</a>
+      </p>
+    </section>
+    <aside class="note">Data from OnCo (onco.cc), CC BY-NC 4.0. The 15-D ODE is not running here.</aside>
+  </main>
+  <footer class="site">Project Confluence thinking lab · research only</footer>
+  <script src="thinking.js"></script>
+</body></html>

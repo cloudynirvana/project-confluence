@@ -23,9 +23,8 @@
   ],
   "rewrites": [
     { "source": "/disclaimer", "destination": "/disclaimer.html" },
-    {
-      "source": "/awaiting-clinical-validation",
-      "destination": "/awaiting-clinical-validation.html"
-    }
+    { "source": "/awaiting-clinical-validation", "destination": "/awaiting-clinical-validation.html" },
+    { "source": "/thinking", "destination": "/thinking.html" },
+    { "source": "/thesis", "destination": "/thesis.html" }
   ]
 }
