@@ -22,7 +22,7 @@ Dashboard:
 2. Set **Root Directory** to `evidence` (second project — not production default).
 3. Framework Preset: **Other**. Leave the build command empty.
 4. Output Directory: `.` (override if Vercel suggests `public`). Films are in `assets/`, not a Vercel `public/` output root.
-5. No environment secrets are required.
+5. No environment secrets are required. Optional: `XAI_API_KEY` only if you want the thesis Grok auditor. Without it the ledger still loads and the auditor soft-fails offline. Never commit an xAI key.
 
 See the README section **Deploy the clinical briefing to Vercel** and [docs/HOSTING.md](../docs/HOSTING.md) for Railway / Fly.
 

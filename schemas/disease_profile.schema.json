@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cloudynirvana/project-confluence/schemas/disease_profile.schema.json",
+  "title": "CONFLUENCE Disease Profile",
+  "description": "Thinking-lab export. Research / in-silico only. Not a medical device, not clinical CDS, not dosing.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profile_id",
+    "disease_id",
+    "disease_label",
+    "created_at",
+    "schema_version",
+    "asker_role",
+    "answers",
+    "observables",
+    "candidate_mechanisms",
+    "non_parameters",
+    "admitted_hypotheses",
+    "citations",
+    "disclaimer"
+  ],
+  "properties": {
+    "profile_id": { "type": "string", "minLength": 1 },
+    "disease_id": { "type": "string", "minLength": 1 },
+    "disease_label": { "type": "string", "minLength": 1 },
+    "created_at": { "type": "string", "minLength": 1 },
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "asker_role": {
+      "type": "string",
+      "enum": ["patient_advocate", "clinician", "researcher", "student", "other"]
+    },
+    "answers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "cancer", "setting", "stuck"],
+      "properties": {
+        "role": { "$ref": "#/$defs/answerChoice" },
+        "cancer": { "$ref": "#/$defs/answerChoice" },
+        "setting": { "$ref": "#/$defs/answerChoice" },
+        "stuck": { "$ref": "#/$defs/answerChoice" }
+      }
+    },
+    "observables": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/observable" }
+    },
+    "candidate_mechanisms": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/candidateMechanism" }
+    },
+    "non_parameters": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "admitted_hypotheses": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/admittedHypothesis" }
+    },
+    "citations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/citation" }
+    },
+    "disclaimer": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "answerChoice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question", "choice_id", "choice_label"],
+      "properties": {
+        "question": { "type": "string" },
+        "choice_id": { "type": "string" },
+        "choice_label": { "type": "string" }
+      }
+    },
+    "observable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement"],
+      "properties": {
+        "statement": { "type": "string" },
+        "citation_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "candidateMechanism": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement", "evidence_class", "falsifier"],
+      "properties": {
+        "statement": { "type": "string" },
+        "evidence_class": { "type": "string" },
+        "citation_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "falsifier": { "type": "string" }
+      }
+    },
+    "admittedHypothesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement", "layer", "evidence_class", "falsifier", "gates_passed", "parameter_status"],
+      "properties": {
+        "statement": { "type": "string" },
+        "layer": { "type": "string", "const": "hypothesis" },
+        "evidence_class": { "type": "string" },
+        "citation_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "falsifier": { "type": "string" },
+        "gates_passed": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "parameter_status": {
+          "type": "string",
+          "const": "forbidden_to_enter_theta"
+        }
+      }
+    },
+    "citation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text"],
+      "properties": {
+        "id": { "type": "string" },
+        "text": { "type": "string" },
+        "url": { "type": ["string", "null"] },
+        "doi": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

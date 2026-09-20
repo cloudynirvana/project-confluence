@@ -3,7 +3,7 @@
 **Document type:** Research findings chapter (working thesis format)
 **Status:** Specification and architectural findings. Not a clinical result.
 **Date:** 18 September 2026
-**Citation style:** numbered Vancouver-style in-text citations [1] matching section 8.
+**Citation style:** numbered Vancouver-style in-text citations [1] matching section 8. Public claims follow [docs/CITATION_POLICY.md](../CITATION_POLICY.md): ledger id or numbered ref; OnCo CC BY-NC 4.0 attribution; no fabricated DOIs; no clinical outcome claims.
 
 Word export with superscript citations is the local deliverable `ONCO_CONFLUENCE_THESIS_FINDINGS.docx`.
 

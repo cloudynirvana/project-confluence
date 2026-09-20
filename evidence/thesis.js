@@ -1,3 +1,41 @@
+const OFFLINE_BANNER =
+  "Evidence auditor offline (no API key) — citations still load from ledger";
+
+let auditorOffline = false;
+
+function isOfflinePayload(data) {
+  if (!data || typeof data !== "object") return false;
+  return data.ok === false && data.reason === "auditor_offline";
+}
+
+function setAuditorOffline(message) {
+  auditorOffline = true;
+  const banner = document.getElementById("auditor-offline");
+  if (banner) {
+    banner.hidden = false;
+    banner.textContent = message || OFFLINE_BANNER;
+  }
+  document.querySelectorAll("button.audit").forEach((btn) => {
+    btn.hidden = true;
+    btn.classList.add("offline-hidden");
+    btn.disabled = true;
+  });
+  const live = document.getElementById("auditor-live");
+  if (live) live.hidden = true;
+}
+
+async function probeAuditor() {
+  try {
+    const res = await fetch("/api/grok-review", { method: "GET", cache: "no-store" });
+    const data = await res.json().catch(() => ({}));
+    if (isOfflinePayload(data) || data.ok !== true) {
+      setAuditorOffline(data.message || OFFLINE_BANNER);
+    }
+  } catch (err) {
+    setAuditorOffline(OFFLINE_BANNER);
+  }
+}
+
 async function loadClaims() {
   const res = await fetch("claims.json", { cache: "no-store" });
   if (!res.ok) throw new Error("Could not load claims.json");
@@ -19,10 +57,18 @@ function renderClaim(c) {
     <button class="audit" type="button" data-id="${c.claim_id}">Audit this claim</button>
     <div class="audit-out" hidden></div>
   </article>`);
-  node.querySelector("button").addEventListener("click", () => audit(c, node));
+  const btn = node.querySelector("button");
+  if (auditorOffline) {
+    btn.hidden = true;
+    btn.classList.add("offline-hidden");
+    btn.disabled = true;
+  } else {
+    btn.addEventListener("click", () => audit(c, node));
+  }
   return node;
 }
 async function audit(claim, node) {
+  if (auditorOffline) return;
   const out = node.querySelector(".audit-out");
   const btn = node.querySelector("button");
   btn.disabled = true;
@@ -42,6 +88,12 @@ async function audit(claim, node) {
       }),
     });
     const data = await res.json();
+    if (isOfflinePayload(data)) {
+      setAuditorOffline(data.message || OFFLINE_BANNER);
+      out.hidden = true;
+      out.textContent = "";
+      return;
+    }
     if (!res.ok) {
       out.textContent = data.error || "Audit request failed.";
       if (data.hint) out.textContent += " " + data.hint;
@@ -64,12 +116,14 @@ async function audit(claim, node) {
       <ul>${sources}</ul><ul>${limits}</ul>
       <p class="meta">${data.disclaimer || "Grok output is an evidence-audit aid, not ground truth."}</p>`;
   } catch (err) {
-    out.textContent = "Network error talking to /api/grok-review.";
+    setAuditorOffline(OFFLINE_BANNER);
+    out.hidden = true;
   } finally {
-    btn.disabled = false;
+    if (!auditorOffline) btn.disabled = false;
   }
 }
 async function auditCustom() {
+  if (auditorOffline) return;
   const text = document.getElementById("custom-claim").value.trim();
   if (!text) return;
   const mount = document.getElementById("custom-out");
@@ -81,7 +135,8 @@ async function auditCustom() {
   await audit(fake, wrap);
 }
 document.getElementById("audit-custom")?.addEventListener("click", auditCustom);
-loadClaims()
+probeAuditor()
+  .then(() => loadClaims())
   .then((rows) => {
     const root = document.getElementById("ledger");
     root.innerHTML = "";
