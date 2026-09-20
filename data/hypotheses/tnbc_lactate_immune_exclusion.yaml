@@ -1,0 +1,28 @@
+# H-TNBC-LAC-EXCL-001
+# Research / in-silico only. Not clinical CDS, not a dose, not a cure.
+
+id: H-TNBC-LAC-EXCL-001
+disease_profile_ref: tnbc_metabolic_immune
+statement: >
+  In metastatic triple-negative breast cancer, lactate-associated metabolism
+  and immune exclusion may be coupled sufficiently to justify an in-silico
+  contrast on a named public RNA-seq cohort, without promoting OnCo LDHA
+  knowledge to the CONFLUENCE parameter p_lactate.
+evidence_class: review_level
+named_public_dataset: >
+  TCGA-BRCA RNA-seq via the NCI Genomic Data Commons
+  (https://portal.gdc.cancer.gov/projects/TCGA-BRCA). Public cohort only;
+  not an identified CONFLUENCE parameter and not a patient-level assay.
+falsifier: >
+  If a pre-registered contrast on TCGA-BRCA RNA-seq (GDC) fails to support
+  a lactate–exclusion association in the stated subtype filter, the
+  hypothesis is retired. OnCo confidence.probability still cannot become Θ.
+status: proposed
+non_claims: >
+  Not a medical device, not clinical decision support, not personalized
+  medicine as clinical CDS, not a diagnosis, not a dose, and not a cure.
+  In-silico research hypothesis only. See DISCLAIMER.md.
+citation_ids:
+  - "3"
+  - "5"
+  - "7"

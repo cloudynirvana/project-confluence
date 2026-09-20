@@ -1,0 +1,135 @@
+{
+  "profile_id": "dp-dormant-occult",
+  "disease_id": "occult",
+  "disease_label": "Dormant / occult residual disease (research analogy)",
+  "created_at": "2026-09-20T00:00:00Z",
+  "schema_version": "1.0.0",
+  "asker_role": "researcher",
+  "answers": {
+    "role": {
+      "question": "Who is asking?",
+      "choice_id": "researcher",
+      "choice_label": "Researcher"
+    },
+    "cancer": {
+      "question": "Which disease \u2014 not cancer?",
+      "choice_id": "occult",
+      "choice_label": "Dormant / occult residual disease (research analogy)"
+    },
+    "setting": {
+      "question": "What is the current regime?",
+      "choice_id": "local",
+      "choice_label": "Localised / early"
+    },
+    "stuck": {
+      "question": "Where is the system stuck?",
+      "choice_id": "unknown",
+      "choice_label": "Biology still unnamed"
+    }
+  },
+  "observables": [
+    {
+      "statement": "Cancer dormancy is a reviewed biological concept with experimental and clinical literature. This profile uses it as a research analogy for occult residual populations, not as a clinical MRD assay or a CONFLUENCE diagnosis.",
+      "citation_ids": [
+        "3"
+      ]
+    },
+    {
+      "statement": "Disease-class labels such as occult or dormant in this repository are state-signature modes for computational discrimination, not TNM or histopathology.",
+      "citation_ids": [
+        "6"
+      ]
+    }
+  ],
+  "candidate_mechanisms": [
+    {
+      "statement": "A residual population may occupy a dormant or occult regime whose control signal is measurement, not an added RHS term; this remains a hypothesis until a named assay can falsify it.",
+      "evidence_class": "review_level",
+      "citation_ids": [
+        "3",
+        "5"
+      ],
+      "falsifier": "If a named longitudinal assay in a stated cohort shows no occult residual compartment under the hypothesized gate, retire the analogy. Do not encode dormancy as identified \u0398."
+    },
+    {
+      "statement": "OnCo LDHA knowledge and confidence.probability can be entered as the confluence_v2_15d parameter p_lactate (or legacy pyruvate_to_lactate).",
+      "evidence_class": "knowledge",
+      "citation_ids": [
+        "4"
+      ],
+      "falsifier": "Rejected a priori: Knowledge is not a parameter."
+    }
+  ],
+  "non_parameters": [
+    "OnCo knowledge records (pages, targets, ideas)",
+    "OnCo confidence.probability",
+    "OnCo Idea maturity",
+    "Legacy validation/gene_to_parameter_map.json values (including LDHA \u2192 pyruvate_to_lactate)",
+    "CONFLUENCE v2 symbols such as p_lactate unless independently identified",
+    "Auditor classification scores",
+    "Grok evidence-audit output",
+    "Thinking-lab role, setting, or stuck labels",
+    "Clinical intent, cure language, or dosing",
+    "MRD-style language as a clinical assay claim",
+    "Dormancy as a CONFLUENCE disease-class diagnosis"
+  ],
+  "admitted_hypotheses": [
+    {
+      "statement": "A residual population may occupy a dormant or occult regime whose control signal is measurement, not an added RHS term; this remains a hypothesis until a named assay can falsify it.",
+      "layer": "hypothesis",
+      "evidence_class": "review_level",
+      "citation_ids": [
+        "3",
+        "5"
+      ],
+      "falsifier": "If a named longitudinal assay in a stated cohort shows no occult residual compartment under the hypothesized gate, retire the analogy. Do not encode dormancy as identified \u0398.",
+      "gates_passed": [
+        "Knowledge\u2260Evidence",
+        "Evidence\u2260Mechanism",
+        "Mechanism\u2260Parameter",
+        "Parameter\u2260Prediction",
+        "not_clinical_outcome"
+      ],
+      "parameter_status": "forbidden_to_enter_theta"
+    }
+  ],
+  "citations": [
+    {
+      "id": "1",
+      "text": "Sung H, Filho AM, Laversanne M, et al. Global cancer statistics 2024. CA Cancer J Clin. 2026.",
+      "url": "https://doi.org/10.3322/caac.70090",
+      "doi": "10.3322/caac.70090"
+    },
+    {
+      "id": "2",
+      "text": "World Health Organization. Cancer fact sheet. 2026.",
+      "url": "https://www.who.int/news-room/fact-sheets/detail/cancer",
+      "doi": null
+    },
+    {
+      "id": "3",
+      "text": "Aguirre-Ghiso JA. Models, mechanisms and clinical evidence for cancer dormancy. Nat Rev Cancer. 2007;7(11):834-846.",
+      "url": "https://doi.org/10.1038/nrc2256",
+      "doi": "10.1038/nrc2256"
+    },
+    {
+      "id": "4",
+      "text": "Gomila J, OnCo contributors. OnCo. 2026. Data CC BY-NC 4.0.",
+      "url": "https://onco.cc",
+      "doi": null
+    },
+    {
+      "id": "5",
+      "text": "Altrock PM, Liu LL, Michor F. The mathematics of cancer: integrating quantitative models. Nat Rev Cancer. 2015.",
+      "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5663316/",
+      "doi": "10.1038/nrc4029"
+    },
+    {
+      "id": "6",
+      "text": "Project Confluence. DISCLAIMER.md. Medical non-claims.",
+      "url": "https://github.com/cloudynirvana/project-confluence/blob/main/DISCLAIMER.md",
+      "doi": null
+    }
+  ],
+  "disclaimer": "Project Confluence disease profiles are computational research artefacts. They are not a medical device, not clinical decision support, not personalized medicine as clinical CDS, and not a claim of cure, diagnosis, or dosing. In-silico / research only. See DISCLAIMER.md."
+}

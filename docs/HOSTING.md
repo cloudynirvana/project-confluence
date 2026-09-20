@@ -44,9 +44,9 @@ Static routes on that project:
 - `/` — cinematic lab reel
 - `/thinking` — disease-specific thinking lab
 - `/thesis` — thesis evidence page + ledger
-- `POST /api/grok-review` — server-side Grok auditor (`evidence/api/grok-review.js`)
+- `GET`/`POST /api/grok-review` — server-side Grok auditor (`evidence/api/grok-review.js`)
 
-**Environment variable (evidence project only):** set `XAI_API_KEY` in the Vercel dashboard for Preview and Production. The key must never be committed, pasted into HTML, or shipped in client JavaScript. Without it, `/thesis` still renders; Audit returns HTTP 503 with a visible hint.
+**Environment variable (evidence project only):** set `XAI_API_KEY` in the Vercel dashboard for Preview and Production. The key must never be committed, pasted into HTML, or shipped in client JavaScript. Without it, `/thesis` still renders the ledger. The auditor **soft-fails** with `{ ok:false, reason:"auditor_offline", message }` and the page shows *Evidence auditor offline (no API key) — citations still load from ledger* instead of a dead audit button. Do not add an xAI key to the repository.
 
 Local preview:
 

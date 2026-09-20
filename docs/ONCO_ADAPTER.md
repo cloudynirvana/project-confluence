@@ -16,6 +16,8 @@ legacy gene→parameter map ≠ identified parameter mapping
 - `data/onco/fixtures/` — offline fixtures only
 - `data/onco/cache/` — gitignored live cache
 - `tests/test_onco_adapter.py` — nine gates
+- `confluence/profiles/` — Disease Profile export (thinking lab). Does not write Θ.
+- `docs/CITATION_POLICY.md` — public-claim citation rules
 
 ## Commands
 

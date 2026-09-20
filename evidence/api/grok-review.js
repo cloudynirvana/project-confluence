@@ -1,6 +1,7 @@
 /**
- * POST /api/grok-review
- * Secret: process.env.XAI_API_KEY only.
+ * GET  /api/grok-review — readiness probe (soft-fails without XAI_API_KEY)
+ * POST /api/grok-review — claim audit
+ * Secret: process.env.XAI_API_KEY only. Never ship the key to the browser.
  */
 const XAI_URL = "https://api.x.ai/v1/responses";
 const MODEL = "grok-4.6";
@@ -103,8 +104,28 @@ module.exports = async function handler(req, res) {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("X-Research-Status", "SIMULATION / RESEARCH");
+  const offline = {
+    ok: false,
+    reason: "auditor_offline",
+    message: "Evidence auditor offline (no API key) — citations still load from ledger",
+  };
   if (req.method === "OPTIONS") { res.status(204).end(); return; }
+  const key = process.env.XAI_API_KEY;
+  if (req.method === "GET") {
+    if (!key) { res.status(200).json(offline); return; }
+    res.status(200).json({
+      ok: true,
+      reason: "auditor_ready",
+      message: "Evidence auditor is configured. Citations still load from the ledger regardless.",
+    });
+    return;
+  }
   if (req.method !== "POST") { res.status(405).json({ error: "POST only" }); return; }
+  if (!key) {
+    // Soft-fail: same JSON on 200 so the thesis page can show a calm banner.
+    res.status(200).json(offline);
+    return;
+  }
   const ip = clientIp(req);
   if (limited(ip)) { res.status(429).json({ error: "Rate limit. Try again in a minute." }); return; }
   let body = req.body;
@@ -115,14 +136,6 @@ module.exports = async function handler(req, res) {
   const claim = String(body.claim || "").trim();
   if (!claim) { res.status(400).json({ error: "claim is required" }); return; }
   if (claim.length > MAX_CLAIM) { res.status(400).json({ error: "claim too long" }); return; }
-  const key = process.env.XAI_API_KEY;
-  if (!key) {
-    res.status(503).json({
-      error: "XAI_API_KEY is not configured on the server.",
-      hint: "Set it in the Vercel project environment. It must never appear in the browser.",
-    });
-    return;
-  }
   const user = [
     "Claim to audit:\n" + claim,
     body.claim_id ? "Ledger id: " + body.claim_id : "",
@@ -153,6 +166,7 @@ module.exports = async function handler(req, res) {
     try { data = JSON.parse(raw); } catch (e) { res.status(502).json({ error: "Upstream returned non-JSON" }); return; }
     if (!upstream.ok) { res.status(502).json({ error: "xAI request failed", status: upstream.status }); return; }
     const audit = parseAudit(extractText(data), claim);
+    audit.ok = true;
     audit.auditor = "grok-4.6";
     audit.disclaimer = "Grok output is an evidence-audit aid. It is not a substitute for expert review or primary-source verification.";
     res.status(200).json(audit);

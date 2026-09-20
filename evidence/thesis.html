@@ -26,10 +26,10 @@
     <h2>Abstract</h2>
     <p>Cancer research now produces knowledge graphs, multi-omic assays and dynamical simulators in parallel. The failure mode is collapsing those layers. This study asks whether a provenance-controlled pipeline can keep the layers apart while still allowing testable predictions. Scientific success is a staged chain — traceability, mathematical validity, identifiability, out-of-sample prediction, experimental falsification — not disease eradication. PR #9 is architectural evidence for the gates, not therapeutic efficacy.</p>
     <h2>Why the study is necessary</h2>
-    <p>GLOBOCAN 2024 estimates, published 2026: about 20.6 million diagnoses and 9.8 million deaths (<a href="#EVID-001">EVID-001</a>). Breast cancer about 2.43 million new cases (<a href="#EVID-002">EVID-002</a>). WHO: many cancers can be cured if found early and treated well; access is uneven (<a href="#EVID-003">EVID-003</a>). Nigeria GLOBOCAN <em>2022</em> profile: 127,763 new cases, 79,542 deaths, breast 32,278 — 2022 estimates, not 2026 incidence (<a href="#EVID-004">EVID-004</a>).</p>
-    <p>Tumours evolve and adapt under therapy (<a href="#EVID-006">EVID-006</a>). Multi-omics increase resolution without automatically producing a causal model. Mathematical oncology supplies in-silico laboratories (<a href="#EVID-007">EVID-007</a>). Adaptive therapy treats treatment as a process under selection (<a href="#EVID-008">EVID-008</a>). The gap is connecting knowledge to dynamical hypotheses without dropping provenance.</p>
+    <p>GLOBOCAN 2024 estimates, published 2026: about 20.6 million diagnoses and 9.8 million deaths [1,2] (<a href="#EVID-001">EVID-001</a>). Breast cancer about 2.43 million new cases [1,2] (<a href="#EVID-002">EVID-002</a>). WHO: many cancers can be cured if found early and treated well; access is uneven [3] (<a href="#EVID-003">EVID-003</a>). Nigeria GLOBOCAN <em>2022</em> profile: 127,763 new cases, 79,542 deaths, breast 32,278 — 2022 estimates, not 2026 incidence [5] (<a href="#EVID-004">EVID-004</a>).</p>
+    <p>Tumours evolve and adapt under therapy [7] (<a href="#EVID-006">EVID-006</a>). Multi-omics increase resolution without automatically producing a causal model. Mathematical oncology supplies in-silico laboratories [8] (<a href="#EVID-007">EVID-007</a>). Adaptive therapy treats treatment as a process under selection [9] (<a href="#EVID-008">EVID-008</a>). The gap is connecting knowledge to dynamical hypotheses without dropping provenance.</p>
     <h2>Evidence for the problem</h2>
-    <p>TNBC is a test case because NCI describes it as roughly 15% of breast cancers, typically faster-growing and more recurrent, and heterogeneous (<a href="#EVID-005">EVID-005</a>). That is not a CONFLUENCE parameter. This branch adds a read-only OnCo adapter with nine tests that refuse knowledge-as-parameter and do not edit CancerODE (<a href="#EVID-009">EVID-009</a>).</p>
+    <p>TNBC is a test case because NCI describes it as roughly 15% of breast cancers, typically faster-growing and more recurrent, and heterogeneous [6] (<a href="#EVID-005">EVID-005</a>). That is not a CONFLUENCE parameter. This branch adds a read-only OnCo adapter with nine tests that refuse knowledge-as-parameter and do not edit CancerODE [11] (<a href="#EVID-009">EVID-009</a>). OnCo is a cited knowledge graph, not Theta [10].</p>
     <p class="neq">Knowledge ≠ Evidence ≠ Causal mechanism ≠ Parameter ≠ Prediction</p>
     <p class="neq">legacy gene→parameter map ≠ identified parameter · structured representation ≠ biological observation</p>
     <h2>Problem statement</h2>
@@ -37,9 +37,9 @@
 <pre class="ladder">Knowledge → Evidence → Hypothesis → Mechanism → Parameter → Prediction → Experiment → New evidence</pre>
     <p>Every arrow is a failure point. A page may motivate a hypothesis; it must not become Theta.</p>
     <h2>Significance of the study</h2>
-    <h3>Scientific</h3><p>Treat cancer as dynamic and adaptive rather than as independent targets (<a href="#EVID-006">EVID-006</a>).</p>
-    <h3>Methodological</h3><p>Evidence gates. OnCo confidence is not P(H). Idea maturity is not evidence level. Failed hypotheses stay visible.</p>
-    <h3>Computational</h3><p>Auditable objects. PR #9 is the current artifact (<a href="#EVID-009">EVID-009</a>).</p>
+    <h3>Scientific</h3><p>Treat cancer as dynamic and adaptive rather than as independent targets [7] (<a href="#EVID-006">EVID-006</a>).</p>
+    <h3>Methodological</h3><p>Evidence gates. OnCo confidence is not P(H). Idea maturity is not evidence level. Failed hypotheses stay visible [10,11].</p>
+    <h3>Computational</h3><p>Auditable objects. PR #9 is the current artifact [11] (<a href="#EVID-009">EVID-009</a>).</p>
     <h3>Translational potential — not demonstrated benefit</h3><p>Models can compare hypotheses before a wet experiment. This page does not claim patient benefit. Translation waits for Gates 6–8.</p>
     <h3>Future research</h3><p>Attach genomic, single-cell, spatial, PK/PD and controllers around a frozen biological model.</p>
     <h2>CONFLUENCE evidence architecture</h2>
@@ -64,21 +64,24 @@ Population dynamics — frozen confluence_v2_15d → controller → prediction �
     </div>
     <p class="meta">Traceability → mathematical validity → identifiability → out-of-sample prediction → experimental falsification.</p>
     <h3>Three-arm programme — hypotheses, not results</h3>
-    <p>validation/validation_protocol.md states H0 versus H1. Thresholds such as r > 0.5 are protocol criteria, not findings (<a href="#EVID-010">EVID-010</a>).</p>
+    <p>validation/validation_protocol.md states H0 versus H1. Thresholds such as r > 0.5 are protocol criteria, not findings [12] (<a href="#EVID-010">EVID-010</a>).</p>
     <div class="arms">
       <div class="arm"><div class="tag">Arm 1 · planned / ongoing hypothesis</div><h3>Separate validation</h3><p>Cancer and metabolic systems independently.</p></div>
       <div class="arm"><div class="tag">Arm 2 · planned / ongoing hypothesis</div><h3>Conjoined validation</h3><p>Coupled versus independent models on comorbidity data.</p></div>
       <div class="arm"><div class="tag">Arm 3 · planned / ongoing hypothesis</div><h3>Universality test</h3><p>Whether ΔΦ distributions match after labels are stripped — against nulls.</p></div>
     </div>
     <h2>Evidence ledger</h2>
-    <p class="meta">Each row keeps year and population. Audit is server-side; the API key never enters this page.</p>
+    <p class="meta">Each row keeps year and population. Numbered Vancouver-style references appear in the text as [n] and in the list below. Ledger ids (EVID-xxx) are the machine-readable claim keys. Citation rules: <code>docs/CITATION_POLICY.md</code>. Audit is server-side; the API key never enters this page.</p>
+    <div id="auditor-offline" class="offline-banner" hidden role="status">Evidence auditor offline (no API key) — citations still load from ledger</div>
     <div id="ledger">Loading claims.json…</div>
     <h2>Grok Evidence Auditor</h2>
     <div class="box" id="auditor-box">
-      <p>Grok output is an <strong>evidence-audit aid</strong>. Not a truth score, not a parameter estimator, not expert review.</p>
-      <label for="custom-claim">Paste or edit a claim</label>
-      <textarea id="custom-claim">LDHA expression can be entered as the CONFLUENCE v2 parameter p_lactate because OnCo lists LDHA as a lactate-metabolism target.</textarea>
-      <p><button class="audit" type="button" id="audit-custom">Audit this claim</button></p>
+      <p>Grok output is an <strong>evidence-audit aid</strong>. Not a truth score, not a parameter estimator, not expert review. Citations still load from the ledger when the auditor is offline.</p>
+      <div class="auditor-live" id="auditor-live">
+        <label for="custom-claim">Paste or edit a claim</label>
+        <textarea id="custom-claim">LDHA expression can be entered as the CONFLUENCE v2 parameter p_lactate because OnCo lists LDHA as a lactate-metabolism target.</textarea>
+        <p><button class="audit" type="button" id="audit-custom">Audit this claim</button></p>
+      </div>
       <div id="custom-out"></div>
     </div>
     <h2>Limitations and falsifiers</h2>
@@ -106,7 +109,7 @@ Population dynamics — frozen confluence_v2_15d → controller → prediction �
       <li>Ogbonna K. Project Confluence PR #9. <a href="https://github.com/cloudynirvana/project-confluence/pull/9">pull/9</a></li>
       <li>Validation protocol. <a href="https://github.com/cloudynirvana/project-confluence/blob/feat/onco-adapter-p0/validation/validation_protocol.md">validation_protocol.md</a></li>
     </ol>
-    <p class="meta">OnCo data CC BY-NC 4.0 where cited. Not medical advice.</p>
+    <p class="meta">OnCo data CC BY-NC 4.0 where cited [10]. Numbered references are Vancouver-style; DOIs are included only when verified. Not medical advice. See DISCLAIMER.md.</p>
   </article>
   <footer class="site">CONFLUENCE thesis evidence · feat/onco-adapter-p0 · research only</footer>
   <script src="thesis.js"></script>

@@ -66,6 +66,17 @@ button.audit {
   border: 1px solid var(--navy); background: var(--navy); color: #fff; padding: 8px 12px; cursor: pointer;
 }
 button.audit:disabled { opacity: 0.5; cursor: wait; }
+button.audit.offline-hidden { display: none; }
+.offline-banner {
+  background: #f4efe4;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  padding: 12px 14px;
+  margin: 12px 0 18px;
+  font: 15px/1.5 ui-sans-serif, system-ui, sans-serif;
+}
+.offline-banner[hidden] { display: none; }
+.auditor-live[hidden] { display: none; }
 .audit-out { font-size: 0.95rem; margin-top: 10px; }
 .audit-out.supported { border-left: 3px solid var(--teal); padding-left: 10px; }
 .audit-out.partially_supported { border-left: 3px solid var(--gold); padding-left: 10px; }
