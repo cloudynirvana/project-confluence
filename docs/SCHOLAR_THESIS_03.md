@@ -35,14 +35,14 @@
 
 ## Sitemap note
 
-`evidence/sitemap.xml` did **not** exist on `main` when Thesis #3 was packaged.
-Created `evidence/sitemap-thesis03.xml` instead of inventing a full-site sitemap.
-If a general evidence sitemap is added later, merge these four `<url>` entries into it
-and point `loc` at the deployed Vercel origin (Root Directory `evidence`).
+`evidence/sitemap.xml` now exists on `main` (Thesis #1 Scholar surface).
+Thesis #3 URLs are listed there as `/thesis-03` and
+`/papers/thesis_03_disease_profile_method.pdf` on the Vercel origin.
+`evidence/sitemap-thesis03.xml` remains as a GitHub-URL fragment.
 
 ## Independence / sit on latest main
 
-- [x] Branched / rebased onto `main` at `64ba76b` (PR #11 merged)
+- [x] Branched / rebased onto `main` at `1f95990` (PR #14 Vancouver bibliography merged; includes PR #11 @ `64ba76b` and Scholar indexing @ `fc51560`)
 - [x] No `CancerODE` / `ode_system.py` edits
 - [x] Cites shipped paths: `confluence/profiles/`, `data/profiles/cases/`, `schemas/disease_profile.schema.json`
 - [x] Does **not** propose a parallel schema contract
