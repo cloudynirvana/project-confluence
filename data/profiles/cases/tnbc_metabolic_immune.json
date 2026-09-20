@@ -1,0 +1,156 @@
+{
+  "profile_id": "dp-tnbc-metabolic-immune",
+  "disease_id": "tnbc",
+  "disease_label": "Triple-negative breast cancer",
+  "created_at": "2026-09-20T00:00:00Z",
+  "schema_version": "1.0.0",
+  "asker_role": "researcher",
+  "answers": {
+    "role": {
+      "question": "Who is asking?",
+      "choice_id": "researcher",
+      "choice_label": "Researcher"
+    },
+    "cancer": {
+      "question": "Which disease \u2014 not cancer?",
+      "choice_id": "tnbc",
+      "choice_label": "Triple-negative breast cancer"
+    },
+    "setting": {
+      "question": "What is the current regime?",
+      "choice_id": "metastatic",
+      "choice_label": "Metastatic / relapsed"
+    },
+    "stuck": {
+      "question": "Where is the system stuck?",
+      "choice_id": "resistance",
+      "choice_label": "Adaptation / persisters"
+    }
+  },
+  "observables": [
+    {
+      "statement": "NCI describes triple-negative breast cancer as about 15% of breast cancers, typically faster-growing and more recurrent than some other invasive subtypes. Descriptor only; not a CONFLUENCE parameter.",
+      "citation_ids": [
+        "3"
+      ]
+    },
+    {
+      "statement": "Research framing for this profile is a coupled tumour\u2013immune\u2013stroma\u2013metabolism axis under treatment pressure. Axes are a thinking scaffold, not measured couplings in confluence_v2_15d.",
+      "citation_ids": [
+        "5",
+        "7"
+      ]
+    },
+    {
+      "statement": "OnCo lists LDHA among lactate-metabolism targets (CC BY-NC 4.0). That page is knowledge, not p_lactate.",
+      "citation_ids": [
+        "4"
+      ]
+    }
+  ],
+  "candidate_mechanisms": [
+    {
+      "statement": "Lactate metabolism, TGF-\u03b2 stroma signalling, immune exclusion and persister states may be coupled loops in metastatic TNBC and can be stated as a testable in-silico mechanism hypothesis.",
+      "evidence_class": "review_level",
+      "citation_ids": [
+        "3",
+        "5",
+        "7"
+      ],
+      "falsifier": "If a named public-cohort contrast (TCGA-BRCA RNA-seq via GDC) and a named assay fail to support a lactate\u2013exclusion association in the stated context, retire the coupling. Never promote it to p_lactate."
+    },
+    {
+      "statement": "OnCo LDHA knowledge and confidence.probability can be entered as the confluence_v2_15d parameter p_lactate (or legacy pyruvate_to_lactate).",
+      "evidence_class": "knowledge",
+      "citation_ids": [
+        "4"
+      ],
+      "falsifier": "Rejected a priori: Knowledge is not a parameter."
+    }
+  ],
+  "non_parameters": [
+    "OnCo knowledge records (pages, targets, ideas)",
+    "OnCo confidence.probability",
+    "OnCo Idea maturity",
+    "Legacy validation/gene_to_parameter_map.json values (including LDHA \u2192 pyruvate_to_lactate)",
+    "CONFLUENCE v2 symbols such as p_lactate unless independently identified",
+    "Auditor classification scores",
+    "Grok evidence-audit output",
+    "Thinking-lab role, setting, or stuck labels",
+    "Clinical intent, cure language, or dosing",
+    "TCGA-BRCA RNA-seq public cohort (not identified \u0398)",
+    "Systemic axes labels (tumour\u2013immune\u2013stroma\u2013metabolism)"
+  ],
+  "admitted_hypotheses": [
+    {
+      "statement": "Lactate metabolism, TGF-\u03b2 stroma signalling, immune exclusion and persister states may be coupled loops in metastatic TNBC and can be stated as a testable in-silico mechanism hypothesis.",
+      "layer": "hypothesis",
+      "evidence_class": "review_level",
+      "citation_ids": [
+        "3",
+        "5",
+        "7"
+      ],
+      "falsifier": "If a named public-cohort contrast (TCGA-BRCA RNA-seq via GDC) and a named assay fail to support a lactate\u2013exclusion association in the stated context, retire the coupling. Never promote it to p_lactate.",
+      "gates_passed": [
+        "Knowledge\u2260Evidence",
+        "Evidence\u2260Mechanism",
+        "Mechanism\u2260Parameter",
+        "Parameter\u2260Prediction",
+        "not_clinical_outcome"
+      ],
+      "parameter_status": "forbidden_to_enter_theta"
+    }
+  ],
+  "citations": [
+    {
+      "id": "1",
+      "text": "Sung H, Filho AM, Laversanne M, et al. Global cancer statistics 2024. CA Cancer J Clin. 2026.",
+      "url": "https://doi.org/10.3322/caac.70090",
+      "doi": "10.3322/caac.70090"
+    },
+    {
+      "id": "2",
+      "text": "World Health Organization. Cancer fact sheet. 2026.",
+      "url": "https://www.who.int/news-room/fact-sheets/detail/cancer",
+      "doi": null
+    },
+    {
+      "id": "3",
+      "text": "National Cancer Institute. Triple-negative breast cancer.",
+      "url": "https://www.cancer.gov/types/breast/patient/triple-negative-brochure",
+      "doi": null
+    },
+    {
+      "id": "4",
+      "text": "Gomila J, OnCo contributors. OnCo: a public, cited knowledge graph of oncology. 2026. Data CC BY-NC 4.0.",
+      "url": "https://onco.cc",
+      "doi": null
+    },
+    {
+      "id": "5",
+      "text": "Altrock PM, Liu LL, Michor F. The mathematics of cancer: integrating quantitative models. Nat Rev Cancer. 2015.",
+      "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5663316/",
+      "doi": "10.1038/nrc4029"
+    },
+    {
+      "id": "6",
+      "text": "Gatenby RA, Silva AS, Gillies RJ, Frieden BR. Adaptive therapy. Cancer Res. 2009;69(11):4894-4903.",
+      "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2676449/",
+      "doi": "10.1158/0008-5472.CAN-08-3658"
+    },
+    {
+      "id": "7",
+      "text": "National Cancer Institute GDC. TCGA-BRCA project (public RNA-seq cohort). Accessed 2026.",
+      "url": "https://portal.gdc.cancer.gov/projects/TCGA-BRCA",
+      "doi": null
+    },
+    {
+      "id": "8",
+      "text": "Project Confluence. DISCLAIMER.md. Medical non-claims.",
+      "url": "https://github.com/cloudynirvana/project-confluence/blob/main/DISCLAIMER.md",
+      "doi": null
+    }
+  ],
+  "disclaimer": "Project Confluence disease profiles are computational research artefacts. They are not a medical device, not clinical decision support, not personalized medicine as clinical CDS, and not a claim of cure, diagnosis, or dosing. In-silico / research only. See DISCLAIMER.md."
+}

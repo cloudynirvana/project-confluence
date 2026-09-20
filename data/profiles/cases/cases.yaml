@@ -1,0 +1,214 @@
+# Research / in-silico Disease Profile case table.
+# Not a medical device, not clinical CDS, not dosing, not a cure.
+# Public claims use Vancouver citations; no fabricated DOIs.
+
+created_at: "2026-09-20T00:00:00Z"
+
+cases:
+  - slug: tnbc_metabolic_immune
+    filename: tnbc_metabolic_immune.json
+    profile_id: dp-tnbc-metabolic-immune
+    disease_id: tnbc
+    disease_label: Triple-negative breast cancer
+    role_id: researcher
+    role_label: Researcher
+    setting_id: metastatic
+    setting_label: Metastatic / relapsed
+    stuck_id: resistance
+    stuck_label: Adaptation / persisters
+    extra_non_parameters:
+      - TCGA-BRCA RNA-seq public cohort (not identified Θ)
+      - Systemic axes labels (tumour–immune–stroma–metabolism)
+    observables:
+      - statement: "NCI describes triple-negative breast cancer as about 15% of breast cancers, typically faster-growing and more recurrent than some other invasive subtypes. Descriptor only; not a CONFLUENCE parameter."
+        citation_ids: ["3"]
+      - statement: "Research framing for this profile is a coupled tumour–immune–stroma–metabolism axis under treatment pressure. Axes are a thinking scaffold, not measured couplings in confluence_v2_15d."
+        citation_ids: ["5", "7"]
+      - statement: "OnCo lists LDHA among lactate-metabolism targets (CC BY-NC 4.0). That page is knowledge, not p_lactate."
+        citation_ids: ["4"]
+    candidate_mechanisms:
+      - statement: "Lactate metabolism, TGF-β stroma signalling, immune exclusion and persister states may be coupled loops in metastatic TNBC and can be stated as a testable in-silico mechanism hypothesis."
+        evidence_class: review_level
+        citation_ids: ["3", "5", "7"]
+        falsifier: "If a named public-cohort contrast (TCGA-BRCA RNA-seq via GDC) and a named assay fail to support a lactate–exclusion association in the stated context, retire the coupling. Never promote it to p_lactate."
+    citations:
+      - id: "1"
+        text: "Sung H, Filho AM, Laversanne M, et al. Global cancer statistics 2024. CA Cancer J Clin. 2026."
+        url: "https://doi.org/10.3322/caac.70090"
+        doi: "10.3322/caac.70090"
+      - id: "2"
+        text: "World Health Organization. Cancer fact sheet. 2026."
+        url: "https://www.who.int/news-room/fact-sheets/detail/cancer"
+      - id: "3"
+        text: "National Cancer Institute. Triple-negative breast cancer."
+        url: "https://www.cancer.gov/types/breast/patient/triple-negative-brochure"
+      - id: "4"
+        text: "Gomila J, OnCo contributors. OnCo: a public, cited knowledge graph of oncology. 2026. Data CC BY-NC 4.0."
+        url: "https://onco.cc"
+      - id: "5"
+        text: "Altrock PM, Liu LL, Michor F. The mathematics of cancer: integrating quantitative models. Nat Rev Cancer. 2015."
+        url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5663316/"
+        doi: "10.1038/nrc4029"
+      - id: "6"
+        text: "Gatenby RA, Silva AS, Gillies RJ, Frieden BR. Adaptive therapy. Cancer Res. 2009;69(11):4894-4903."
+        url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2676449/"
+        doi: "10.1158/0008-5472.CAN-08-3658"
+      - id: "7"
+        text: "National Cancer Institute GDC. TCGA-BRCA project (public RNA-seq cohort). Accessed 2026."
+        url: "https://portal.gdc.cancer.gov/projects/TCGA-BRCA"
+      - id: "8"
+        text: "Project Confluence. DISCLAIMER.md. Medical non-claims."
+        url: "https://github.com/cloudynirvana/project-confluence/blob/main/DISCLAIMER.md"
+
+  - slug: gbm_invasive_niche
+    filename: gbm_invasive_niche.json
+    profile_id: dp-gbm-invasive-niche
+    disease_id: gbm
+    disease_label: Glioblastoma
+    role_id: researcher
+    role_label: Researcher
+    setting_id: local
+    setting_label: Localised / early
+    stuck_id: undruggable
+    stuck_label: Target known, not reachable
+    extra_non_parameters:
+      - Fly connectome stubs (not a brain-tumour controller)
+      - Hypoxia or invasion labels as ODE Θ
+    observables:
+      - statement: "NCI describes glioblastoma as an aggressive malignant brain tumour. That descriptor is setting context, not a CONFLUENCE parameter or a clinical stage claim from this repository."
+        citation_ids: ["3"]
+      - statement: "Research framing: spatial invasion, hypoxia, and immune privilege inside an organ that cannot be widely resected. Framing is a systems board, not a measured 15-D coupling."
+        citation_ids: ["5"]
+    candidate_mechanisms:
+      - statement: "Invasive niche, hypoxia, and immune privilege may jointly limit clearance as a spatial evolutionary process in GBM and can be posed as an in-silico hypothesis with a named falsifier."
+        evidence_class: review_level
+        citation_ids: ["3", "5"]
+        falsifier: "If a named imaging or tissue assay in a stated cohort shows invasion without the putative hypoxia–privilege coupling, drop the joint claim. Do not import ROS from tnbc_mod_3s or write Θ."
+    citations:
+      - id: "1"
+        text: "Sung H, Filho AM, Laversanne M, et al. Global cancer statistics 2024. CA Cancer J Clin. 2026."
+        url: "https://doi.org/10.3322/caac.70090"
+        doi: "10.3322/caac.70090"
+      - id: "2"
+        text: "World Health Organization. Cancer fact sheet. 2026."
+        url: "https://www.who.int/news-room/fact-sheets/detail/cancer"
+      - id: "3"
+        text: "National Cancer Institute. Adult central nervous system tumors treatment (PDQ) — glioblastoma context."
+        url: "https://www.cancer.gov/types/brain/hp/adult-brain-treatment-pdq"
+      - id: "4"
+        text: "Gomila J, OnCo contributors. OnCo. 2026. Data CC BY-NC 4.0."
+        url: "https://onco.cc"
+      - id: "5"
+        text: "Altrock PM, Liu LL, Michor F. The mathematics of cancer: integrating quantitative models. Nat Rev Cancer. 2015."
+        url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5663316/"
+        doi: "10.1038/nrc4029"
+      - id: "6"
+        text: "Project Confluence. DISCLAIMER.md. Medical non-claims."
+        url: "https://github.com/cloudynirvana/project-confluence/blob/main/DISCLAIMER.md"
+
+  - slug: pdac_stromal_barrier
+    filename: pdac_stromal_barrier.json
+    profile_id: dp-pdac-stromal-barrier
+    disease_id: pdac
+    disease_label: Pancreatic ductal adenocarcinoma
+    role_id: researcher
+    role_label: Researcher
+    setting_id: metastatic
+    setting_label: Metastatic / relapsed
+    stuck_id: late
+    stuck_label: Found too late
+    extra_non_parameters:
+      - Stage-at-diagnosis ideas from OnCo
+      - Adding OnCo targets to CancerODE RHS
+    observables:
+      - statement: "NCI pancreatic cancer pages describe a disease often found late, with dense stroma as a clinical and biological challenge. That is setting context, not an identified S_fib value."
+        citation_ids: ["3"]
+      - statement: "Research framing: desmoplasia as a delivery and detection barrier. A better ODE will not move median diagnosis earlier."
+        citation_ids: ["5"]
+    candidate_mechanisms:
+      - statement: "Desmoplastic stroma may act as a drug-delivery and detection barrier in PDAC; lumped handles such as S_fib remain assumed annotations unless independently identified."
+        evidence_class: review_level
+        citation_ids: ["3", "5"]
+        falsifier: "If a named stromal-disruption experiment does not change delivery or burden signatures in the stated model context, retire the barrier-as-load-bearing-loop claim. Do not write Θ from an OnCo page."
+    citations:
+      - id: "1"
+        text: "Sung H, Filho AM, Laversanne M, et al. Global cancer statistics 2024. CA Cancer J Clin. 2026."
+        url: "https://doi.org/10.3322/caac.70090"
+        doi: "10.3322/caac.70090"
+      - id: "2"
+        text: "World Health Organization. Cancer fact sheet. 2026."
+        url: "https://www.who.int/news-room/fact-sheets/detail/cancer"
+      - id: "3"
+        text: "National Cancer Institute. Pancreatic cancer treatment (PDQ)."
+        url: "https://www.cancer.gov/types/pancreatic/hp/pancreatic-treatment-pdq"
+      - id: "4"
+        text: "Gomila J, OnCo contributors. OnCo. 2026. Data CC BY-NC 4.0."
+        url: "https://onco.cc"
+      - id: "5"
+        text: "Altrock PM, Liu LL, Michor F. The mathematics of cancer: integrating quantitative models. Nat Rev Cancer. 2015."
+        url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5663316/"
+        doi: "10.1038/nrc4029"
+      - id: "6"
+        text: "Project Confluence. DISCLAIMER.md. Medical non-claims."
+        url: "https://github.com/cloudynirvana/project-confluence/blob/main/DISCLAIMER.md"
+
+  - slug: dormant_occult
+    filename: dormant_occult.json
+    profile_id: dp-dormant-occult
+    disease_id: occult
+    disease_label: Dormant / occult residual disease (research analogy)
+    role_id: researcher
+    role_label: Researcher
+    setting_id: local
+    setting_label: Localised / early
+    stuck_id: unknown
+    stuck_label: Biology still unnamed
+    extra_non_parameters:
+      - MRD-style language as a clinical assay claim
+      - Dormancy as a CONFLUENCE disease-class diagnosis
+    observables:
+      - statement: "Cancer dormancy is a reviewed biological concept with experimental and clinical literature. This profile uses it as a research analogy for occult residual populations, not as a clinical MRD assay or a CONFLUENCE diagnosis."
+        citation_ids: ["3"]
+      - statement: "Disease-class labels such as occult or dormant in this repository are state-signature modes for computational discrimination, not TNM or histopathology."
+        citation_ids: ["6"]
+    candidate_mechanisms:
+      - statement: "A residual population may occupy a dormant or occult regime whose control signal is measurement, not an added RHS term; this remains a hypothesis until a named assay can falsify it."
+        evidence_class: review_level
+        citation_ids: ["3", "5"]
+        falsifier: "If a named longitudinal assay in a stated cohort shows no occult residual compartment under the hypothesized gate, retire the analogy. Do not encode dormancy as identified Θ."
+    citations:
+      - id: "1"
+        text: "Sung H, Filho AM, Laversanne M, et al. Global cancer statistics 2024. CA Cancer J Clin. 2026."
+        url: "https://doi.org/10.3322/caac.70090"
+        doi: "10.3322/caac.70090"
+      - id: "2"
+        text: "World Health Organization. Cancer fact sheet. 2026."
+        url: "https://www.who.int/news-room/fact-sheets/detail/cancer"
+      - id: "3"
+        text: "Aguirre-Ghiso JA. Models, mechanisms and clinical evidence for cancer dormancy. Nat Rev Cancer. 2007;7(11):834-846."
+        url: "https://doi.org/10.1038/nrc2256"
+        doi: "10.1038/nrc2256"
+      - id: "4"
+        text: "Gomila J, OnCo contributors. OnCo. 2026. Data CC BY-NC 4.0."
+        url: "https://onco.cc"
+      - id: "5"
+        text: "Altrock PM, Liu LL, Michor F. The mathematics of cancer: integrating quantitative models. Nat Rev Cancer. 2015."
+        url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5663316/"
+        doi: "10.1038/nrc4029"
+      - id: "6"
+        text: "Project Confluence. DISCLAIMER.md. Medical non-claims."
+        url: "https://github.com/cloudynirvana/project-confluence/blob/main/DISCLAIMER.md"
+
+refuse_examples:
+  - slug: poison_ldha_as_theta
+    disease_id: tnbc
+    p_lactate: 0.22
+    role_id: researcher
+    setting_id: metastatic
+    stuck_id: resistance
+    candidate_mechanisms:
+      - statement: "Write OnCo LDHA confidence.probability into p_lactate."
+        evidence_class: knowledge
+        citation_ids: ["4"]
+        falsifier: "Should never run."
+        force_admit: true

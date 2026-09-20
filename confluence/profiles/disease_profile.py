@@ -76,6 +76,7 @@ DISEASE_LABELS = {
     "melanoma": "Melanoma",
     "cervix": "Cervical cancer",
     "cml": "CML",
+    "occult": "Dormant / occult residual disease (research analogy)",
 }
 
 GATES = (
@@ -408,50 +409,81 @@ def build_thinking_answers(
     )
 
 
+def ldha_onco_poison_candidate() -> CandidateMechanism:
+    """Audit trap: knowledge must remain a candidate and never an admitted Θ."""
+    return CandidateMechanism(
+        statement=(
+            "OnCo LDHA knowledge and confidence.probability can be entered as the "
+            "confluence_v2_15d parameter p_lactate (or legacy pyruvate_to_lactate)."
+        ),
+        evidence_class="knowledge",
+        citation_ids=["4"],
+        falsifier="Rejected a priori: Knowledge is not a parameter.",
+    )
+
+
 def build_disease_profile(
     *,
     role_id: str = "researcher",
     role_label: str = "Researcher",
     disease_id: str = "tnbc",
+    disease_label: Optional[str] = None,
     setting_id: str = "metastatic",
     setting_label: str = "Metastatic / relapsed",
     stuck_id: str = "resistance",
     stuck_label: str = "Adaptation / persisters",
     extra_candidates: Optional[Sequence[CandidateMechanism]] = None,
+    candidate_mechanisms: Optional[Sequence[CandidateMechanism]] = None,
+    observables: Optional[Sequence[Observable]] = None,
+    citations: Optional[Sequence[Citation]] = None,
+    extra_non_parameters: Optional[Sequence[str]] = None,
+    include_default_poison: bool = True,
     created_at: Optional[str] = None,
     profile_id: Optional[str] = None,
 ) -> DiseaseProfile:
     """Build a gated profile. OnCo/LDHA knowledge never becomes admitted Θ."""
-    disease_label = DISEASE_LABELS.get(disease_id, disease_id)
+    label = disease_label or DISEASE_LABELS.get(disease_id, disease_id)
     answers = build_thinking_answers(
         role_id=role_id,
         role_label=role_label,
         disease_id=disease_id,
-        disease_label=disease_label,
+        disease_label=label,
         setting_id=setting_id,
         setting_label=setting_label,
         stuck_id=stuck_id,
         stuck_label=stuck_label,
     )
-    candidates = list(_default_candidates(disease_id, disease_label))
+    if candidate_mechanisms is not None:
+        candidates = list(candidate_mechanisms)
+    else:
+        candidates = list(_default_candidates(disease_id, label))
     if extra_candidates:
         candidates.extend(extra_candidates)
+    if include_default_poison and not any(
+        refuse_ldha_onco_as_parameter(c.statement) for c in candidates
+    ):
+        candidates.append(ldha_onco_poison_candidate())
     admitted = admit_hypotheses(candidates)
     stamp = created_at or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     pid = profile_id or f"dp-{disease_id}-{uuid.uuid4().hex[:8]}"
+    non_parameters = list(DEFAULT_NON_PARAMETERS)
+    if extra_non_parameters:
+        for item in extra_non_parameters:
+            if item not in non_parameters:
+                non_parameters.append(item)
     return DiseaseProfile(
         profile_id=pid,
         disease_id=disease_id,
-        disease_label=disease_label,
+        disease_label=label,
         created_at=stamp,
         schema_version=SCHEMA_VERSION,
         asker_role=map_asker_role(role_id),
         answers=answers,
-        observables=_default_observables(disease_id, disease_label),
+        observables=list(observables) if observables is not None else _default_observables(disease_id, label),
         candidate_mechanisms=candidates,
-        non_parameters=list(DEFAULT_NON_PARAMETERS),
+        non_parameters=non_parameters,
         admitted_hypotheses=admitted,
-        citations=core_citations(),
+        citations=list(citations) if citations is not None else core_citations(),
         disclaimer=RESEARCH_DISCLAIMER,
     )
 

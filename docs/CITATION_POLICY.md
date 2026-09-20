@@ -30,4 +30,5 @@ claim of cure, diagnosis, or dosing. See [DISCLAIMER.md](../DISCLAIMER.md).
 - `docs/manuscript/ONCO_CONFLUENCE_THESIS_FINDINGS.md`
 - `evidence/thesis.html` and `evidence/claims.json`
 - Disease Profile JSON from the thinking lab
+- `data/profiles/cases/` research case pack
 - README / HOSTING copy that restates burden statistics

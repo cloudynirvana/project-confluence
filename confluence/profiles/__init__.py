@@ -13,6 +13,7 @@ from confluence.profiles.disease_profile import (
     build_disease_profile,
     refuse_ldha_onco_as_parameter,
 )
+from confluence.profiles.hypothesis_object import HypothesisObject
 
 __all__ = [
     "RESEARCH_DISCLAIMER",
@@ -21,6 +22,7 @@ __all__ = [
     "CandidateMechanism",
     "Citation",
     "DiseaseProfile",
+    "HypothesisObject",
     "Observable",
     "ThinkingLabAnswers",
     "admit_hypotheses",
