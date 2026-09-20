@@ -89,6 +89,16 @@ def test_hypothesis_object_loads_named_dataset():
     assert obj.disclaimer == RESEARCH_DISCLAIMER
 
 
+def test_pack_summary_is_scholar_safe():
+    text = (CASES / "SUMMARY.md").read_text(encoding="utf-8")
+    lowered = text.lower()
+    assert "in-silico" in lowered or "research" in lowered
+    assert "not" in lowered and ("clinical" in lowered or "cds" in lowered)
+    assert "10.3322/caac.70090" in text
+    assert "personalized medicine as cds" in lowered or "not clinical decision support" in lowered
+    assert "cure patients" not in lowered
+
+
 def test_hypothesis_object_refuses_missing_dataset_name():
     with pytest.raises(Exception):
         HypothesisObject(

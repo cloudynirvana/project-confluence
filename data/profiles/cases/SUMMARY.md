@@ -1,7 +1,8 @@
 # Disease Profile case pack
 
-Research / in-silico only. Not a medical device, not clinical CDS, not dosing, not a cure.
-See DISCLAIMER.md and docs/CITATION_POLICY.md.
+## Research summary (not a clinical abstract)
+
+This pack is an in-silico, evidence-gated sketch of disease-specific systems hypotheses (TNBC, glioblastoma, PDAC, and occult residual disease as a research analogy). It does not report patient outcomes, doses, or clinical decision support, and it is not personalized medicine as CDS. Global burden context, where used, follows GLOBOCAN 2024 (Sung et al. CA Cancer J Clin. 2026. doi:10.3322/caac.70090) and WHO cancer fact sheets. Mathematical-oncology framing follows Altrock, Liu and Michor (Nat Rev Cancer. 2015. doi:10.1038/nrc4029). Adaptive-therapy literature is research context only (Gatenby et al. Cancer Res. 2009. doi:10.1158/0008-5472.CAN-08-3658). OnCo records (onco.cc, CC BY-NC 4.0) are knowledge, not identified ODE parameters. See DISCLAIMER.md and docs/CITATION_POLICY.md.
 
 | File | Disease | Asker | Admitted hypotheses | Candidates (incl. audit traps) | Citations |
 | --- | --- | --- | ---: | ---: | ---: |

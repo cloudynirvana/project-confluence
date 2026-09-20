@@ -1,7 +1,10 @@
 # Disease Profile case pack
 
-Research / in-silico only. Not a medical device, not clinical CDS, not
-personalized medicine as CDS, not a dose, and not a cure.
+In-silico research artefacts only. Not a medical device, not clinical CDS,
+not personalized medicine as CDS, not a dose, and not a cure. Public
+summaries stay Scholar-safe: cited, research-only, no clinical-outcome
+claims. See `SUMMARY.md` and DISCLAIMER.md. A separate change on `main`
+owns citation_* meta tags and a citeable PDF.
 
 Rebuild:
 
