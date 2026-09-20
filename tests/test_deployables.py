@@ -24,6 +24,10 @@ def test_evidence_site_is_static_and_honest() -> None:
     assert "fastapi" in compact and "websocket" in compact
     assert "awaiting-clinical-validation" in lowered
     assert "DISCLAIMER.md" in index
+    assert 'href="/thinking"' in index
+    assert 'href="/thesis"' in index
+    assert "thinking lab" in lowered
+    assert "research thesis" in lowered
     for phrase in (
         "this is a cure",
         "fda-approved",
