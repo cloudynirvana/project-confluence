@@ -86,8 +86,8 @@ button.audit.offline-hidden { display: none; }
 .audit-out.supported { border-left: 3px solid var(--teal); padding-left: 10px; }
 .audit-out.partially_supported { border-left: 3px solid var(--gold); padding-left: 10px; }
 .audit-out.insufficient, .audit-out.contradicted { border-left: 3px solid var(--rose); padding-left: 10px; }
-.refs { font-size: 0.95rem; }
-.refs li { margin: 0 0 8px; }
+.refs { font-size: 0.92rem; padding-left: 1.4rem; }
+.refs li { margin: 0 0 10px; padding-left: 0.35rem; }
 footer.site { border-top: 1px solid var(--line); padding: 22px; text-align: center; color: var(--muted); font: 12px ui-sans-serif, system-ui, sans-serif; }
 #auditor-box textarea {
   width: 100%; min-height: 90px; font: inherit; padding: 10px; border: 1px solid var(--line); background: #fff;

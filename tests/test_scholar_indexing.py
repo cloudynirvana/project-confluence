@@ -17,10 +17,12 @@ TITLE = (
     "Oncology Knowledge Graphs with Adaptive Cancer-State Models"
 )
 SUNG_DOI = "10.3322/caac.70090"
+GATENBY_DOI = "10.1158/0008-5472.CAN-08-3658"
+ALTROCK_DOI = "10.1038/nrc4029"
 FORBIDDEN_DOIS = (
-    "10.1158/0008-5472.CAN-08-3658",
     "10.5281/zenodo",
     "10.2471/",
+    "10.xxxx",
 )
 
 
@@ -64,11 +66,13 @@ def test_thesis_html_has_scholar_citation_tags() -> None:
     assert "citation_doi" not in tags
     assert "citation_arxiv_id" not in tags
     refs = tags.get("citation_reference", [])
-    assert len(refs) == 12
+    assert len(refs) >= 40
     blob = "\n".join(refs)
     assert "Global cancer statistics 2024" in blob
     assert SUNG_DOI in blob
-    assert blob.count("citation_doi=") == 1
+    assert GATENBY_DOI in blob
+    assert ALTROCK_DOI in blob
+    assert blob.count("citation_doi=") >= 30
     for banned in FORBIDDEN_DOIS:
         assert banned not in blob
     assert AUTHOR in html
@@ -79,7 +83,8 @@ def test_thesis_html_has_scholar_citation_tags() -> None:
     assert "cc by-nc" in lowered
     assert "not a confluence parameter" in lowered
     listed = re.findall(r'<ol class="refs">(.*?)</ol>', html, flags=re.S)
-    assert listed and listed[0].count("<li>") == 12
+    assert listed and listed[0].count("<li>") >= 40
+    assert listed[0].count("<li>") == len(refs)
 
 
 def test_sitemap_lists_thesis_html_and_pdf() -> None:
@@ -136,3 +141,8 @@ def test_citeable_pdf_is_present_and_honest() -> None:
     gsc = (REPO / "docs" / "SCHOLAR_INDEXING.md").read_text(encoding="utf-8")
     assert "Search Console" in gsc
     assert "Zenodo" in gsc
+    assert (REPO / "docs" / "CITATION_STYLE.md").is_file()
+    style = (REPO / "docs" / "CITATION_STYLE.md").read_text(encoding="utf-8")
+    assert "Never invent" in style
+    assert "Crossref" in style
+    assert "PMID" in style

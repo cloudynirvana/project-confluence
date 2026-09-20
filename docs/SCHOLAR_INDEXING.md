@@ -13,9 +13,11 @@ not OnCo-as-parameter.
 - Highwire `citation_*` on `evidence/thesis.html`: title, author **Kelechi Emeka Ogbonna**,
   date `2026/09/20`, technical-report institution, absolute
   `citation_fulltext_html_url` and `citation_pdf_url`.
-- Twelve `citation_reference` tags, one per numbered Vancouver item on the page.
-  The only DOI in those tags is `10.3322/caac.70090` (already on the page and
-  in the manuscript). No invented DOIs. No ORCID (none is recorded in this repo).
+- One `citation_reference` tag per numbered Vancouver item on the page
+  (same list as `docs/manuscript/thesis_01_confluence_onco.md`). Journal DOIs
+  are Crossref/PubMed-verified only. Agency and GitHub items are URL citations.
+  No invented DOIs. No ORCID (none is recorded in this repo). Style:
+  [CITATION_STYLE.md](CITATION_STYLE.md).
 - Citeable PDF: `evidence/thesis.pdf` → **https://confluence-research.vercel.app/thesis.pdf**
   (same site-root directory as `/thesis`, as Scholar requires). Built from
   `docs/manuscript/thesis_01_confluence_onco.md`.
@@ -68,7 +70,10 @@ No DOI is minted for this chapter now.
 ## Regeneration
 
 ```bash
+python scripts/sync_thesis_references.py
 python scripts/build_thesis_pdf.py
 ```
 
-Requires `reportlab`. CI asserts the committed PDF and the Highwire / sitemap files.
+Bibliography source: `docs/manuscript/thesis_01_bibliography.json`. Style:
+[CITATION_STYLE.md](CITATION_STYLE.md). Requires `reportlab` for the PDF. CI
+asserts the committed PDF, Highwire tags, and a ≥40-item Vancouver list.
