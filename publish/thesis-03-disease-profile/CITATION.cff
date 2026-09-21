@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+title: "Disease Profiles for Complex Pathologies: A Gated Method for Systemic Personalized-Medicine Research Objects"
+message: "If you cite this manuscript, please use the metadata below. This record is a working method thesis, not a journal article. No DOI is registered for this document. Do not invent a DOI."
+type: article
+authors:
+  - family-names: Ogbonna
+    given-names: Kelechi Emeka
+    email: kelechiogbonna300@gmail.com
+repository-code: "https://github.com/cloudynirvana/thesis-03-disease-profile"
+url: "https://confluence-research.vercel.app/thesis-03"
+license: MIT
+date-released: "2026-09-20"
+abstract: "This thesis defines the Disease Profile as a versioned research object for systemic personalized-medicine research. A profile is not a patient chart, not clinical decision support, and not personalized medicine as a clinical product. Admission is gated: Knowledge ≠ Evidence ≠ Mechanism ≠ Parameter ≠ Prediction. Worked examples are qualitative boards, not patient outcomes. Research only."
+keywords:
+  - Disease Profile
+  - research object
+  - personalized-medicine research
+  - knowledge gates
+  - identifiability
+  - OnCo
+  - CONFLUENCE
+  - not clinical decision support
