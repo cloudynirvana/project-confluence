@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+title: "CONFLUENCE × OnCo: An Evidence-Gated Dynamical Framework for Integrating Oncology Knowledge Graphs with Adaptive Cancer-State Models"
+message: "If you cite this manuscript, please use the metadata below. This record is the working thesis, not a journal article. No DOI is registered for this document. Do not reuse the Project Confluence software Zenodo DOI."
+type: article
+authors:
+  - family-names: Ogbonna
+    given-names: Kelechi Emeka
+    email: kelechiogbonna300@gmail.com
+repository-code: "https://github.com/cloudynirvana/thesis-01-confluence-onco"
+url: "https://confluence-research.vercel.app/thesis"
+license: MIT
+date-released: "2026-09-20"
+abstract: "Cancer research now produces knowledge graphs, multi-omic assays and dynamical simulators in parallel. The failure mode is collapsing those layers. This study asks whether a provenance-controlled pipeline can keep the layers apart while still allowing testable predictions. Scientific success is a staged chain — traceability, mathematical validity, identifiability, out-of-sample prediction, experimental falsification — not disease eradication. Research only. Not a medical device. Not clinical decision support."
+keywords:
+  - computational oncology
+  - knowledge graphs
+  - dynamical systems
+  - evidence gates
+  - identifiability
+  - OnCo
+  - CONFLUENCE
+  - research-only

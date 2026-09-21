@@ -119,16 +119,18 @@
     <p>Aerobic glycolysis is a classical cancer-cell observation [32-35]. Lactate can polarise macrophages and blunt T- and NK-cell surveillance [36-38,42]. OnCo listing LDHA therefore has a literature context. It still does not identify <code>p_lactate</code> [10,11,36,63].</p>
     <p class="neq">Knowledge ≠ Evidence ≠ Causal mechanism ≠ Parameter ≠ Prediction</p>
     <p class="neq">legacy gene→parameter map ≠ identified parameter · structured representation ≠ biological observation</p>
-    <h2>Problem statement</h2>
-    <p>How can heterogeneous oncology knowledge and molecular observations be incorporated into a cancer dynamical model without collapsing evidence, mechanism, parameterisation and prediction into unsupported assumptions?</p>
+    <h2>1. Problem Statement</h2>
+    <p>How can heterogeneous oncology knowledge-graph records and molecular observations be incorporated into a frozen cancer dynamical model without collapsing knowledge, evidence, mechanism, parameterisation, and prediction into unsupported assumptions [10,45-53,57,61]?</p>
+    <p>That is a computational and medical-methods problem. It is not a claim to treat, dose, or cure patients [3,56].</p>
 <pre class="ladder">Knowledge → Evidence → Hypothesis → Mechanism → Parameter → Prediction → Experiment → New evidence</pre>
-    <p>Every arrow is a failure point. A page may motivate a hypothesis; it must not become Theta.</p>
-    <h2>Significance of the study</h2>
-    <h3>Scientific</h3><p>Treat cancer as dynamic and adaptive rather than as independent targets [7,13-17] (<a href="#EVID-006">EVID-006</a>).</p>
+    <p>Every arrow is a failure point. A page may motivate a hypothesis; it must not become Theta [45,47,51,57].</p>
+    <h2>2. Justification of the Study</h2>
+    <p>Existing integration habits fail by overclaiming (GLOBOCAN/WHO figures are context, not Θ [1-4,56,64]), by parameter smuggling (OnCo LDHA or the legacy gene-to-parameter map as <code>p_lactate</code> [10,11,36,58,63]), and by missing identifiability gates [45-52,57]. PR #9 is architectural evidence for the refusal, not therapeutic efficacy [11,56].</p>
+    <h2>3. Significance of the Study</h2>
+    <h3>Scientific</h3><p>Treat cancer as dynamic and adaptive rather than as independent targets [7,13-17] (<a href="#EVID-006">EVID-006</a>). Significance is for researchers, not a clinic [56].</p>
     <h3>Methodological</h3><p>Evidence gates. Structural and practical identifiability are refusal rules, not a new proof for confluence_v2_15d [45-52]. OnCo confidence is not P(H). Idea maturity is not evidence level. Failed hypotheses stay visible [10,11,57].</p>
     <h3>Computational</h3><p>Auditable objects. PR #9 is the current artifact [11,58,60] (<a href="#EVID-009">EVID-009</a>).</p>
-    <h3>Translational potential — not demonstrated benefit</h3><p>Models can compare hypotheses before a wet experiment [8,39]. This page does not claim patient benefit [56]. Translation waits for Gates 6–8 [3,12].</p>
-    <h3>Future research</h3><p>Attach genomic, single-cell, spatial, PK/PD and controllers around a frozen biological model.</p>
+    <h3>Not clinical CDS / not a cure</h3><p>Models can compare hypotheses before a wet experiment [8,39]. This page does not claim patient benefit [56]. Translation waits for Gates 6–8 [3,12].</p>
     <h2>CONFLUENCE evidence architecture</h2>
 <pre class="arch">Oncology knowledge (OnCo, literature)
         ↓ read-only adapter

@@ -76,7 +76,9 @@ Requires Google Chrome (`google-chrome --headless=new`). The script overwrites b
 
 ## Word count
 
-**10,363 words** in `docs/manuscript/thesis_03_disease_profile_method.md` (20 September 2026, Vancouver-complete bibliography, 77 references). Regenerated PDF is 24 pages.
+**11,132 words** in `docs/manuscript/thesis_03_disease_profile_method.md` (21 September 2026, Problem / Justification / Significance sections added before Methods; Vancouver-complete bibliography, 77 references). Regenerated PDF page count is set by `scripts/render_thesis_03_pdf.py`.
+
+Count the markdown source (abstract through disclaimer). Early sections before Methods now include **1. Problem Statement**, **2. Justification of the Study**, and **3. Significance of the Study** (computational/medical-methods problem; not CDS; not a cure). Vancouver list remains **77** references.
 
 Count the markdown source (abstract through disclaimer), not this checklist.
 

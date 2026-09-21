@@ -119,6 +119,9 @@ def test_citeable_pdf_is_present_and_honest() -> None:
         "## Abstract",
         "## Keywords",
         "## Introduction",
+        "## 1. Problem Statement",
+        "## 2. Justification of the Study",
+        "## 3. Significance of the Study",
         "## Specific aims",
         "## Background",
         "## Methods",
@@ -130,6 +133,9 @@ def test_citeable_pdf_is_present_and_honest() -> None:
         "## Disclaimer",
     ):
         assert heading in manuscript
+    assert "computational and medical-methods problem" in manuscript.lower()
+    assert "not a claim to treat" in manuscript.lower()
+    assert "not clinical decision support" in manuscript.lower()
     assert "refuse_knowledge_as_parameter" in manuscript
     assert "not a medical device" in manuscript.lower()
     vercel = (EVIDENCE / "vercel.json").read_text(encoding="utf-8")
