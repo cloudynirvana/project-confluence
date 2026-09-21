@@ -5,16 +5,19 @@
 User-agent: Googlebot
 Allow: /thesis
 Allow: /thesis.pdf
+Allow: /thesis-03
 Allow: /
 
 User-agent: Googlebot-Scholar
 Allow: /thesis
 Allow: /thesis.pdf
+Allow: /thesis-03
 Allow: /
 
 User-agent: *
 Allow: /thesis
 Allow: /thesis.pdf
+Allow: /thesis-03
 Allow: /
 
 Sitemap: https://confluence-research.vercel.app/sitemap.xml

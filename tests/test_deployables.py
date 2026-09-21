@@ -26,8 +26,22 @@ def test_evidence_site_is_static_and_honest() -> None:
     assert "DISCLAIMER.md" in index
     assert 'href="/thinking"' in index
     assert 'href="/thesis"' in index
+    assert 'href="/thesis-03"' in index
     assert "thinking lab" in lowered
     assert "research thesis" in lowered
+    thesis03 = (REPO / "evidence" / "thesis-03.html").read_text(encoding="utf-8")
+    assert 'name="citation_title"' in thesis03
+    assert 'name="citation_author"' in thesis03
+    assert 'name="citation_pdf_url"' in thesis03
+    assert thesis03.count('name="citation_reference"') == 77
+    assert "10.1126/science.aaf2666" in thesis03
+    assert "10.1126/science.aan6814" not in thesis03
+    assert "10.3322/caac.70090" in thesis03
+    assert "not personalized medicine as a clinical product" in thesis03.lower()
+    assert (REPO / "docs" / "manuscript" / "thesis_03_disease_profile_method.md").is_file()
+    assert (REPO / "docs" / "manuscript" / "thesis_03_disease_profile_method.pdf").is_file()
+    assert (REPO / "evidence" / "papers" / "thesis_03_disease_profile_method.pdf").is_file()
+    assert (REPO / "evidence" / "sitemap-thesis03.xml").is_file()
     for phrase in (
         "this is a cure",
         "fda-approved",
@@ -37,6 +51,7 @@ def test_evidence_site_is_static_and_honest() -> None:
         assert phrase not in lowered
     vercel = (REPO / "evidence" / "vercel.json").read_text(encoding="utf-8")
     assert '"outputDirectory": "."' in vercel
+    assert "/thesis-03" in vercel
     assert not (REPO / "evidence" / "public").exists()
     assert (REPO / "evidence" / "assets" / "still_hero.png").is_file()
     assert (REPO / "evidence" / "assets" / "cinematic.mp4").is_file()
