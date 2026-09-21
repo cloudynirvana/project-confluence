@@ -38,6 +38,17 @@ def test_evidence_site_is_static_and_honest() -> None:
     assert "10.1126/science.aan6814" not in thesis03
     assert "10.3322/caac.70090" in thesis03
     assert "not personalized medicine as a clinical product" in thesis03.lower()
+    thesis03_md = (REPO / "docs" / "manuscript" / "thesis_03_disease_profile_method.md").read_text(
+        encoding="utf-8"
+    )
+    for heading in (
+        "## 1. Problem Statement",
+        "## 2. Justification of the Study",
+        "## 3. Significance of the Study",
+    ):
+        assert heading in thesis03_md
+    assert "computational and medical-methods problem" in thesis03_md.lower()
+    assert "not personalized medicine as a clinical product" in thesis03_md.lower()
     assert (REPO / "docs" / "manuscript" / "thesis_03_disease_profile_method.md").is_file()
     assert (REPO / "docs" / "manuscript" / "thesis_03_disease_profile_method.pdf").is_file()
     assert (REPO / "evidence" / "papers" / "thesis_03_disease_profile_method.pdf").is_file()

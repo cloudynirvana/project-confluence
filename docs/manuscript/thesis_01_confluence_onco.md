@@ -3,8 +3,9 @@
 **Document type:** Thesis #1 — working manuscript (computational research)  
 **Author:** Kelechi Emeka Ogbonna  
 **Affiliation:** Independent computational research / Project Confluence (GitHub cloudynirvana)  
-**Correspondence:** https://github.com/cloudynirvana/project-confluence  
+**Correspondence:** Kelechi Emeka Ogbonna, kelechiogbonna300@gmail.com · https://github.com/cloudynirvana/project-confluence  
 **Date:** 20 September 2026  
+**Revision:** 21 September 2026 — Problem Statement, Justification of the Study, and Significance of the Study added before Methods.  
 **Public HTML:** https://confluence-research.vercel.app/thesis  
 **Citeable PDF:** https://confluence-research.vercel.app/thesis.pdf  
 **Status:** Architectural and methodological findings. Not a clinical result.  
@@ -40,6 +41,42 @@ GLOBOCAN 2024 estimates, published 8 July 2026, report about 20.6 million diagno
 Cancer is organised as a set of acquired capabilities — the hallmarks — rather than as a single targetable defect [13-15]. Tumours evolve clonally and adapt under therapy [7,16,17]. Intra-tumour heterogeneity, branched evolution and therapy resistance are documented empirical features of that process [18-21]. Multi-omics increase resolution without automatically producing a causal model [20,43,49]. The tumour microenvironment recruits stromal and immune cells that regulate progression, exclusion and metastasis [22-27]. Mathematical oncology supplies in-silico laboratories that couple those layers as dynamical systems [8,39]. Adaptive therapy treats treatment as a process under selection rather than as a fixed maximum-tolerated pulse [9,40,41]. The gap this thesis addresses is connecting knowledge to dynamical hypotheses without dropping provenance [10,11,57].
 
 TNBC is used as a test case because NCI describes it as roughly 15% of breast cancers, typically faster-growing and more recurrent, and heterogeneous [6]. Independent reviews describe the same clinical heterogeneity and recurrence pattern [28-31]. That description is not a CONFLUENCE parameter [6,56,63].
+
+---
+
+## 1. Problem Statement
+
+How can heterogeneous oncology knowledge-graph records and molecular observations be incorporated into a frozen cancer dynamical model without collapsing knowledge, evidence, mechanism, parameterisation, and prediction into unsupported assumptions [10,45-53,57,61]?
+
+That is the research problem. It is a computational and medical-methods problem. It is not a claim to treat, dose, or cure patients [3,56].
+
+Cancer research now produces knowledge graphs, multi-omic assays, and dynamical simulators in parallel [10,20,43,44,53,61]. OnCo names genes, diseases, ideas, and citations [10,61]. CONFLUENCE v2 asks how a frozen 15-dimensional state moves under an in-silico controller [11,58,60]. Mixing the two without provenance treats a web page, an OnCo confidence score, or a legacy numeric map as an identified parameter Θ [45-52,57,63]. The conversion ladder — Knowledge → Evidence → Hypothesis → Mechanism → Parameter → Prediction → Experiment → new Evidence — has a failure point at every arrow [57]. A literature record may motivate a hypothesis; it must not become Θ [45,47,51,57].
+
+The problem is therefore to keep those layers as typed objects, to refuse skip-level promotion (including LDHA as `p_lactate`), and to define scientific success as a staged, falsifiable chain rather than as disease eradication [11,12,36,43-52,56,58].
+
+---
+
+## 2. Justification of the Study
+
+Existing integration habits fail in documented ways that this study is built to catch.
+
+**Overclaiming.** GLOBOCAN 2024 estimates (about 20.6 million diagnoses and 9.8 million deaths) and WHO language that many cancers can be cured if found early and treated well are health-system context [1-4,54,55,64]. They are not CONFLUENCE parameters and not a product claim [56,59]. Adaptive-therapy and mathematical-oncology papers supply in-silico laboratories and control ideas; they are not CONFLUENCE efficacy [8,9,39-41]. Biomedical knowledge graphs integrate assertions; they remain literature objects until an identification step is performed [53].
+
+**Parameter smuggling.** The P0 findings record the failure mode: treat OnCo's LDHA lactate-metabolism listing as the v2 symbol `p_lactate`, or treat `validation/gene_to_parameter_map.json` (`LDHA → pyruvate_to_lactate (+0.10 / +0.30)`) as identified Θ [10,11,36,58,63]. Alias trap: legacy `pyruvate_to_lactate` is not v2 `p_lactate` (default 0.22) [58,63]. Warburg and lactate-immune papers explain why the gene is scientifically interesting; they do not identify the coefficient [32-38,42]. OnCo `confidence.probability` is not P(H). Idea maturity is not evidence level [10,57,59].
+
+**Missing gates.** Structural identifiability asks whether a unique parameter vector is consistent with noise-free input–output data [45,46,48,50]. Practical identifiability asks whether finite, noisy data actually constrain those parameters [47,52]. Nonlinear biological systems are often only partially observable; unidentified symbols must remain labelled as such [51]. Without Gate 4, a silent write from a knowledge record into `CancerODE` produces a confident but unidentifiable model [43-52,57]. Hallmarks, clonal evolution, intra-tumour heterogeneity, and the tumour microenvironment further explain why a named gene or a TNBC subtype label is not a sufficient statistic for Θ [6,7,13-21,22-31].
+
+**What this study therefore does.** Pull request #9 shipped a read-only OnCo adapter and nine refusal tests without editing `CancerODE` [11,58]. This manuscript records those gates as architectural evidence, not as therapeutic efficacy [11,56].
+
+---
+
+## 3. Significance of the Study
+
+**Scientific significance for researchers.** The work treats cancer as a dynamic, adaptive, microenvironment-coupled process rather than as a bag of independent named targets [7,13-17,22-27]. It gives laboratories a typed conversion ladder and a success criterion — traceability, mathematical validity, identifiability, out-of-sample prediction, experimental falsification — that can fail honestly [12,43-52,57]. Failed or refused claims (LDHA as `p_lactate`) stay visible [11,58,63].
+
+**Methodological significance.** Evidence gates and the identifiability literature become refusal rules, not a new structural-identifiability proof for `confluence_v2_15d` [45-52]. Layer objects (`OncoRef`, Evidence, Mechanism, Parameter, Prediction) may point at the next layer; they may not collapse into it [57]. Public claims require a ledger id or a numbered Vancouver reference; DOIs are not invented [59].
+
+**What this significance is not.** It is not clinical decision support, not a medical device, not a dosing table, and not a cure [3,56]. GLOBOCAN burden figures motivate computational oncology; they do not licence a CONFLUENCE product [1,2,56,64]. Translation waits for Gates 6–8, which this repository does not claim to have passed [3,12,56]. The significance of the study is methodological honesty for researchers, not a path to a clinic.
 
 ---
 

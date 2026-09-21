@@ -2,8 +2,10 @@
 
 **Thesis #3 — working method manuscript**  
 **Author:** Kelechi Emeka Ogbonna  
+**Correspondence:** kelechiogbonna300@gmail.com  
 **Affiliation:** Project Confluence (computational research)  
 **Date:** 20 September 2026  
+**Revision:** 21 September 2026 — Problem Statement, Justification of the Study, and Significance of the Study added before Methods.  
 **Document type:** Thesis-format method paper (research / in-silico only)  
 **Status:** Method paper on the shipped Disease Profile research object (`confluence/profiles/`, `data/profiles/cases/`, `schemas/disease_profile.schema.json` on `main` at `64ba76b`). Not a clinical result. Not a patient-level product.  
 **Citation style:** numbered Vancouver references matching the reference list.
@@ -74,6 +76,40 @@ Thesis #3 is the method paper for the CONFLUENCE-native object that a thinking l
 ### 1.5 What this thesis is not
 
 This thesis is not a digital twin of a named person. It is not a CDS rule set. It is not a claim that CONFLUENCE restored complexity in a patient. It is not a claim that OnCo pages are evidence. It is not a claim that the four complex-case templates are validated models. GLOBOCAN 2024 estimates — about 20.6 million diagnoses and 9.8 million deaths across 34 cancers and 186 countries — are setting context for why disease-specific systems work is necessary [21,22,67]. They are not CONFLUENCE results.
+
+---
+
+## 1. Problem Statement
+
+How can a laboratory encode a complex pathology as a versioned, reusable research object without treating a patient chart, a knowledge-graph page, or a qualitative board as an identified parameter or as clinical decision support [1-5,27,31,34,35,50,51]?
+
+That is the research problem. It is a computational and medical-methods problem. It is not a claim to treat, dose, or personalize care for a named person [3,4].
+
+Personalized medicine entered the biomedical lexicon as a research programme: measure more of the person and the tumour, then test whether those measurements change a mechanistic claim [1,2]. The same words are now used, loosely, for a clinical product: a chart, a score, a recommended regimen [1,2]. Complex pathologies — triple-negative breast cancer with coupled metabolic and immune exclusion [8-12,69,70], glioblastoma with hypoxic and invasive niches [13-16], pancreatic ductal adenocarcinoma with a desmoplastic stromal barrier [17-22], and dormant or occult residual disease [23-26] — do not become usable research objects by pasting an OnCo page into an ordinary differential equation [27-33,70]. They become usable when a laboratory can name what was asked, what was observed, what mechanism is hypothesized, what must not become a parameter, and which public dataset could falsify the claim [31,34,35,42,71-75].
+
+The problem is therefore to specify a Disease Profile contract — schema, gates, non-parameter list, and a HypothesisObject bound to a named public dataset — that travels as a FAIR-style research object and refuses skip-level promotion [34,35,43,50,51,71-75]. Success is a usable, honest object, not a survival difference [3,4,43].
+
+---
+
+## 2. Justification of the Study
+
+Existing tools and habits fail in documented ways that this method is built to catch.
+
+**Overclaiming.** Hamburg and Collins described personalized medicine as a path, not a completed clinic [1]. Jameson and Longo already warned that “precision” can be problematic when the word outruns the evidence [2]. GLOBOCAN 2024 burden estimates and WHO cancer-fact-sheet language are setting context; they are not CONFLUENCE results and not a CDS engine [21,22,47,67]. Mathematical oncology and adaptive therapy supply in-silico laboratories; they do not licence a silent write from a web page into Θ [6,7,70]. NSTG and related Nigerian policy documents are knowledge constraints, not executable care [40,41,48,49].
+
+**Parameter smuggling.** The P0 findings chapter records the same trap Thesis #1 refuses: OnCo LDHA knowledge and `confidence.probability` entered as `p_lactate`, or the legacy `LDHA → pyruvate_to_lactate` map treated as identified Θ [27,31-33,36,44]. Alias trap: legacy `pyruvate_to_lactate` is not v2 `p_lactate` (default 0.22) [31]. Idea maturity is not evidence level [31,44]. Thinking-lab role, regime, and stuck labels are questions, not measurements [42]. CaseCard `nstg_touchpoints` must not become `x_cap_scale` or an infection-risk weight [38,40]. A trial result in TNBC is Evidence of a trial; it is not a CONFLUENCE regimen [11].
+
+**Missing gates.** Without `Knowledge ≠ Evidence ≠ Mechanism ≠ Parameter ≠ Prediction`, a profile is a chart with extra JSON [31,50,51]. Structural and practical identifiability require that unidentified symbols stay labelled [50,51]. FAIR and research-object literature ask for artefacts that are findable, versioned, and honest about what they are not — a paper plus a dump of files is not laboratory memory [34,35]. Pull request #9 shipped read-only OnCo plumbing [32,36,37]. Pull request #11 shipped the Disease Profile exporter, schema `1.0.0`, and four gated case files [43,71-77]. Complexity Science CaseCards are companion YAML templates, not validated models [38-40]. None of those artefacts is a clinical product [3-5].
+
+---
+
+## 3. Significance of the Study
+
+**Scientific significance for researchers.** The method gives laboratories a durable export of a four-question thinking laboratory so that TNBC, GBM, PDAC, and dormancy boards can be replayed, cited, and refused without opening `CancerODE` [8-26,42,73]. Admitted hypotheses bind to named public datasets (TCGA, CCLE/DepMap, Ivy GAP, GEO) as falsifiers, not as completed analyses [52-54,56-65,68,75]. Failed poison candidates (OnCo-as-Θ) remain visible in the object [31-33,73].
+
+**Methodological significance.** A Disease Profile is closer to a FAIR research object than to a medical record [34,35]. The five-layer gate is an admission function (`admit_hypotheses`) with `parameter_status = forbidden_to_enter_theta` [71,74]. Efficiency is a research-operations claim: add a new complex disease-class without an RHS edit, without inventing a DOI, and without converting a chart into CDS [39,43,55,77]. Companion CaseCards share the refusal; they do not duplicate the CONFLUENCE contract [38-40].
+
+**What this significance is not.** It is not clinical decision support, not a patient chart, not a dose, not a digital twin of a named person, and not personalized medicine as a clinical product [1-5,47]. Translation after biological and clinical validation remains unclaimed [3-5]. GLOBOCAN figures do not become profile coefficients [21,22,67]. The significance of the study is methodological honesty for researchers, not a path to a clinic.
 
 ---
 
